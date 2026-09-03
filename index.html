@@ -1,222 +1,50 @@
-<!DOCTYPE html>
-<html lang="id">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SIAP ASN — Tryout CPNS & Bimbel Online</title>
-<meta name="description" content="SIAP ASN — Platform belajar, latihan soal, tryout dan Live Tryout untuk persiapan seleksi ASN.">
+<!doctype html>
+<html lang="id"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>SIAP ASN — Tryout & Belajar ASN</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-:root{
-  --bg:#07152c;--bg2:#0b2145;--card:rgba(255,255,255,.08);
-  --line:rgba(255,255,255,.12);--text:#f7fbff;--muted:#aebed4;
-  --cyan:#21d4fd;--blue:#3478f6;--green:#38d39f;--gold:#ffc857;
-}
-*{box-sizing:border-box} html{scroll-behavior:smooth}
-body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
-body:before{content:"";position:fixed;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(33,212,253,.15),transparent 65%);top:-250px;right:-220px;pointer-events:none}
-a{text-decoration:none;color:inherit}
-.container{width:min(1160px,calc(100% - 40px));margin:auto}
-nav{height:76px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
-.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.5px;font-size:21px}
-.logo{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;box-shadow:0 10px 30px rgba(33,212,253,.25)}
-.logo b{font-size:20px;color:white;letter-spacing:-5px;padding-right:4px}
-.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}
-.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:750;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
-.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:white;box-shadow:0 14px 35px rgba(33,212,253,.18)}
-.btn-dark{background:rgba(255,255,255,.08);border:1px solid var(--line);color:white}
-.hero{padding:72px 0 65px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;min-height:600px}
-.badge{display:inline-flex;padding:8px 13px;border:1px solid rgba(33,212,253,.3);background:rgba(33,212,253,.08);border-radius:99px;color:#7fe8ff;font-size:13px}
-h1{font-size:clamp(42px,6vw,74px);line-height:.98;margin:18px 0;font-weight:900;letter-spacing:-3px}
-h1 span{background:linear-gradient(135deg,var(--cyan),#9be7ff);-webkit-background-clip:text;color:transparent}
-.hero p{font-size:18px;line-height:1.7;color:var(--muted);max-width:610px}
-.hero-actions{display:flex;gap:12px;margin-top:27px;flex-wrap:wrap}
-.stats{display:flex;gap:26px;margin-top:38px;flex-wrap:wrap}
-.stat b{font-size:23px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
-.phone-wrap{display:flex;justify-content:center}
-.phone{width:310px;background:#081b38;border:9px solid #152b4c;border-radius:42px;padding:15px;box-shadow:0 30px 80px rgba(0,0,0,.45);position:relative}
-.phone:before{content:"";display:block;width:100px;height:22px;border-radius:0 0 16px 16px;background:#152b4c;margin:-15px auto 9px}
-.app-head{display:flex;justify-content:space-between;align-items:center;margin:7px 0 18px}
-.app-brand{font-weight:850}.hello{font-size:12px;color:var(--muted)}
-.mini-hero{background:linear-gradient(135deg,#1268df,#20c8f6);padding:19px;border-radius:24px}
-.mini-hero small{opacity:.85}.mini-hero h3{margin:7px 0 3px;font-size:22px}.mini-hero p{font-size:11px;margin:0;opacity:.8}
-.progress{height:7px;background:rgba(255,255,255,.25);border-radius:99px;margin-top:15px}.progress i{display:block;width:72%;height:100%;background:white;border-radius:99px}
-.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
-.quick div,.try-card{background:#10294d;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:13px}
-.quick span{font-size:20px}.quick b{display:block;font-size:12px;margin-top:5px}
-.try-card{margin-top:12px;background:linear-gradient(135deg,#142f55,#0e2444)}
-.try-card small{color:#82eaff}.try-card strong{display:block;margin-top:5px;font-size:14px}
-.section{padding:90px 0}.section.alt{background:#091b37;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
-.kicker{color:#62dcff;font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase}
-h2{font-size:clamp(31px,4vw,48px);letter-spacing:-1.7px;margin:10px 0 13px}
-.lead{color:var(--muted);line-height:1.7;max-width:700px}
-.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:35px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:23px;padding:24px;transition:.25s}
-.card:hover{transform:translateY(-5px);border-color:rgba(33,212,253,.35)}
-.icon{font-size:28px;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(33,212,253,.09);margin-bottom:16px}
-.card h3{margin:0 0 9px}.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
-.live{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:35px}
-.live-box{padding:35px;border-radius:28px;background:linear-gradient(135deg,#0e3262,#0a2144);border:1px solid rgba(33,212,253,.18)}
-.live-box h3{font-size:30px;margin:10px 0}.live-box p{color:var(--muted);line-height:1.7}
-.rank{background:#0b1c35;border:1px solid var(--line);border-radius:28px;padding:24px}
-.rank-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
-.rank-item:last-child{border:0}.medal{font-size:25px}.rank-item small{color:var(--muted);display:block;margin-top:3px}.score{margin-left:auto;color:#6ce8ff;font-weight:800}
-.pricing{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:35px;max-width:800px}
-.price{border:1px solid var(--line);border-radius:28px;padding:30px;background:rgba(255,255,255,.045)}
-.price.hot{border-color:rgba(33,212,253,.55);background:linear-gradient(145deg,rgba(33,212,253,.12),rgba(52,120,246,.08))}
-.price h3{margin:0}.price ul{list-style:none;padding:0;color:var(--muted);line-height:2}
-.price li:before{content:"✓";color:var(--green);font-weight:900;margin-right:9px}
-.cta{text-align:center;padding:80px 20px}.cta-box{padding:55px 25px;border-radius:34px;background:linear-gradient(135deg,#0877e7,#16c7ee);box-shadow:0 25px 70px rgba(0,126,255,.2)}
-.cta h2{margin:0 0 10px}.cta p{opacity:.85;margin-bottom:25px}
-footer{padding:35px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
-.footer{display:flex;justify-content:space-between;gap:20px}
-@media(max-width:800px){
- .navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:35px;text-align:center}.hero p{margin:auto}.hero-actions,.stats{justify-content:center}
- .phone{width:290px}.grid{grid-template-columns:1fr}.live,.pricing{grid-template-columns:1fr}.section{padding:65px 0}
-}
-.appbar{position:sticky;top:0;z-index:20;background:rgba(7,21,44,.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--line)}.app-shell{display:none}.app-shell.show{display:block}.auth-modal{position:fixed;inset:0;background:rgba(0,0,0,.65);z-index:99;display:none;align-items:center;justify-content:center;padding:20px}.auth-modal.show{display:flex}.auth-box{width:min(430px,100%);background:#0b2145;border:1px solid var(--line);border-radius:26px;padding:25px}.auth-box input{width:100%;margin:7px 0 13px;padding:13px;border-radius:12px;border:1px solid var(--line);background:#071a35;color:white}.app-main{padding:22px 0 80px}.app-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:15px}.data-card{background:var(--card);border:1px solid var(--line);border-radius:20px;padding:18px}.data-card h3{margin:8px 0}.data-card p{color:var(--muted);font-size:13px;line-height:1.5}.banner-img{width:100%;height:170px;object-fit:cover;border-radius:20px;border:1px solid var(--line)}.app-tabs{display:flex;gap:8px;overflow:auto;padding:12px 0}.tab{white-space:nowrap}.tab.active{background:linear-gradient(135deg,var(--cyan),var(--blue));color:white}.view{display:none}.view.active{display:block}.question{font-size:18px;line-height:1.5;margin:20px 0}.option{width:100%;text-align:left;padding:14px;margin:8px 0;border-radius:14px;border:1px solid var(--line);background:#10294d;color:white;cursor:pointer}.option.selected{border-color:var(--cyan);background:rgba(33,212,253,.14)}.timer{font-weight:900;font-size:24px;color:#7fe8ff}@media(max-width:800px){.app-grid{grid-template-columns:1fr 1fr}.banner-img{height:140px}}
-</head>
-<body><div id="landing">
+:root{--bg:#07152c;--panel:#10284a;--card:#102b50;--text:#f7fbff;--muted:#aebed4;--cyan:#21d4fd;--blue:#3478f6;--line:rgba(255,255,255,.14)}
+*{box-sizing:border-box}body{margin:0;font-family:Arial,system-ui,sans-serif;background:var(--bg);color:var(--text)}button{font:inherit} .container{width:min(1120px,calc(100% - 36px));margin:auto}
+nav{height:76px;display:flex;align-items:center;justify-content:space-between}.brand{font-size:22px;font-weight:900}.brand b{color:var(--cyan)}
+.btn{border:0;border-radius:12px;padding:13px 20px;font-weight:800;cursor:pointer}.primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:white}.dark{background:#18375f;color:white;border:1px solid var(--line)}
+.hero{min-height:650px;display:grid;grid-template-columns:1.1fr .9fr;gap:40px;align-items:center}.badge{display:inline-block;padding:8px 13px;border-radius:99px;background:#12355a;color:#7fe8ff;font-size:13px;font-weight:bold}.hero h1{font-size:clamp(46px,7vw,78px);line-height:1;margin:20px 0}.hero h1 span{color:var(--cyan)}.lead{color:var(--muted);font-size:18px;line-height:1.7}.hero-card,.card{background:linear-gradient(145deg,#12355f,#0b2145);border:1px solid var(--line);border-radius:24px;padding:28px}.hero-card h2{font-size:28px}.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:22px}.stat{padding:18px;background:#0a1c38;border-radius:16px;text-align:center}.stat b{display:block;font-size:25px;color:var(--cyan)}
+section{padding:70px 0}.title{text-align:center;font-size:36px;margin:0 0 12px}.subtitle{text-align:center;color:var(--muted);margin-bottom:35px}.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}.card h3{margin-top:0}.footer{padding:28px;text-align:center;color:var(--muted);border-top:1px solid var(--line)}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.modalbox{width:min(420px,100%);background:#10284a;border:1px solid var(--line);border-radius:24px;padding:25px}.modalbox input{width:100%;padding:14px;margin:8px 0 14px;border-radius:12px;border:1px solid var(--line);font-size:16px}.msg{min-height:22px;color:#ff9d9d;margin-top:10px}
+#app{display:none}.appbar{position:sticky;top:0;background:#0b2145;border-bottom:1px solid var(--line);z-index:10}.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:18px 0}.tab{padding:10px 15px}.view{display:none}.view.active{display:block}.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.data-card{background:#10284a;border:1px solid var(--line);padding:20px;border-radius:20px}.tag{display:inline-block;background:#173a64;padding:6px 10px;border-radius:8px;font-size:12px}.banner-img{max-width:100%;border-radius:18px;max-height:260px}.question{font-size:21px;font-weight:700;margin:20px 0}.option{display:block;width:100%;text-align:left;padding:16px;margin:10px 0;border-radius:12px;background:#10284a;color:white;border:1px solid var(--line);cursor:pointer}.option.selected{border-color:var(--cyan);background:#16456d}.timer{font-size:28px;color:var(--cyan);font-weight:900}
+@media(max-width:800px){.hero{grid-template-columns:1fr;padding:50px 0}.grid,.data-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.navlinks{display:none}}
+</style></head><body>
+<div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
+<main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, latihan soal, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
+<section><div class="container"><h2 class="title">Kenapa SIAP ASN?</h2><p class="subtitle">Belajar terarah dan ukur perkembanganmu.</p><div class="grid"><div class="card"><h3>📝 Tryout</h3><p>Simulasi ujian dengan soal pilihan.</p></div><div class="card"><h3>📚 Materi</h3><p>Materi belajar yang tersusun.</p></div><div class="card"><h3>📊 Analisis</h3><p>Lihat hasil dan perkembangan.</p></div></div></div></section><div class="footer">© 2026 SIAP ASN</div></div>
 
-<div class="container">
-<nav>
-  <a href="#" class="brand"><span class="logo"><b>SA</b></span> SIAP ASN</a>
-  <div class="navlinks">
-    <a href="#fitur">Fitur</a><a href="#tryout">Live Tryout</a><a href="#member">Member</a>
-  </div>
-  <button class="btn btn-primary" onclick="openAuth()">Masuk / Daftar</button>
-</nav>
+<div id="app"><div class="appbar"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><button class="btn dark" onclick="logout()">Keluar</button></nav></div></div><div class="container"><div class="tabs"><button class="btn dark tab" onclick="showView('home')">🏠 Beranda</button><button class="btn dark tab" onclick="showView('materials')">📚 Materi</button><button class="btn dark tab" onclick="showView('tryouts')">📝 Tryout</button><button class="btn dark tab" onclick="showView('live')">🔴 Live</button></div>
+<div id="view-home" class="view active"><h2>Selamat datang, <span id="userName"></span> 👋</h2><div id="bannerArea"></div><div class="stats"><div class="stat"><b id="statMaterials">0</b>Materi</div><div class="stat"><b id="statTryouts">0</b>Tryout</div><div class="stat"><b id="statLive">0</b>Live</div></div></div>
+<div id="view-materials" class="view"><h2>📚 Materi</h2><div id="materialsArea" class="data-grid"></div></div><div id="view-tryouts" class="view"><h2>📝 Tryout</h2><div id="tryoutsArea" class="data-grid"></div></div><div id="view-live" class="view"><h2>🔴 Live Tryout</h2><div id="liveArea" class="data-grid"></div></div>
+<div id="view-exam" class="view"><div style="display:flex;justify-content:space-between;align-items:center"><h2>📝 Tryout</h2><span id="examTimer" class="timer">--:--</span></div><div id="examArea"></div></div></div></div>
 
-<section class="hero">
-  <div>
-    <span class="badge">🚀 Platform Persiapan Seleksi ASN</span>
-    <h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1>
-    <p>SIAP ASN adalah teman belajarmu untuk menghadapi seleksi CPNS dan ASN melalui materi, latihan soal, tryout, analisis hasil, dan Live Tryout bersama.</p>
-    <div class="hero-actions">
-      <button class="btn btn-primary" onclick="openAuth()">🚀 Mulai Belajar</button>
-      <a class="btn btn-dark" href="#fitur">Lihat Fitur</a>
-    </div>
-    <div class="stats">
-      <div class="stat"><b>📚 Materi</b><span>Belajar terstruktur</span></div>
-      <div class="stat"><b>🏆 Tryout</b><span>Latihan & simulasi</span></div>
-      <div class="stat"><b>🔴 Live</b><span>Ranking real-time</span></div>
-    </div>
-  </div>
+<div id="authModal" class="modal"><div class="modalbox"><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div><button class="btn dark" style="margin-top:8px" onclick="closeAuth()">Tutup</button></div></div>
 
-  <div class="phone-wrap">
-    <div class="phone">
-      <div class="app-head"><div><div class="hello">Selamat datang 👋</div><div class="app-brand">SIAP ASN</div></div><div>🔔</div></div>
-      <div class="mini-hero"><small>PROGRES BELAJAR</small><h3>72% Siap!</h3><p>Lanjutkan perjalananmu hari ini.</p><div class="progress"><i></i></div></div>
-      <div class="quick"><div><span>📚</span><b>Materi</b></div><div><span>✍️</span><b>Latihan Soal</b></div><div><span>🏆</span><b>Tryout</b></div><div><span>📊</span><b>Analisis</b></div></div>
-      <div class="try-card"><small>🔴 LIVE TRYOUT BERIKUTNYA</small><strong>Simulasi Seleksi ASN #01</strong><small>Sabtu • 09.00 WIB</small></div>
-    </div>
-  </div>
-</section>
-</div>
-
-<section class="section alt" id="fitur">
-<div class="container">
-  <div class="kicker">SEMUA DALAM SATU APLIKASI</div>
-  <h2>Persiapan ASN yang lebih modern.</h2>
-  <p class="lead">Tidak hanya kumpulan soal. SIAP ASN dirancang agar pengguna bisa belajar, berlatih, mengukur kemampuan, dan mengikuti kompetisi tryout.</p>
-
-  <div class="grid">
-    <div class="card"><div class="icon">📚</div><h3>Materi Belajar</h3><p>Materi terstruktur untuk membantu memahami dasar-dasar seleksi.</p></div>
-    <div class="card"><div class="icon">✍️</div><h3>Latihan Soal</h3><p>Latihan soal berdasarkan kategori dengan hasil langsung.</p></div>
-    <div class="card"><div class="icon">🏆</div><h3>Tryout CAT</h3><p>Simulasi tryout dengan timer dan sistem penilaian.</p></div>
-    <div class="card"><div class="icon">🔴</div><h3>Live Tryout</h3><p>Kerjakan bersama peserta lain sesuai jadwal yang ditentukan.</p></div>
-    <div class="card"><div class="icon">🥇</div><h3>Ranking</h3><p>Lihat posisi dan performa kamu dibanding peserta lain.</p></div>
-    <div class="card"><div class="icon">📊</div><h3>Analisis Hasil</h3><p>Pantau perkembangan dan ketahui bagian yang perlu ditingkatkan.</p></div>
-  </div>
-</div>
-</section>
-
-<section class="section" id="tryout">
-<div class="container">
-<div class="kicker">FITUR UNGGULAN</div>
-<h2>🔥 Live Tryout SIAP ASN</h2>
-<div class="live">
-  <div class="live-box">
-    <span class="badge">🔴 TERJADWAL & REAL-TIME</span>
-    <h3>Rasakan simulasi kompetisi yang sesungguhnya.</h3>
-    <p>Semua peserta masuk pada jadwal yang sama, mengerjakan tryout, lalu hasil dan ranking ditampilkan setelah sistem memproses peserta.</p>
-    <a href="#member" class="btn btn-primary">Lihat Sistem Member</a>
-  </div>
-  <div class="rank">
-    <b>🏆 CONTOH LIVE RANKING</b>
-    <div class="rank-item"><span class="medal">🥇</span><div><b>Peserta #001</b><small>Waktu lebih cepat</small></div><span class="score">425</span></div>
-    <div class="rank-item"><span class="medal">🥈</span><div><b>Peserta #024</b><small>Hasil Tryout</small></div><span class="score">415</span></div>
-    <div class="rank-item"><span class="medal">🥉</span><div><b>Peserta #107</b><small>Hasil Tryout</small></div><span class="score">405</span></div>
-  </div>
-</div>
-</div>
-</section>
-
-<section class="section alt" id="member">
-<div class="container">
-<div class="kicker">PILIH CARA BELAJARMU</div>
-<h2>Mulai gratis, tingkatkan saat siap.</h2>
-<div class="pricing">
-  <div class="price">
-    <h3>🆓 GRATIS</h3>
-    <ul>
-      <li>2 Tryout awal gratis</li>
-      <li>Tryout gratis mingguan</li>
-      <li>Akses fitur dasar</li>
-      <li>Materi pilihan</li>
-    </ul>
-  </div>
-  <div class="price hot">
-    <h3>⭐ PREMIUM</h3>
-    <ul>
-      <li>15 Tryout langsung terbuka</li>
-      <li>Tryout baru setiap 3 hari</li>
-      <li>Akses fitur Premium</li>
-      <li>Keuntungan khusus Live Tryout</li>
-    </ul>
-  </div>
-</div>
-</div>
-</section>
-
-<section class="cta" id="download">
-<div class="container">
-  <div class="cta-box">
-    <h2>Sudah siap menjadi versi terbaikmu?</h2>
-    <p>Download SIAP ASN dan mulai perjalanan belajarmu hari ini.</p>
-    <button class="btn btn-dark" onclick="alert('Link Google Play akan dipasang setelah aplikasi resmi diterbitkan.')">📱 Segera Hadir di Google Play</button>
-  </div>
-</div>
-</section>
-
-<footer>
-<div class="container footer">
-  <span>© 2026 SIAP ASN. All rights reserved.</span>
-  <span>Tryout CPNS & Bimbel Online</span>
-</div>
-</footer><div style="position:fixed;right:18px;bottom:18px;z-index:50"><button class="btn btn-primary" onclick="openAuth()">🔐 Masuk / Daftar</button></div></div>
-
-<div class="auth-modal" id="authModal"><div class="auth-box"><div style="display:flex;justify-content:space-between"><h2 id="authTitle">Masuk SIAP ASN</h2><button class="btn btn-dark" onclick="closeAuth()">✕</button></div><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password"><button class="btn btn-primary" style="width:100%;justify-content:center" onclick="submitAuth()">Masuk</button><p class="lead" style="font-size:13px">Belum punya akun? <a href="#" onclick="toggleAuth()">Daftar sekarang</a></p><div id="authMsg"></div></div></div>
-<div class="app-shell" id="appShell"><div class="appbar"><div class="container"><nav><a class="brand" href="#"><span class="logo"><b>SA</b></span> SIAP ASN</a><button class="btn btn-dark" onclick="logout()">Keluar</button></nav></div></div><main class="container app-main"><div class="app-tabs"><button class="btn btn-dark tab active" onclick="showView('home',this)">🏠 Beranda</button><button class="btn btn-dark tab" onclick="showView('materials',this)">📚 Materi</button><button class="btn btn-dark tab" onclick="showView('tryouts',this)">📝 Tryout</button><button class="btn btn-dark tab" onclick="showView('live',this)">🔴 Live</button><button class="btn btn-dark tab" onclick="showView('profile',this)">👤 Profil</button></div><section class="view active" id="view-home"><h2>Halo, <span id="userName">Pejuang ASN</span> 👋</h2><p class="lead">Lanjutkan persiapanmu hari ini.</p><div id="bannerArea"></div><div class="app-grid" style="margin-top:18px"><div class="data-card">📚<h3 id="statMaterials">0</h3><p>Materi tersedia</p></div><div class="data-card">📝<h3 id="statTryouts">0</h3><p>Tryout tersedia</p></div><div class="data-card">🔴<h3 id="statLive">0</h3><p>Live Tryout</p></div></div></section><section class="view" id="view-materials"><h2>📚 Materi Belajar</h2><div id="materialsArea" class="app-grid"></div></section><section class="view" id="view-tryouts"><h2>📝 Tryout</h2><div id="tryoutsArea" class="app-grid"></div></section><section class="view" id="view-live"><h2>🔴 Live Tryout</h2><div id="liveArea" class="app-grid"></div></section><section class="view" id="view-profile"><h2>👤 Profil Saya</h2><div class="data-card"><p id="profileEmail"></p><p id="profileMembership"></p></div></section><section class="view" id="view-exam"><button class="btn btn-dark" onclick="showView('tryouts')">← Kembali</button><div class="data-card"><div class="timer" id="examTimer">00:00</div><div id="examArea"></div></div></section></main></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script><script>
+<script>
 const SUPABASE_URL='https://qinxnrcdsmxduhvrnzfh.supabase.co';
 const SUPABASE_KEY='sb_publishable__o_Qj-DptS7XEcYyi9CrSQ_pY3E5RSX';
-const sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
-let isRegister=false,currentExam=null,examQuestions=[],examIndex=0,answers={},timerInt;
-function $(id){return document.getElementById(id)}
-function openAuth(){$('authModal').classList.add('show')}
-function closeAuth(){$('authModal').classList.remove('show')}
-function toggleAuth(){isRegister=!isRegister;$('authTitle').textContent=isRegister?'Daftar SIAP ASN':'Masuk SIAP ASN';document.querySelector('#authModal .btn-primary').textContent=isRegister?'Daftar':'Masuk'}
-async function submitAuth(){const email=$('authEmail').value.trim(),password=$('authPassword').value,msg=$('authMsg');msg.textContent='';if(!email||!password){msg.textContent='Email dan password wajib.';return}const r=isRegister?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});if(r.error){msg.textContent=r.error.message;return}if(isRegister){msg.textContent='Pendaftaran berhasil. Silakan login.';return}closeAuth();startApp()}
-function showView(name,btn){document.querySelectorAll('.view').forEach(x=>x.classList.remove('active'));const v=$('view-'+name);if(v)v.classList.add('active');document.querySelectorAll('.tab').forEach(x=>x.classList.remove('active'));if(btn)btn.classList.add('active')}
-async function startApp(){const landing=$('landing'),shell=$('appShell');if(landing)landing.style.display='none';shell.classList.add('show');const {data:{user}}=await sb.auth.getUser();$('userName').textContent=user?.email?.split('@')[0]||'Pejuang ASN';$('profileEmail').textContent=user?.email||'';await Promise.all([loadHome(),loadMaterials(),loadTryouts(),loadLive()])}
-async function loadHome(){const [b,m,t,l]=await Promise.all([sb.from('banners').select('*').eq('is_active',true).order('sort_order'),sb.from('materials').select('id',{count:'exact',head:true}).eq('is_published',true),sb.from('tryouts').select('id',{count:'exact',head:true}).eq('status','published').neq('type','live'),sb.from('tryouts').select('id',{count:'exact',head:true}).eq('type','live').eq('status','published')]);$('bannerArea').innerHTML=(b.data||[]).map(x=>'<img class="banner-img" src="'+x.image_url+'"><h3>'+x.title+'</h3>').join('');$('statMaterials').textContent=m.count||0;$('statTryouts').textContent=t.count||0;$('statLive').textContent=l.count||0}
-async function loadMaterials(){const {data}=await sb.from('materials').select('*').eq('is_published',true).order('created_at',{ascending:false});$('materialsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+x.title+'</h3><p>'+ (x.summary||'')+'</p></div>').join('')||'<p class="lead">Belum ada materi.</p>'}
-async function loadTryouts(){const {data}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium').eq('status','published').neq('type','live').order('created_at',{ascending:false});$('tryoutsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+x.title+'</h3><p>'+ (x.description||'')+'</p><p>⏱️ '+x.duration_minutes+' menit</p><button class="btn btn-primary" onclick="startExam(\''+x.id+'\')">Mulai Tryout</button></div>').join('')||'<p class="lead">Belum ada Tryout.</p>'}
-async function loadLive(){const now=new Date().toISOString();const {data}=await sb.from('tryouts').select('*').eq('type','live').eq('status','published').order('available_from');$('liveArea').innerHTML=(data||[]).map(x=>{const active=x.available_from&&x.available_until&&now>=x.available_from&&now<=x.available_until;return '<div class="data-card"><span class="tag">🔴 LIVE</span><h3>'+x.title+'</h3><p>'+ (x.available_from?new Date(x.available_from).toLocaleString('id-ID'):'Belum dijadwalkan')+'</p><button class="btn '+(active?'btn-primary':'btn-dark')+'" '+(active?'':'disabled')+' onclick="startExam(\''+x.id+'\')">'+(active?'Masuk Live':'Belum Dibuka')+'</button></div>'}).join('')||'<p class="lead">Belum ada Live Tryout.</p>'}
-async function startExam(id){const {data,error}=await sb.from('tryout_questions').select('question_order,questions(*)').eq('tryout_id',id).order('question_order');if(error){alert(error.message);return}examQuestions=(data||[]).map(x=>x.questions).filter(Boolean);if(!examQuestions.length){alert('Soal belum tersedia.');return}currentExam=id;examIndex=0;answers={};showView('exam');renderQuestion();const {data:tr}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();let sec=(tr?.duration_minutes||60)*60;clearInterval(timerInt);timerInt=setInterval(()=>{const min=Math.floor(sec/60),s=sec%60;$('examTimer').textContent=min+':'+String(s).padStart(2,'0');sec--;if(sec<0){clearInterval(timerInt);finishExam()}},1000)}
-function renderQuestion(){const q=examQuestions[examIndex];$('examArea').innerHTML='<div class="lead">Soal '+(examIndex+1)+' / '+examQuestions.length+'</div><div class="question">'+q.question_text+'</div>'+['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]).map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="answers[\''+q.id+'\']=\''+k+'\';renderQuestion()">'+k+'. '+q['option_'+k.toLowerCase()]+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px"><button class="btn btn-dark" '+(examIndex===0?'disabled':'')+' onclick="examIndex--;renderQuestion()">← Sebelumnya</button>' +(examIndex===examQuestions.length-1?'<button class="btn btn-primary" onclick="finishExam()">Selesai</button>':'<button class="btn btn-primary" onclick="examIndex++;renderQuestion()">Berikutnya →</button>')+'</div>'}
-async function finishExam(){clearInterval(timerInt);let correct=0;examQuestions.forEach(q=>{if(answers[q.id]===q.correct_answer)correct++});const {data:{user}}=await sb.auth.getUser();const score=Math.round(correct/examQuestions.length*100);await sb.from('tryout_attempts').insert({tryout_id:currentExam,user_id:user.id,submitted_at:new Date().toISOString(),score,correct_count:correct,wrong_count:examQuestions.length-correct,unanswered_count:examQuestions.length-Object.keys(answers).length,duration_seconds:0,status:'submitted'});alert('Tryout selesai! Nilai kamu: '+score);showView('tryouts')}
+const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
+let registerMode=false,currentExam=null,examQuestions=[],examIndex=0,answers={},timerInt=null;
+const el=id=>document.getElementById(id);
+function openAuth(reg=false){registerMode=reg;el('authTitle').textContent=reg?'Daftar SIAP ASN':'Masuk SIAP ASN';el('authButton').textContent=reg?'Daftar':'Masuk';el('authMsg').textContent='';el('authModal').classList.add('show')}
+function closeAuth(){el('authModal').classList.remove('show')}
+function toggleAuth(){openAuth(!registerMode)}
+async function submitAuth(){const email=el('authEmail').value.trim(),password=el('authPassword').value;const msg=el('authMsg');msg.textContent='';if(!email||!password){msg.textContent='Email dan password wajib diisi.';return}try{el('authButton').disabled=true;el('authButton').textContent='Memproses...';const r=registerMode?await sb.auth.signUp({email,password}):await sb.auth.signInWithPassword({email,password});if(r.error)throw r.error;if(registerMode){msg.style.color='#7fffd4';msg.textContent='Berhasil daftar. Silakan cek email bila diminta konfirmasi.';openAuth(false);return}await startApp()}catch(err){msg.style.color='#ff9d9d';msg.textContent=err.message||'Login gagal.'}finally{el('authButton').disabled=false;el('authButton').textContent=registerMode?'Daftar':'Masuk'}}
+async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.all([loadHome(),loadMaterials(),loadTryouts(),loadLive()])}
+function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));el('view-'+name).classList.add('active')}
+async function loadHome(){try{const [b,m,t,l]=await Promise.all([sb.from('banners').select('*').eq('is_active',true).order('sort_order'),sb.from('materials').select('id',{count:'exact',head:true}).eq('is_published',true),sb.from('tryouts').select('id',{count:'exact',head:true}).eq('status','published').neq('type','live'),sb.from('tryouts').select('id',{count:'exact',head:true}).eq('status','published').eq('type','live')]);el('bannerArea').innerHTML=(b.data||[]).map(x=>'<div class="data-card">'+(x.image_url?'<img class="banner-img" src="'+x.image_url+'">':'')+'<h3>'+safe(x.title)+'</h3></div>').join('');el('statMaterials').textContent=m.count||0;el('statTryouts').textContent=t.count||0;el('statLive').textContent=l.count||0}catch(e){console.error(e)}}
+const safe=x=>String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+async function loadMaterials(){const {data,error}=await sb.from('materials').select('*').eq('is_published',true).order('created_at',{ascending:false});if(error){el('materialsArea').textContent=error.message;return}el('materialsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.summary)+'</p></div>').join('')||'<p>Belum ada materi.</p>'}
+async function loadTryouts(){const {data,error}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium').eq('status','published').neq('type','live').order('created_at',{ascending:false});if(error){el('tryoutsArea').textContent=error.message;return}el('tryoutsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.description)+'</p><p>⏱️ '+(x.duration_minutes||60)+' menit</p><button class="btn primary" onclick="startExam(\''+x.id+'\')">Mulai Tryout</button></div>').join('')||'<p>Belum ada tryout.</p>'}
+async function loadLive(){const {data,error}=await sb.from('tryouts').select('*').eq('status','published').eq('type','live').order('available_from');if(error){el('liveArea').textContent=error.message;return}el('liveArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">🔴 LIVE</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.description)+'</p><button class="btn primary" onclick="startExam(\''+x.id+'\')">Masuk</button></div>').join('')||'<p>Belum ada Live Tryout.</p>'}
+async function startExam(id){const {data,error}=await sb.from('tryout_questions').select('question_order,questions(*)').eq('tryout_id',id).order('question_order');if(error){alert(error.message);return}examQuestions=(data||[]).map(x=>x.questions).filter(Boolean);if(!examQuestions.length){alert('Soal belum tersedia.');return}currentExam=id;examIndex=0;answers={};showView('exam');renderQuestion();const {data:tr}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();let sec=(tr?.duration_minutes||60)*60;clearInterval(timerInt);timerInt=setInterval(()=>{el('examTimer').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');if(--sec<0)finishExam()},1000)}
+function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);el('examArea').innerHTML='<p>'+ (examIndex+1)+' / '+examQuestions.length+'</p><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>'}
+function choose(id,k){answers[id]=k;renderQuestion()}function prevQ(){if(examIndex>0){examIndex--;renderQuestion()}}function nextQ(){if(examIndex>=examQuestions.length-1)finishExam();else{examIndex++;renderQuestion()}}
+async function finishExam(){clearInterval(timerInt);const correct=examQuestions.filter(q=>answers[q.id]===q.correct_answer).length;const {data:{user}}=await sb.auth.getUser();if(user){const score=Math.round(correct/examQuestions.length*100);await sb.from('tryout_attempts').insert({tryout_id:currentExam,user_id:user.id,submitted_at:new Date().toISOString(),score,correct_count:correct,wrong_count:examQuestions.length-correct,unanswered_count:examQuestions.length-Object.keys(answers).length,duration_seconds:0,status:'submitted'});alert('Tryout selesai! Nilai kamu: '+score)}showView('tryouts')}
 async function logout(){await sb.auth.signOut();location.reload()}
-sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()});
-</script></body>
-</html>
+sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()}).catch(console.error);
+</script></body></html>
