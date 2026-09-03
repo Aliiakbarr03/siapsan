@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIAP ASN — Tryout CPNS & Bimbel Online</title>
+<meta name="description" content="SIAP ASN — Platform belajar, latihan soal, tryout dan Live Tryout untuk persiapan seleksi ASN.">
+<style>
+:root{
+  --bg:#07152c;--bg2:#0b2145;--card:rgba(255,255,255,.08);
+  --line:rgba(255,255,255,.12);--text:#f7fbff;--muted:#aebed4;
+  --cyan:#21d4fd;--blue:#3478f6;--green:#38d39f;--gold:#ffc857;
+}
+*{box-sizing:border-box} html{scroll-behavior:smooth}
+body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;background:var(--bg);color:var(--text);overflow-x:hidden}
+body:before{content:"";position:fixed;width:700px;height:700px;border-radius:50%;background:radial-gradient(circle,rgba(33,212,253,.15),transparent 65%);top:-250px;right:-220px;pointer-events:none}
+a{text-decoration:none;color:inherit}
+.container{width:min(1160px,calc(100% - 40px));margin:auto}
+nav{height:76px;display:flex;align-items:center;justify-content:space-between;position:relative;z-index:2}
+.brand{display:flex;align-items:center;gap:12px;font-weight:850;letter-spacing:.5px;font-size:21px}
+.logo{width:45px;height:45px;border-radius:14px;background:linear-gradient(135deg,var(--cyan),var(--blue));display:grid;place-items:center;box-shadow:0 10px 30px rgba(33,212,253,.25)}
+.logo b{font-size:20px;color:white;letter-spacing:-5px;padding-right:4px}
+.navlinks{display:flex;gap:25px;color:var(--muted);font-size:14px}
+.btn{border:0;border-radius:14px;padding:13px 20px;font-weight:750;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn-primary{background:linear-gradient(135deg,var(--cyan),var(--blue));color:white;box-shadow:0 14px 35px rgba(33,212,253,.18)}
+.btn-dark{background:rgba(255,255,255,.08);border:1px solid var(--line);color:white}
+.hero{padding:72px 0 65px;display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;min-height:600px}
+.badge{display:inline-flex;padding:8px 13px;border:1px solid rgba(33,212,253,.3);background:rgba(33,212,253,.08);border-radius:99px;color:#7fe8ff;font-size:13px}
+h1{font-size:clamp(42px,6vw,74px);line-height:.98;margin:18px 0;font-weight:900;letter-spacing:-3px}
+h1 span{background:linear-gradient(135deg,var(--cyan),#9be7ff);-webkit-background-clip:text;color:transparent}
+.hero p{font-size:18px;line-height:1.7;color:var(--muted);max-width:610px}
+.hero-actions{display:flex;gap:12px;margin-top:27px;flex-wrap:wrap}
+.stats{display:flex;gap:26px;margin-top:38px;flex-wrap:wrap}
+.stat b{font-size:23px}.stat span{display:block;color:var(--muted);font-size:12px;margin-top:4px}
+.phone-wrap{display:flex;justify-content:center}
+.phone{width:310px;background:#081b38;border:9px solid #152b4c;border-radius:42px;padding:15px;box-shadow:0 30px 80px rgba(0,0,0,.45);position:relative}
+.phone:before{content:"";display:block;width:100px;height:22px;border-radius:0 0 16px 16px;background:#152b4c;margin:-15px auto 9px}
+.app-head{display:flex;justify-content:space-between;align-items:center;margin:7px 0 18px}
+.app-brand{font-weight:850}.hello{font-size:12px;color:var(--muted)}
+.mini-hero{background:linear-gradient(135deg,#1268df,#20c8f6);padding:19px;border-radius:24px}
+.mini-hero small{opacity:.85}.mini-hero h3{margin:7px 0 3px;font-size:22px}.mini-hero p{font-size:11px;margin:0;opacity:.8}
+.progress{height:7px;background:rgba(255,255,255,.25);border-radius:99px;margin-top:15px}.progress i{display:block;width:72%;height:100%;background:white;border-radius:99px}
+.quick{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:12px}
+.quick div,.try-card{background:#10294d;border:1px solid rgba(255,255,255,.06);border-radius:18px;padding:13px}
+.quick span{font-size:20px}.quick b{display:block;font-size:12px;margin-top:5px}
+.try-card{margin-top:12px;background:linear-gradient(135deg,#142f55,#0e2444)}
+.try-card small{color:#82eaff}.try-card strong{display:block;margin-top:5px;font-size:14px}
+.section{padding:90px 0}.section.alt{background:#091b37;border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+.kicker{color:#62dcff;font-weight:800;font-size:13px;letter-spacing:1.4px;text-transform:uppercase}
+h2{font-size:clamp(31px,4vw,48px);letter-spacing:-1.7px;margin:10px 0 13px}
+.lead{color:var(--muted);line-height:1.7;max-width:700px}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-top:35px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:23px;padding:24px;transition:.25s}
+.card:hover{transform:translateY(-5px);border-color:rgba(33,212,253,.35)}
+.icon{font-size:28px;width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:rgba(33,212,253,.09);margin-bottom:16px}
+.card h3{margin:0 0 9px}.card p{margin:0;color:var(--muted);font-size:14px;line-height:1.65}
+.live{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:35px}
+.live-box{padding:35px;border-radius:28px;background:linear-gradient(135deg,#0e3262,#0a2144);border:1px solid rgba(33,212,253,.18)}
+.live-box h3{font-size:30px;margin:10px 0}.live-box p{color:var(--muted);line-height:1.7}
+.rank{background:#0b1c35;border:1px solid var(--line);border-radius:28px;padding:24px}
+.rank-item{display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--line)}
+.rank-item:last-child{border:0}.medal{font-size:25px}.rank-item small{color:var(--muted);display:block;margin-top:3px}.score{margin-left:auto;color:#6ce8ff;font-weight:800}
+.pricing{display:grid;grid-template-columns:repeat(2,1fr);gap:18px;margin-top:35px;max-width:800px}
+.price{border:1px solid var(--line);border-radius:28px;padding:30px;background:rgba(255,255,255,.045)}
+.price.hot{border-color:rgba(33,212,253,.55);background:linear-gradient(145deg,rgba(33,212,253,.12),rgba(52,120,246,.08))}
+.price h3{margin:0}.price ul{list-style:none;padding:0;color:var(--muted);line-height:2}
+.price li:before{content:"✓";color:var(--green);font-weight:900;margin-right:9px}
+.cta{text-align:center;padding:80px 20px}.cta-box{padding:55px 25px;border-radius:34px;background:linear-gradient(135deg,#0877e7,#16c7ee);box-shadow:0 25px 70px rgba(0,126,255,.2)}
+.cta h2{margin:0 0 10px}.cta p{opacity:.85;margin-bottom:25px}
+footer{padding:35px 0;border-top:1px solid var(--line);color:var(--muted);font-size:13px}
+.footer{display:flex;justify-content:space-between;gap:20px}
+@media(max-width:800px){
+ .navlinks{display:none}.hero{grid-template-columns:1fr;padding-top:35px;text-align:center}.hero p{margin:auto}.hero-actions,.stats{justify-content:center}
+ .phone{width:290px}.grid{grid-template-columns:1fr}.live,.pricing{grid-template-columns:1fr}.section{padding:65px 0}
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+<nav>
+  <a href="#" class="brand"><span class="logo"><b>SA</b></span> SIAP ASN</a>
+  <div class="navlinks">
+    <a href="#fitur">Fitur</a><a href="#tryout">Live Tryout</a><a href="#member">Member</a>
+  </div>
+  <a class="btn btn-primary" href="#download">Download App</a>
+</nav>
+
+<section class="hero">
+  <div>
+    <span class="badge">🚀 Platform Persiapan Seleksi ASN</span>
+    <h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1>
+    <p>SIAP ASN adalah teman belajarmu untuk menghadapi seleksi CPNS dan ASN melalui materi, latihan soal, tryout, analisis hasil, dan Live Tryout bersama.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#download">📱 Download Android</a>
+      <a class="btn btn-dark" href="#fitur">Lihat Fitur</a>
+    </div>
+    <div class="stats">
+      <div class="stat"><b>📚 Materi</b><span>Belajar terstruktur</span></div>
+      <div class="stat"><b>🏆 Tryout</b><span>Latihan & simulasi</span></div>
+      <div class="stat"><b>🔴 Live</b><span>Ranking real-time</span></div>
+    </div>
+  </div>
+
+  <div class="phone-wrap">
+    <div class="phone">
+      <div class="app-head"><div><div class="hello">Selamat datang 👋</div><div class="app-brand">SIAP ASN</div></div><div>🔔</div></div>
+      <div class="mini-hero"><small>PROGRES BELAJAR</small><h3>72% Siap!</h3><p>Lanjutkan perjalananmu hari ini.</p><div class="progress"><i></i></div></div>
+      <div class="quick"><div><span>📚</span><b>Materi</b></div><div><span>✍️</span><b>Latihan Soal</b></div><div><span>🏆</span><b>Tryout</b></div><div><span>📊</span><b>Analisis</b></div></div>
+      <div class="try-card"><small>🔴 LIVE TRYOUT BERIKUTNYA</small><strong>Simulasi Seleksi ASN #01</strong><small>Sabtu • 09.00 WIB</small></div>
+    </div>
+  </div>
+</section>
+</div>
+
+<section class="section alt" id="fitur">
+<div class="container">
+  <div class="kicker">SEMUA DALAM SATU APLIKASI</div>
+  <h2>Persiapan ASN yang lebih modern.</h2>
+  <p class="lead">Tidak hanya kumpulan soal. SIAP ASN dirancang agar pengguna bisa belajar, berlatih, mengukur kemampuan, dan mengikuti kompetisi tryout.</p>
+
+  <div class="grid">
+    <div class="card"><div class="icon">📚</div><h3>Materi Belajar</h3><p>Materi terstruktur untuk membantu memahami dasar-dasar seleksi.</p></div>
+    <div class="card"><div class="icon">✍️</div><h3>Latihan Soal</h3><p>Latihan soal berdasarkan kategori dengan hasil langsung.</p></div>
+    <div class="card"><div class="icon">🏆</div><h3>Tryout CAT</h3><p>Simulasi tryout dengan timer dan sistem penilaian.</p></div>
+    <div class="card"><div class="icon">🔴</div><h3>Live Tryout</h3><p>Kerjakan bersama peserta lain sesuai jadwal yang ditentukan.</p></div>
+    <div class="card"><div class="icon">🥇</div><h3>Ranking</h3><p>Lihat posisi dan performa kamu dibanding peserta lain.</p></div>
+    <div class="card"><div class="icon">📊</div><h3>Analisis Hasil</h3><p>Pantau perkembangan dan ketahui bagian yang perlu ditingkatkan.</p></div>
+  </div>
+</div>
+</section>
+
+<section class="section" id="tryout">
+<div class="container">
+<div class="kicker">FITUR UNGGULAN</div>
+<h2>🔥 Live Tryout SIAP ASN</h2>
+<div class="live">
+  <div class="live-box">
+    <span class="badge">🔴 TERJADWAL & REAL-TIME</span>
+    <h3>Rasakan simulasi kompetisi yang sesungguhnya.</h3>
+    <p>Semua peserta masuk pada jadwal yang sama, mengerjakan tryout, lalu hasil dan ranking ditampilkan setelah sistem memproses peserta.</p>
+    <a href="#member" class="btn btn-primary">Lihat Sistem Member</a>
+  </div>
+  <div class="rank">
+    <b>🏆 CONTOH LIVE RANKING</b>
+    <div class="rank-item"><span class="medal">🥇</span><div><b>Peserta #001</b><small>Waktu lebih cepat</small></div><span class="score">425</span></div>
+    <div class="rank-item"><span class="medal">🥈</span><div><b>Peserta #024</b><small>Hasil Tryout</small></div><span class="score">415</span></div>
+    <div class="rank-item"><span class="medal">🥉</span><div><b>Peserta #107</b><small>Hasil Tryout</small></div><span class="score">405</span></div>
+  </div>
+</div>
+</div>
+</section>
+
+<section class="section alt" id="member">
+<div class="container">
+<div class="kicker">PILIH CARA BELAJARMU</div>
+<h2>Mulai gratis, tingkatkan saat siap.</h2>
+<div class="pricing">
+  <div class="price">
+    <h3>🆓 GRATIS</h3>
+    <ul>
+      <li>2 Tryout awal gratis</li>
+      <li>Tryout gratis mingguan</li>
+      <li>Akses fitur dasar</li>
+      <li>Materi pilihan</li>
+    </ul>
+  </div>
+  <div class="price hot">
+    <h3>⭐ PREMIUM</h3>
+    <ul>
+      <li>15 Tryout langsung terbuka</li>
+      <li>Tryout baru setiap 3 hari</li>
+      <li>Akses fitur Premium</li>
+      <li>Keuntungan khusus Live Tryout</li>
+    </ul>
+  </div>
+</div>
+</div>
+</section>
+
+<section class="cta" id="download">
+<div class="container">
+  <div class="cta-box">
+    <h2>Sudah siap menjadi versi terbaikmu?</h2>
+    <p>Download SIAP ASN dan mulai perjalanan belajarmu hari ini.</p>
+    <button class="btn btn-dark" onclick="alert('Link Google Play akan dipasang setelah aplikasi resmi diterbitkan.')">📱 Segera Hadir di Google Play</button>
+  </div>
+</div>
+</section>
+
+<footer>
+<div class="container footer">
+  <span>© 2026 SIAP ASN. All rights reserved.</span>
+  <span>Tryout CPNS & Bimbel Online</span>
+</div>
+</footer>
+
+</body>
+</html>
