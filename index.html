@@ -30,6 +30,10 @@ const SUPABASE_KEY='sb_publishable__o_Qj-DptS7XEcYyi9CrSQ_pY3E5RSX';
 const ADMIN_URL='https://aliiakbarr03.github.io/siap-asn-admin/';
 const sb=supabase.createClient(SUPABASE_URL,SUPABASE_KEY);
 let registerMode=false,currentExam=null,examQuestions=[],examIndex=0,answers={},timerInt=null;
+// FIX: dulu sisa detik disimpan di variabel lokal `sec` di dalam startExam(),
+// jadi finishExam() tidak tahu berapa lama waktu yang sudah dipakai.
+// Sekarang disimpan global supaya bisa dikirim sebagai duration_seconds.
+let examTotalSeconds=0,examSecondsLeft=0;
 const el=id=>document.getElementById(id);
 function openAuth(reg=false){registerMode=reg;el('authTitle').textContent=reg?'Daftar SIAP ASN':'Masuk SIAP ASN';el('authButton').textContent=reg?'Daftar':'Masuk';el('authMsg').textContent='';el('authModal').classList.add('show')}
 function closeAuth(){el('authModal').classList.remove('show')}
@@ -42,10 +46,44 @@ const safe=x=>String(x||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&
 async function loadMaterials(){const {data,error}=await sb.from('materials').select('*').eq('is_published',true).order('created_at',{ascending:false});if(error){el('materialsArea').textContent=error.message;return}el('materialsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.summary)+'</p></div>').join('')||'<p>Belum ada materi.</p>'}
 async function loadTryouts(){const {data,error}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium').eq('status','published').neq('type','live').order('created_at',{ascending:false});if(error){el('tryoutsArea').textContent=error.message;return}el('tryoutsArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">'+(x.is_premium?'👑 Premium':'🆓 Gratis')+'</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.description)+'</p><p>⏱️ '+(x.duration_minutes||60)+' menit</p><button class="btn primary" onclick="startExam(\''+x.id+'\')">Mulai Tryout</button></div>').join('')||'<p>Belum ada tryout.</p>'}
 async function loadLive(){const {data,error}=await sb.from('tryouts').select('*').eq('status','published').eq('type','live').order('available_from');if(error){el('liveArea').textContent=error.message;return}el('liveArea').innerHTML=(data||[]).map(x=>'<div class="data-card"><span class="tag">🔴 LIVE</span><h3>'+safe(x.title)+'</h3><p>'+safe(x.description)+'</p><button class="btn primary" onclick="startExam(\''+x.id+'\')">Masuk</button></div>').join('')||'<p>Belum ada Live Tryout.</p>'}
-async function startExam(id){const {data,error}=await sb.from('tryout_questions').select('question_order,questions(*)').eq('tryout_id',id).order('question_order');if(error){alert(error.message);return}examQuestions=(data||[]).map(x=>x.questions).filter(Boolean);if(!examQuestions.length){alert('Soal belum tersedia.');return}currentExam=id;examIndex=0;answers={};showView('exam');renderQuestion();const {data:tr}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();let sec=(tr?.duration_minutes||60)*60;clearInterval(timerInt);timerInt=setInterval(()=>{el('examTimer').textContent=Math.floor(sec/60)+':'+String(sec%60).padStart(2,'0');if(--sec<0)finishExam()},1000)}
+
+// FIX: sebelumnya query langsung ke tabel tryout_questions/questions dengan
+// select('question_order,questions(*)') — ini mengirim correct_answer &
+// explanation ke browser sejak soal dimuat (bisa dilihat lewat tab Network).
+// Sekarang pakai RPC get_tryout_questions yang sudah menyaring kolom sensitif
+// di sisi server.
+async function startExam(id){
+  const {data,error}=await sb.rpc('get_tryout_questions',{p_tryout_id:id});
+  if(error){alert(error.message);return}
+  examQuestions=data||[];
+  if(!examQuestions.length){alert('Soal belum tersedia.');return}
+  currentExam=id;examIndex=0;answers={};showView('exam');renderQuestion();
+  const {data:tr}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();
+  examTotalSeconds=(tr?.duration_minutes||60)*60;
+  examSecondsLeft=examTotalSeconds;
+  clearInterval(timerInt);
+  timerInt=setInterval(()=>{
+    el('examTimer').textContent=Math.floor(examSecondsLeft/60)+':'+String(examSecondsLeft%60).padStart(2,'0');
+    if(--examSecondsLeft<0)finishExam();
+  },1000);
+}
 function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);el('examArea').innerHTML='<p>'+ (examIndex+1)+' / '+examQuestions.length+'</p><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>'}
 function choose(id,k){answers[id]=k;renderQuestion()}function prevQ(){if(examIndex>0){examIndex--;renderQuestion()}}function nextQ(){if(examIndex>=examQuestions.length-1)finishExam();else{examIndex++;renderQuestion()}}
-async function finishExam(){clearInterval(timerInt);const correct=examQuestions.filter(q=>answers[q.id]===q.correct_answer).length;const {data:{user}}=await sb.auth.getUser();if(user){const score=Math.round(correct/examQuestions.length*100);await sb.from('tryout_attempts').insert({tryout_id:currentExam,user_id:user.id,submitted_at:new Date().toISOString(),score,correct_count:correct,wrong_count:examQuestions.length-correct,unanswered_count:examQuestions.length-Object.keys(answers).length,duration_seconds:0,status:'submitted'});alert('Tryout selesai! Nilai kamu: '+score)}showView('tryouts')}
+
+// FIX: sebelumnya nilai dihitung di browser (correct = filter answers===correct_answer)
+// lalu langsung insert ke tryout_attempts dari client. Karena correct_answer
+// tadinya ada di memori browser, siswa bisa mengubah skor/jawaban sebelum
+// dikirim. Sekarang penilaian dipindah ke RPC submit_tryout_attempt yang
+// menghitung skor di server berdasarkan data asli di database.
+async function finishExam(){
+  clearInterval(timerInt);
+  const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);
+  const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});
+  if(error){alert('Gagal mengirim jawaban: '+error.message);showView('tryouts');return}
+  const result=Array.isArray(data)?data[0]:data;
+  alert('Tryout selesai! Nilai kamu: '+(result?.score??0));
+  showView('tryouts');
+}
 async function logout(){await sb.auth.signOut();location.reload()}
 sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()}).catch(console.error);
 </script></body></html>
