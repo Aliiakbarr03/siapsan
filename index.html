@@ -12,6 +12,36 @@ section{padding:70px 0}.title{text-align:center;font-size:36px;margin:0 0 12px}.
 .modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);align-items:center;justify-content:center;padding:18px;z-index:20}.modal.show{display:flex}.modalbox{width:min(420px,100%);background:#10284a;border:1px solid var(--line);border-radius:24px;padding:25px}.modalbox input{width:100%;padding:14px;margin:8px 0 14px;border-radius:12px;border:1px solid var(--line);font-size:16px}.msg{min-height:22px;color:#ff9d9d;margin-top:10px}
 #app{display:none}.appbar{position:sticky;top:0;background:#0b2145;border-bottom:1px solid var(--line);z-index:10}.tabs{display:flex;gap:8px;flex-wrap:wrap;padding:18px 0}.tab{padding:10px 15px}.view{display:none}.view.active{display:block}.data-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}.data-card{background:#10284a;border:1px solid var(--line);padding:20px;border-radius:20px}.tag{display:inline-block;background:#173a64;padding:6px 10px;border-radius:8px;font-size:12px}.banner-img{max-width:100%;border-radius:18px;max-height:260px}.question{font-size:21px;font-weight:700;margin:20px 0}.option{display:block;width:100%;text-align:left;padding:16px;margin:10px 0;border-radius:12px;background:#10284a;color:white;border:1px solid var(--line);cursor:pointer}.option.selected{border-color:var(--cyan);background:#16456d}.timer{font-size:28px;color:var(--cyan);font-weight:900}
 @media(max-width:800px){.hero{grid-template-columns:1fr;padding:50px 0}.grid,.data-grid{grid-template-columns:1fr}.stats{grid-template-columns:1fr 1fr}.navlinks{display:none}}
+
+/* === SIAP ASN VISUAL REDESIGN: UI ONLY === */
+
+@import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap');
+:root{--bg:#f8f9fc;--panel:#fff;--card:#fff;--text:#202124;--muted:#667085;--cyan:#6750a4;--blue:#6750a4;--line:#e6e8ef}
+*{font-family:'DM Sans',system-ui,sans-serif}
+body{background:radial-gradient(circle at top right,#fff0e8 0,transparent 28%),radial-gradient(circle at top left,#f0ebff 0,transparent 32%),#f8f9fc!important;color:#202124!important}
+nav{height:80px!important;background:rgba(255,255,255,.82)!important;border-bottom:1px solid #e8eaed!important;backdrop-filter:blur(16px)!important;position:sticky;top:0;z-index:20}
+.brand{font-family:'Plus Jakarta Sans',sans-serif!important;font-weight:800!important;color:#202124!important;letter-spacing:-.04em}
+.brand b{color:#6750a4!important}
+a{color:inherit}
+.btn{border-radius:999px!important;background:#f1f3f4!important;color:#202124!important;border:0!important;font-weight:700!important;padding:11px 18px!important}
+.btn.primary,.primary{background:linear-gradient(135deg,#6750a4,#856ec2)!important;color:white!important;box-shadow:0 8px 22px rgba(103,80,164,.20)!important}
+.btn:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(60,64,67,.12)}
+.hero,.panel,.card,.data-card{background:rgba(255,255,255,.92)!important;border:1px solid #e8eaed!important;border-radius:24px!important;box-shadow:0 5px 20px rgba(60,64,67,.06)!important}
+.hero{overflow:hidden}
+h1,h2,h3{font-family:'Plus Jakarta Sans',sans-serif!important;color:#202124!important;letter-spacing:-.035em}
+.muted{color:#667085!important}
+input,select,textarea{background:#fff!important;color:#202124!important;border:1px solid #dadce0!important;border-radius:14px!important}
+input:focus,select:focus,textarea:focus{outline:none!important;border-color:#6750a4!important;box-shadow:0 0 0 4px rgba(103,80,164,.12)!important}
+.banner-img{border-radius:20px!important;box-shadow:0 8px 28px rgba(60,64,67,.12)!important}
+.data-card{transition:transform .2s ease,box-shadow .2s ease!important}
+.data-card:hover{transform:translateY(-3px)!important;box-shadow:0 14px 32px rgba(60,64,67,.10)!important}
+table{background:#fff!important;border-radius:16px!important;overflow:hidden}
+th{background:#f8f9fa!important;color:#5f6368!important}
+td,th{border-color:#edf0f2!important;color:#202124!important}
+footer{background:#fff!important;border-top:1px solid #e8eaed!important;color:#667085!important}
+::-webkit-scrollbar{width:10px}::-webkit-scrollbar-thumb{background:#d6d9df;border-radius:20px}
+@media(max-width:700px){nav{height:auto!important;padding:14px 0!important}.hero,.panel,.card,.data-card{border-radius:18px!important}}
+
 </style></head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, latihan soal, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
