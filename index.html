@@ -197,6 +197,10 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 .sa-course-icon .sa-pub-cat-icon.legacy{font-size:22px;line-height:1}
 </style>
 
+
+<style>
+.i-latsol{background:#edf0ff!important;color:#5b50d6!important}.sa-latsol-card{position:relative;overflow:hidden}.sa-latsol-card:before{content:"";position:absolute;inset:0 0 auto 0;height:4px;background:linear-gradient(90deg,#5b50d6,#8b7fff,#ff8a7b)}.sa-latsol-meta{display:flex;gap:7px;flex-wrap:wrap;margin:12px 0}.sa-latsol-stat{padding:6px 9px;border-radius:999px;background:#f6f7fb;color:#697383;font-size:11px;font-weight:800}.sa-latsol-stat.premium{background:#f0edff;color:#5b4dcc}.sa-mode-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sa-mode-card{padding:16px;border:1px solid #e8eaef;border-radius:18px;background:#fff;box-shadow:0 6px 20px rgba(40,44,63,.04)}.sa-mode-card h3{margin:10px 0 5px;font-size:14px}.sa-mode-card p{font-size:12px;color:#7a8390;margin:0;line-height:1.5}@media(max-width:1000px){.sa-mode-grid{grid-template-columns:1fr 1fr}}@media(max-width:650px){.sa-mode-grid{grid-template-columns:1fr}}
+</style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, latihan soal, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
@@ -226,6 +230,7 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div class="sa-sidebar-label">BELAJAR</div>
       <button class="sa-nav active" data-sa-view="home" onclick="showView('home')"><span class="sa-icon i-home">⌂</span><span>Beranda</span></button>
       <button class="sa-nav" data-sa-view="materials" onclick="showView('materials')"><span class="sa-icon i-material">▦</span><span>Materi</span></button>
+      <button class="sa-nav" data-sa-view="latsols" onclick="showView('latsols')"><span class="sa-icon i-latsol">▤</span><span>Latsol</span></button>
       <button class="sa-nav" data-sa-view="drilling" onclick="showView('drilling')"><span class="sa-icon i-drill">◈</span><span>Drilling Soal</span></button>
       <button class="sa-nav" data-sa-view="tryouts" onclick="showView('tryouts')"><span class="sa-icon i-tryout">▤</span><span>Tryout</span></button>
       <button class="sa-nav" data-sa-view="favorites" onclick="showView('favorites')"><span class="sa-icon i-fav">★</span><span>Favorit</span></button>
@@ -263,6 +268,12 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
         <div class="sa-page-title"><div><span class="sa-kicker">BELAJAR</span><h1>Materi CPNS</h1><p>Belajar materi secara bertahap dan lihat progresmu di setiap kategori.</p></div><button class="sa-outline-btn" onclick="showView('progress')">Lihat Progress →</button></div>
         <div class="sa-filterbar"><button class="sa-filter active" type="button">Semua materi</button><button class="sa-filter" type="button" onclick="showView('favorites')">★ Bookmark</button><input id="materialSearch" class="sa-search" oninput="filterMaterials(this.value)" placeholder="Cari materi..."></div>
         <div id="materialsArea" class="sa-course-grid"></div>
+      </div>
+
+      <div id="view-latsols" class="view">
+        <div class="sa-page-title"><div><span class="sa-kicker">LATIHAN TERSTRUKTUR</span><h1>Latsol</h1><p>Latihan soal terarah dari Bank Soal SIAP ASN.</p></div><button class="sa-outline-btn" onclick="showView('drilling')">Drilling Soal →</button></div>
+        <div class="sa-filterbar"><input id="latsolSearch" class="sa-search" oninput="filterLatsols(this.value)" placeholder="Cari latsol... "></div>
+        <div id="latsolsArea" class="sa-course-grid"></div>
       </div>
 
       <div id="view-drilling" class="view">
@@ -594,5 +605,83 @@ async function loadNotifications(){const area=document.getElementById('notificat
 async function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
 async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('app').classList.add('sa-app-shell');el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.allSettled([loadHome(),loadTryouts(),loadLive(),loadDashboard(),loadProfile(),loadRanking('overall'),loadFavoriteIds(),loadNotifications(),loadPremium()]);await loadSaHomePanels();refreshPublishedIcons();loadProfileAndHeader().catch(()=>{});setSaActive('home')}
 
+</script>
+
+<script>
+/* === SIAP ASN LEARNING ENGINE WEB V2 === */
+let latsolRows=[];
+let practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'drilling'};
+
+async function loadLatsols(){
+  const a=el('latsolsArea');if(!a)return;
+  a.innerHTML='<div class="sa-course-grid"><div class="sa-course-card">Memuat Latsol...</div></div>';
+  try{const {data,error}=await sb.rpc('get_latsol_catalog');if(error)throw error;latsolRows=data||[];renderLatsols(latsolRows);}
+  catch(e){a.innerHTML=`<div class="sa-course-card">Gagal memuat Latsol: ${safe(e.message||'Terjadi kesalahan.')}</div>`}
+}
+function renderLatsols(rows){
+  const a=el('latsolsArea');if(!a)return;
+  a.innerHTML=(rows||[]).map(x=>`<div class="sa-course-card sa-latsol-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.category_icon||'clipboard-list')}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div><div style="margin-top:14px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Latihan soal terstruktur.')}</p><div class="sa-latsol-meta"><span class="sa-latsol-stat">${x.question_count} soal</span><span class="sa-latsol-stat">${x.duration_minutes} menit</span>${x.subcategory?`<span class="sa-latsol-stat">${safe(x.subcategory)}</span>`:''}</div></div><button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button></div>`).join('')||'<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+  refreshPublishedIcons();
+}
+function filterLatsols(v){const q=String(v||'').toLowerCase();renderLatsols(latsolRows.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)))}
+
+async function startLatsol(id){
+  try{
+    const {data:sid,error:se}=await sb.rpc('begin_practice_session',{p_activity_type:'latsol',p_mode:'preset',p_latsol_id:id,p_category_id:null,p_subcategory:null,p_limit:10});
+    if(se)throw se;
+    const sessionId=Array.isArray(sid)?sid[0]:sid;
+    const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
+    practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:'Latsol',target:'latsols'};
+    if(!practiceState.rows.length)throw new Error('Soal belum tersedia.');
+    renderPracticeQuestion();
+  }catch(e){el('latsolsArea').innerHTML=`<div class="sa-course-card">${safe(e.message||'Gagal memulai Latsol.')}<br><button class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>`}
+}
+
+function renderPracticeQuestion(){
+  const a=practiceState.target==='latsols'?el('latsolsArea'):el('drillingArea');
+  const q=practiceState.rows[practiceState.index];if(!a||!q)return;
+  const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+  a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">${safe(practiceState.title)}</span>${q.subcategory?`<div class="sa-subcategory">${safe(q.subcategory)}</div>`:''}<h2 style="margin:5px 0">Soal ${practiceState.index+1} dari ${practiceState.rows.length}</h2></div><button class="sa-outline-btn" onclick="${practiceState.target==='latsols'?'loadLatsols()':'loadDrilling()'}">Keluar</button></div><div class="data-card" style="padding:22px"><div class="question" style="margin:0 0 18px;font-size:19px">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${practiceState.selected===k?'selected':''}" onclick="choosePractice('${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}<div id="practiceFeedback"></div><div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px"><span class="muted">${practiceState.index+1}/${practiceState.rows.length}</span><button class="btn primary" ${practiceState.selected?'':'disabled'} onclick="nextPractice()">${practiceState.index===practiceState.rows.length-1?'Selesai':'Berikutnya →'}</button></div></div>`;
+}
+function choosePractice(k){
+  practiceState.selected=k;practiceState.answers[practiceState.rows[practiceState.index].id]=k;
+  renderPracticeQuestion();
+  const q=practiceState.rows[practiceState.index],f=el('practiceFeedback');
+  const ok=String(k).toUpperCase()===String(q.correct_answer||'').toUpperCase();
+  if(f)f.innerHTML=`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;
+}
+async function nextPractice(){
+  if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
+  const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});
+  if(error){alert(error.message);return;}
+  const r=Array.isArray(data)?data[0]:data;
+  const target=practiceState.target;alert(`${practiceState.title} selesai! Akurasi: ${r?.score??0}%`);
+  practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'drilling'};
+  if(target==='latsols') await loadLatsols(); else await loadDrilling();
+}
+
+async function loadDrilling(){
+  const a=el('drillingArea');if(!a)return;a.innerHTML='<div class="sa-course-grid"><div class="sa-course-card">Memuat data drilling...</div></div>';
+  try{
+    const {data:cats,error}=await sb.from('categories').select('id,name,icon,description').eq('is_active',true).order('sort_order');if(error)throw error;
+    const {data:st}=await sb.rpc('get_drill_stats');const s=Array.isArray(st)?st[0]:st;const total=Number(s?.total_subcategories||0),mastered=Number(s?.mastered_count||0);
+    a.innerHTML=`<div class="sa-section-head"><div><span class="sa-kicker">DRILLING SOAL</span><h2>Pilih Mode Drilling</h2><p>Latihan berdasarkan pilihanmu atau biarkan sistem menemukan kelemahanmu.</p></div></div><div class="sa-stats-grid" style="margin-bottom:18px"><div class="sa-stat-card"><span>Total sesi</span><b>${s?.total_sessions??0}</b></div><div class="sa-stat-card"><span>Akurasi rata-rata</span><b>${s?.average_accuracy??0}%</b></div><div class="sa-stat-card"><span>Soal dikerjakan</span><b>${s?.questions_done??0}</b></div><div class="sa-stat-card"><span>Bab mastered</span><b>${mastered}/${total}</b></div></div><div class="sa-mode-grid"><div class="sa-mode-card"><div class="sa-course-icon i-drill">◈</div><h3>Latihan Bebas</h3><p>Pilih kategori lalu ambil 10 soal random.</p><button class="sa-card-action" onclick="${cats?.length?`openDrillSubcategories('${cats[0].id}','${safe(cats[0].name)}')`:'loadDrilling()'}">Mulai →</button></div><div class="sa-mode-card"><div class="sa-course-icon i-progress">↗</div><h3>Drilling Adaptif</h3><p>Kesulitan mengikuti akurasi terakhirmu.</p><button class="sa-card-action" onclick="startPracticeMode('adaptive')">Mulai →</button></div><div class="sa-mode-card"><div class="sa-course-icon i-fav">↻</div><h3>Ulangi Salah</h3><p>Kerjakan lagi soal yang pernah kamu salah.</p><button class="sa-card-action" onclick="startPracticeMode('wrong')">Mulai →</button></div><div class="sa-mode-card"><div class="sa-course-icon i-rank">◎</div><h3>Drilling Kelemahan</h3><p>Fokus pada subkategori dengan akurasi terendah.</p><button class="sa-card-action" onclick="startPracticeMode('weakness')">Mulai →</button></div></div><div style="margin-top:18px"><div class="sa-section-head"><div><h2>Pilih Kategori</h2><p>Latihan bebas berdasarkan kategori utama.</p></div></div><div class="sa-course-grid">${(cats||[]).map(c=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(c.icon||'book-open')}</div><span class="sa-chip">${safe(c.name)}</span></div><h3>${safe(c.name)}</h3><p>${safe(c.description||'Latihan soal berdasarkan kategori.')}</p><button class="sa-card-action" onclick="openDrillSubcategories('${c.id}','${safe(c.name)}')">Pilih subkategori →</button></div>`).join('')}</div></div>`;
+    refreshPublishedIcons();
+  }catch(e){a.innerHTML=`<div class="sa-course-card">Gagal memuat drilling: ${safe(e.message||'Terjadi kesalahan.')}</div>`}
+}
+
+async function openDrillSubcategories(categoryId,categoryName){
+ const a=el('drillingArea');if(!a)return;a.innerHTML='<div class="sa-course-card">Menyiapkan pilihan subkategori...</div>';
+ try{const {data,error}=await sb.rpc('get_drill_questions',{p_category_id:categoryId,p_subcategory:null,p_limit:100});if(error)throw error;const seen=new Set(),subs=[];(data||[]).forEach(r=>{const s=String(r.subcategory||'').trim();if(s&&!seen.has(s)){seen.add(s);subs.push(s)}});a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">LATIHAN BEBAS</span><h2 style="margin:5px 0">${safe(categoryName)}</h2><p>Pilih subkategori atau langsung latihan campuran.</p></div><button class="sa-outline-btn" onclick="loadDrilling()">Kembali</button></div><div class="data-card"><div class="sa-category-tree"><button class="sa-filter active" onclick="startFreeDrilling('${categoryId}','${safe(categoryName)}','')">Semua Subkategori</button>${subs.map(s=>`<button class="sa-filter" onclick="startFreeDrilling('${categoryId}','${safe(categoryName)}','${safe(s)}')">${safe(s)}</button>`).join('')}</div>${subs.length?'<p class="muted" style="margin-top:14px">Pilih subkategori untuk latihan yang lebih terarah.</p>':'<p class="muted" style="margin-top:14px">Belum ada subkategori.</p>'}</div>`;}
+ catch(e){a.innerHTML=`<div class="sa-course-card">Gagal memuat subkategori: ${safe(e.message||'Terjadi kesalahan.')}</div>`}
+}
+async function startFreeDrilling(categoryId,categoryName,subcategory=''){return startPracticeMode('free',categoryId,subcategory,categoryName)}
+async function startPracticeMode(mode,categoryId=null,subcategory='',categoryName=''){const a=el('drillingArea');a.innerHTML='<div class="sa-course-card">Menyiapkan drilling...</div>';try{const {data:sid,error:se}=await sb.rpc('begin_practice_session',{p_activity_type:'drilling',p_mode:mode,p_latsol_id:null,p_category_id:categoryId,p_subcategory:subcategory||null,p_limit:10});if(se)throw se;const sessionId=Array.isArray(sid)?sid[0]:sid;const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:mode==='free'?(categoryName||'Latihan Bebas'):'Drilling '+(mode==='adaptive'?'Adaptif':mode==='wrong'?'Ulangi Salah':'Kelemahan'),target:'drilling'};if(!practiceState.rows.length)throw new Error('Belum ada soal untuk mode ini.');renderPracticeQuestion();}catch(e){a.innerHTML=`<div class="sa-course-card">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:12px" onclick="loadDrilling()">Kembali</button></div>`}}
+
+const _showViewLearningBase=showView;
+showView=async function(name){
+  if(name==='latsols'){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));el('view-latsols').classList.add('active');document.querySelectorAll('.sa-nav').forEach(x=>x.classList.toggle('active',x.dataset.saView==='latsols'));el('saPageLabel').textContent='Latsol';await loadLatsols();return;}
+  return _showViewLearningBase(name);
+};
 </script>
 </body></html>
