@@ -195,6 +195,21 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 .sa-course-icon .sa-pub-cat-icon{display:grid;place-items:center;width:30px;height:30px}
 .sa-course-icon .sa-pub-cat-icon svg{width:22px;height:22px;stroke-width:1.9}
 .sa-course-icon .sa-pub-cat-icon.legacy{font-size:22px;line-height:1}
+
+/* === FINAL BANNER MODE: IMAGE ONLY === */
+.sa-home-banner-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);gap:16px;margin-bottom:18px}
+.sa-home-carousel{position:relative;min-height:270px;border-radius:22px;overflow:hidden;background:#eef0f6}
+.sa-hero-slide,.sa-side-banner{position:relative;overflow:hidden;background:#eef0f6;cursor:default}
+.sa-hero-slide{position:absolute;inset:0;display:none}.sa-hero-slide.active{display:block;animation:saFade .45s ease}
+.sa-hero-slide img,.sa-side-banner img{width:100%;height:100%;object-fit:cover;display:block}
+.sa-hero-slide:after,.sa-side-banner:after,.sa-banner-overlay{display:none!important;content:none!important}
+.sa-hero-slide[data-url],.sa-side-banner[data-url]{cursor:pointer}.sa-hero-slide[data-url]:focus-visible,.sa-side-banner[data-url]:focus-visible{outline:3px solid #6d5dfc;outline-offset:-3px}
+.sa-home-banner-layout.no-side{grid-template-columns:1fr}.sa-home-banner-layout.no-side .sa-home-side-banners{display:none}
+.sa-banner-fallback{display:grid;place-items:center;background:linear-gradient(135deg,#5b50d6,#8f7bff);color:#fff}
+.sa-banner-fallback:before{content:'Belum ada gambar banner';font-weight:800}
+@media(max-width:820px){.sa-home-banner-layout{grid-template-columns:1fr}.sa-home-carousel{min-height:230px}.sa-home-side-banners{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:520px){.sa-home-side-banners{grid-template-columns:1fr}}
+
 </style>
 
 
@@ -234,24 +249,14 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
     </div>
   </div>
   <div class="sa-layout">
-    <aside id="saSidebar" class="sa-sidebar">
-      <div class="sa-sidebar-label">BELAJAR</div>
-      <button class="sa-nav active" data-sa-view="home" onclick="showView('home')"><span class="sa-icon i-home">⌂</span><span>Beranda</span></button>
+    <aside id="saSidebar" class="sa-sidebar" data-menu-version="clean-v1">
       <button class="sa-nav" data-sa-view="materials" onclick="showView('materials')"><span class="sa-icon i-material">▦</span><span>Materi</span></button>
       <button class="sa-nav" data-sa-view="latsols" onclick="showView('latsols')"><span class="sa-icon i-latsol">▤</span><span>Latsol</span></button>
       <button class="sa-nav" data-sa-view="drilling" onclick="showView('drilling')"><span class="sa-icon i-drill">◈</span><span>Drilling Soal</span></button>
       <button class="sa-nav" data-sa-view="tryouts" onclick="showView('tryouts')"><span class="sa-icon i-tryout">▤</span><span>Tryout</span></button>
-      <button class="sa-nav" data-sa-view="favorites" onclick="showView('favorites')"><span class="sa-icon i-fav">★</span><span>Favorit</span></button>
-
-      <div class="sa-sidebar-label sa-label-gap">PERFORMA</div>
-      <button class="sa-nav" data-sa-view="history" onclick="showView('history')"><span class="sa-icon i-history">◷</span><span>Riwayat & Analisis</span></button>
       <button class="sa-nav" data-sa-view="ranking" onclick="showView('ranking')"><span class="sa-icon i-rank">♛</span><span>Ranking</span></button>
-      <button class="sa-nav" data-sa-view="progress" onclick="showView('progress')"><span class="sa-icon i-progress">▥</span><span>Progress Belajar</span></button>
-
-      <div class="sa-sidebar-label sa-label-gap">INFORMASI</div>
       <button class="sa-nav" data-sa-view="formations" onclick="showView('formations')"><span class="sa-icon i-formasi">▤</span><span>Formasi CPNS</span></button>
       <button class="sa-nav sa-nav-notif" data-sa-view="notifications" onclick="showView('notifications')"><span class="sa-icon i-notif">●</span><span>Notifikasi</span><em id="saNotifBadge"></em></button>
-
       <div class="sa-side-premium" onclick="showView('premium')"><div class="sa-crown">♛</div><div><b>Upgrade Premium</b><small>Belajar tanpa batas</small></div><span>›</span></div>
     </aside>
 
@@ -273,7 +278,7 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div id="view-profile" class="view"><div class="profile-page-head"><div><div class="eyebrow">AKUN SAYA</div><h2>Profil Peserta</h2><p class="muted">Lengkapi biodata dan pasang foto profil langsung dari perangkatmu.</p></div><button class="btn dark" onclick="showView('home')">← Kembali</button></div><div id="profileArea"><div class="profile-loading">Memuat profil...</div></div></div>
 
       <div id="view-materials" class="view">
-        <div class="sa-page-title"><div><span class="sa-kicker">BELAJAR</span><h1>Materi CPNS</h1><p>Belajar materi secara bertahap dan lihat progresmu di setiap kategori.</p></div><button class="sa-outline-btn" onclick="showView('progress')">Lihat Progress →</button></div>
+        <div class="sa-page-title"><div><span class="sa-kicker">BELAJAR</span><h1>Materi CPNS</h1><p>Belajar materi secara bertahap dan lihat progresmu di setiap kategori.</p></div></div>
         <div class="sa-filterbar"><button class="sa-filter active" type="button">Semua materi</button><button class="sa-filter" type="button" onclick="showView('favorites')">★ Bookmark</button><input id="materialSearch" class="sa-search" oninput="filterMaterials(this.value)" placeholder="Cari materi..."></div>
         <div id="materialsArea" class="sa-course-grid"></div>
       </div>
@@ -293,10 +298,6 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
         <div class="sa-page-title"><div><span class="sa-kicker">SIMULASI UJIAN</span><h1>Tryout</h1><p>Kerjakan simulasi secara penuh dan lihat analisismu setelah selesai.</p></div><button class="sa-outline-btn" onclick="showView('live')">🔴 Live Tryout</button></div>
         <div id="tryoutsArea" class="sa-course-grid"></div>
       </div>
-
-      <div id="view-history" class="view"><div class="sa-page-title"><div><span class="sa-kicker">AKTIVITAS</span><h1>Riwayat & Analisis</h1><p>Lihat perkembangan nilai dan hasil tryoutmu.</p></div></div><div id="historyArea"></div></div>
-      <div id="view-favorites" class="view"><div class="sa-page-title"><div><span class="sa-kicker">BOOKMARK</span><h1>Soal Favorit</h1><p>Simpan soal yang ingin kamu pelajari lagi.</p></div></div><div id="favoritesArea" class="sa-course-grid"></div></div>
-      <div id="view-progress" class="view"><div class="sa-page-title"><div><span class="sa-kicker">PERFORMA</span><h1>Progress Belajar</h1><p>Pantau seberapa jauh materi yang sudah kamu selesaikan.</p></div></div><div id="progressArea"></div></div>
       <div id="view-ranking" class="view"><div class="sa-page-title"><div><span class="sa-kicker">KOMPETISI</span><h1>Ranking</h1><p>Bandingkan performamu dengan peserta lain.</p></div></div><div class="sa-filterbar"><button class="sa-filter active" onclick="loadRanking('overall')">Overall</button><button class="sa-filter" onclick="loadRanking('monthly')">Bulanan</button><button class="sa-filter" onclick="loadRanking('weekly')">Mingguan</button></div><div id="rankingArea"></div></div>
       <div id="view-live" class="view"><div class="sa-page-title"><div><span class="sa-kicker">TRYOUT TERJADWAL</span><h1>Live Tryout</h1><p>Ikuti tryout yang berlangsung pada waktu yang telah ditentukan.</p></div></div><div id="liveArea" class="sa-course-grid"></div></div>
       <div id="view-formations" class="view"><div class="sa-page-title"><div><span class="sa-kicker">INFORMASI SELEKSI</span><h1>Formasi CPNS</h1><p>Cari informasi formasi yang tersedia dan tentukan targetmu.</p></div></div><div class="sa-filterbar"><input id="formationSearch" class="sa-search" oninput="filterFormations(this.value)" placeholder="Cari instansi, jabatan, pendidikan..."></div><div id="formationsArea" class="sa-formation-grid"></div></div>
@@ -528,7 +529,7 @@ document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id
 
 /* === SIAP ASN MODERN LEARNING UX === */
 function toggleSaSidebar(){const s=document.getElementById('saSidebar');if(s)s.classList.toggle('open')}
-function saPageName(name){return ({home:'Beranda',materials:'Materi',drilling:'Drilling Soal',tryouts:'Tryout',favorites:'Favorit',history:'Riwayat & Analisis',ranking:'Ranking',progress:'Progress Belajar',formations:'Formasi CPNS',notifications:'Notifikasi',premium:'Pembelian',live:'Live Tryout',profile:'Akun Saya',exam:'Tryout'})[name]||'Beranda'}
+function saPageName(name){return ({home:'Beranda',materials:'Materi',drilling:'Drilling Soal',tryouts:'Tryout',ranking:'Ranking',formations:'Formasi CPNS',notifications:'Notifikasi',premium:'Pembelian',live:'Live Tryout',profile:'Akun Saya',exam:'Tryout'})[name]||'Beranda'}
 function setSaActive(name){document.querySelectorAll('.sa-nav').forEach(b=>b.classList.toggle('active',b.dataset.saView===name));const l=document.getElementById('saPageLabel');if(l)l.textContent=saPageName(name);const s=document.getElementById('saSidebar');if(s)s.classList.remove('open')}
 async function loadSaHomePanels(){
   try{
@@ -797,6 +798,97 @@ showView=async function(name){
       if(session?.user) window.startApp().catch(console.error);
     }).catch(console.error);
   }
+})();
+</script>
+
+
+<script id="siap-asn-final-ui-lock">
+/* FINAL UI LOCK: one sidebar source + image-only banners */
+(function(){
+  const internalTargets=new Set(['materials','latsols','drilling','tryouts','premium','ranking','formations','notifications']);
+  function safeBannerUrl(v){return String(v||'').trim()}
+  function goBanner(url){
+    const u=safeBannerUrl(url); if(!u) return;
+    if(internalTargets.has(u)){ window.showView(u); return; }
+    if(/^https?:\/\//i.test(u)){ window.open(u,'_blank','noopener'); return; }
+  }
+  function makeCard(x,cls){
+    const url=safeBannerUrl(x.action_url);
+    const img=x.image_url?`<img src="${safe(x.image_url)}" alt="${safe(x.title||'Banner SIAP ASN')}">`:'';
+    const attrs=url?` data-url="${safe(url)}" role="link" tabindex="0" aria-label="Buka banner"`:'';
+    return `<article class="${cls}"${attrs}>${img}</article>`;
+  }
+  window.loadHome=async function(){
+    const area=document.getElementById('bannerArea');
+    if(!area) return;
+    area.innerHTML='<div class="sa-home-banner-layout"><div class="sa-home-carousel" id="saHomeCarousel"></div><div class="sa-home-side-banners" id="saHomeSideBanners"></div></div>';
+    try{
+      const now=new Date().toISOString();
+      const {data,error}=await sb.from('banners')
+        .select('title,image_url,action_url,sort_order,placement,starts_at,ends_at')
+        .eq('is_active',true).order('sort_order');
+      if(error) throw error;
+      const active=(data||[]).filter(x=>(!x.starts_at||x.starts_at<=now)&&(!x.ends_at||x.ends_at>=now));
+      const heroes=active.filter(x=>(x.placement||'hero')==='hero');
+      const sides=active.filter(x=>x.placement==='side').slice(0,3);
+      const heroBox=document.getElementById('saHomeCarousel');
+      const sideBox=document.getElementById('saHomeSideBanners');
+      const layout=area.querySelector('.sa-home-banner-layout');
+      heroBox.innerHTML=heroes.length?heroes.map((x,i)=>makeCard(x,'sa-hero-slide'+(i===0?' active':''))).join(''):'<article class="sa-hero-slide active sa-banner-fallback"></article>';
+      if(sides.length){sideBox.innerHTML=sides.map(x=>makeCard(x,'sa-side-banner')).join('');}
+      else {layout.classList.add('no-side');sideBox.innerHTML='';}
+      area.querySelectorAll('[data-url]').forEach(card=>{
+        card.addEventListener('click',()=>goBanner(card.dataset.url));
+        card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goBanner(card.dataset.url);}});
+      });
+      const slides=[...heroBox.querySelectorAll('.sa-hero-slide')];
+      if(slides.length>1){let i=0;clearInterval(window.__saBannerTimer);window.__saBannerTimer=setInterval(()=>{slides[i].classList.remove('active');i=(i+1)%slides.length;slides[i].classList.add('active');},5000);}
+    }catch(e){
+      console.error('Banner load failed',e);
+      const heroBox=document.getElementById('saHomeCarousel'); if(heroBox) heroBox.innerHTML='<article class="sa-hero-slide active sa-banner-fallback"></article>';
+      const layout=area.querySelector('.sa-home-banner-layout'); if(layout) layout.classList.add('no-side');
+    }
+  };
+  /* Exam UI has no Favorite action anymore. */
+  window.renderQuestion=function(){
+    const q=examQuestions[examIndex]; if(!q) return;
+    const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+    const area=document.getElementById('examArea'); if(!area) return;
+    area.innerHTML='<p>'+(examIndex+1)+' / '+examQuestions.length+'</p><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>';
+  };
+  /* Final startup path deliberately excludes the retired Favorite feature. */
+  let __saStartingClean=null;
+  window.startApp=async function(){
+    if(__saStartingClean) return __saStartingClean;
+    __saStartingClean=(async()=>{
+      const {data:{user}}=await sb.auth.getUser(); if(!user) return;
+      const landing=document.getElementById('landing'), app=document.getElementById('app');
+      if(landing) landing.style.display='none'; if(app){app.style.display='block';app.classList.add('sa-app-shell');}
+      if(typeof window.closeAuth==='function') window.closeAuth();
+      const userName=document.getElementById('userName'); if(userName) userName.textContent=(user.email||'').split('@')[0]||'Peserta';
+      await Promise.allSettled([
+        typeof window.loadMaterials==='function'?window.loadMaterials():Promise.resolve(),
+        typeof window.loadTryouts==='function'?window.loadTryouts():Promise.resolve(),
+        typeof window.loadLive==='function'?window.loadLive():Promise.resolve(),
+        typeof window.loadDashboard==='function'?window.loadDashboard():Promise.resolve(),
+        typeof window.loadProfile==='function'?window.loadProfile():Promise.resolve(),
+        typeof window.loadRanking==='function'?window.loadRanking('overall'):Promise.resolve(),
+        typeof window.loadNotifications==='function'?window.loadNotifications():Promise.resolve(),
+        typeof window.loadPremium==='function'?window.loadPremium():Promise.resolve(),
+        typeof window.loadSaHomePanels==='function'?window.loadSaHomePanels():Promise.resolve()
+      ]);
+      if(typeof window.loadProfileAndHeader==='function') window.loadProfileAndHeader().catch(()=>{});
+      await window.showView('home');
+      if(typeof window.refreshPublishedIcons==='function') window.refreshPublishedIcons();
+    })().finally(()=>{__saStartingClean=null;});
+    return __saStartingClean;
+  };
+  /* Removed feature routes stay unavailable even if an old script calls them. */
+  const baseShow=window.showView;
+  window.showView=async function(name){
+    if(['favorites','history','progress'].includes(name)) return window.showView('home');
+    return baseShow(name);
+  };
 })();
 </script>
 
