@@ -249,6 +249,11 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 @media(max-width:650px){.siap-activity-view{padding:0}.sa-activity-tabs{grid-template-columns:1fr}.sa-activity-card{padding-left:68px}.sa-activity-icon{left:14px}.sa-activity-new{right:12px;top:12px}}
 </style>
 
+
+<style id="material-reader-fix">
+/* === MATERIAL READER FIX === */
+.sa-material-reader{max-width:100%;padding:4px 0}.material-reader-summary{font-size:15px;line-height:1.7;margin:14px 0 18px}.material-reader-content{background:#fff;border:1px solid #e7eaf0;border-radius:16px;padding:22px 24px;color:#263342;font-size:16px;line-height:1.85;white-space:normal}.material-reader-content p{margin:0 0 16px}.material-reader-content p:last-child{margin-bottom:0}.material-empty-content{color:#7b8794;font-style:italic}.material-reader-actions{margin-top:16px}@media(max-width:700px){.material-reader-content{padding:17px;font-size:15px;line-height:1.75}.material-reader-actions{display:grid;grid-template-columns:repeat(2,1fr)}.material-reader-actions .btn:last-child{grid-column:1/-1}}
+</style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
@@ -544,7 +549,46 @@ async function loadFavorites(){const area=el('favoritesArea');area.innerHTML='<d
 async function loadMaterials(){const area=el('materialsArea');area.innerHTML='<div class="data-card">Memuat materi...</div>';try{const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});if(error)throw error;renderMaterials(data||[])}catch(e){area.innerHTML='<div class="data-card">Gagal memuat materi: '+safe(e.message)+'</div>'}}
 function renderMaterials(rows){const area=el('materialsArea');area.innerHTML='<div class="data-card feature-card" style="grid-column:1/-1"><div class="feature-toolbar"><input data-legacy-material-search="1" class="search-box" placeholder="Cari materi..." oninput="filterMaterials()"><button class="btn dark" onclick="loadMaterials()">Reset</button></div></div>'+((rows||[]).map(x=>`<div class="data-card feature-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')).toLowerCase())}">${x.cover_url?'<img class="material-cover" src="'+safe(x.cover_url)+'" alt="">':''}<div class="feature-top"><span class="tag">${safe(x.category_name||'Materi')}</span><span class="chip">${x.is_premium?'👑 Premium':'Gratis'}</span></div><h3>${safe(x.title)}</h3><p class="muted">${safe(x.summary||'')}</p><div class="material-progress-row"><div class="progress"><div style="width:${Math.max(0,Math.min(100,Number(x.progress_percent||0)))}%"></div></div><b>${Number(x.progress_percent||0)}%</b></div><button class="btn primary" style="margin-top:12px" onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>=100?'Baca Lagi':'Mulai Belajar'}</button></div>`).join('')||'<div class="data-card">Belum ada materi.</div>')}
 function filterMaterials(){const q=(el('materialSearch')?.value||'').trim().toLowerCase();document.querySelectorAll('.material-item').forEach(x=>x.style.display=!q||x.dataset.search.includes(q)?'':'none')}
-async function openMaterial(id){el('materialModal').classList.add('show');el('materialDetailArea').innerHTML='<div class="profile-loading">Memuat materi...</div>';try{const {data,error}=await sb.rpc('get_my_material_detail',{p_material_id:id});if(error)throw error;const m=Array.isArray(data)?data[0]:data;if(!m)throw new Error('Materi tidak ditemukan atau belum bisa diakses.');el('materialDetailArea').innerHTML=`<div class="feature-top"><div><span class="tag">${safe(m.category_name||'Materi')}</span><h2>${safe(m.title)}</h2></div><span class="chip">${Number(m.progress_percent||0)}%</span></div>${m.cover_url?'<img class="material-cover" src="'+safe(m.cover_url)+'" alt="">':''}<p class="muted">${safe(m.summary||'')}</p><div class="material-content">${safe(m.content||'Belum ada isi materi.')}</div><div class="material-progress-row"><div class="progress"><div id="materialProgressBar" style="width:${Number(m.progress_percent||0)}%"></div></div><b id="materialProgressValue">${Number(m.progress_percent||0)}%</b></div><div class="feature-toolbar"><button class="btn dark" onclick="setMaterialProgress('${m.id}',25)">25%</button><button class="btn dark" onclick="setMaterialProgress('${m.id}',50)">50%</button><button class="btn dark" onclick="setMaterialProgress('${m.id}',75)">75%</button><button class="btn primary" onclick="setMaterialProgress('${m.id}',100)">Tandai Selesai</button></div>`}catch(e){el('materialDetailArea').innerHTML='<div class="data-card">Gagal membuka materi: '+safe(e.message)+'</div>'}}
+function formatMaterialContent(value){
+  const text=String(value??'').replace(/\r\n/g,'\n').trim();
+  if(!text)return '<div class="material-empty-content">Isi materi belum tersedia.</div>';
+  return text.split(/\n{2,}/).map(block=>`<p>${safe(block).replace(/\n/g,'<br>')}</p>`).join('');
+}
+async function openMaterial(id){
+  const modal=el('materialModal'),area=el('materialDetailArea');
+  modal.classList.add('show');
+  area.innerHTML='<div class="profile-loading">Memuat isi materi...</div>';
+  try{
+    const {data,error}=await sb.rpc('get_my_material_detail',{p_material_id:id});
+    if(error)throw error;
+    let m=Array.isArray(data)?data[0]:data;
+    if(!m)throw new Error('Materi tidak ditemukan atau belum bisa diakses.');
+
+    // Fallback penting: bila RPC mengembalikan metadata tetapi kolom isi materi kosong,
+    // ambil isi asli langsung dari tabel materials tanpa mengubah data lain.
+    const detailContent=m.content??m.content_html??m.body??m.material_content??m.isi_materi??'';
+    if(!String(detailContent).trim()){
+      const {data:raw,error:rawError}=await sb.from('materials')
+        .select('id,title,summary,content,cover_url,is_premium,is_published,sort_order')
+        .eq('id',id).eq('is_published',true).maybeSingle();
+      if(!rawError&&raw)m={...raw,...m,content:raw.content??m.content};
+    }
+
+    const content=m.content??m.content_html??m.body??m.material_content??m.isi_materi??'';
+    const pct=Math.max(0,Math.min(100,Number(m.progress_percent||0)));
+    area.innerHTML=`
+      <article class="sa-material-reader">
+        <div class="feature-top"><div><span class="tag">${safe(m.category_name||'Materi')}</span><h2>${safe(m.title||'Materi')}</h2></div><span class="chip">${pct}%</span></div>
+        ${m.cover_url?'<img class="material-cover" src="'+safe(m.cover_url)+'" alt="Cover materi">':''}
+        ${m.summary?'<p class="muted material-reader-summary">'+safe(m.summary)+'</p>':''}
+        <div class="material-content material-reader-content">${formatMaterialContent(content)}</div>
+        <div class="material-progress-row"><div class="progress"><div id="materialProgressBar" style="width:${pct}%"></div></div><b id="materialProgressValue">${pct}%</b></div>
+        <div class="feature-toolbar material-reader-actions"><button class="btn dark" onclick="setMaterialProgress('${safe(m.id||id)}',25)">25%</button><button class="btn dark" onclick="setMaterialProgress('${safe(m.id||id)}',50)">50%</button><button class="btn dark" onclick="setMaterialProgress('${safe(m.id||id)}',75)">75%</button><button class="btn primary" onclick="setMaterialProgress('${safe(m.id||id)}',100)">Tandai Selesai</button></div>
+      </article>`;
+  }catch(e){
+    area.innerHTML='<div class="data-card">Gagal membuka materi: '+safe(e.message||'Terjadi kesalahan.')+'</div>';
+  }
+}
 async function setMaterialProgress(id,pct){try{const {data,error}=await sb.rpc('update_material_progress',{p_material_id:id,p_progress_percent:pct});if(error)throw error;const r=Array.isArray(data)?data[0]:data;const p=r?.progress_percent??pct;if(el('materialProgressBar'))el('materialProgressBar').style.width=p+'%';if(el('materialProgressValue'))el('materialProgressValue').textContent=p+'%'}catch(e){alert(e.message||'Gagal menyimpan progres materi.')}}
 function closeMaterial(){el('materialModal').classList.remove('show')}
 async function loadPremium(){const area=el('premiumArea');area.innerHTML='<div class="data-card">Memuat paket...</div>';try{const {data:plans,error}=await sb.rpc('get_premium_plans');if(error)throw error;const {data:prof}=await sb.from('profiles').select('membership,membership_expires_at').eq('id',(await sb.auth.getUser()).data.user.id).single();const active=prof?.membership==='premium'&&(!prof.membership_expires_at||new Date(prof.membership_expires_at)>new Date());area.innerHTML=`<div class="data-card"><div class="chip">${active?'👑 PREMIUM AKTIF':'AKUN FREE'}</div><h2>${active?'Akses Premium Aktif':'Upgrade ke Premium'}</h2><p class="muted">${active?(prof.membership_expires_at?'Berlaku sampai '+new Date(prof.membership_expires_at).toLocaleDateString('id-ID'):'Premium aktif'):'Buka materi dan tryout premium.'}</p></div><div class="plan-grid">${(plans||[]).map(p=>`<div class="plan-card"><span class="tag">PREMIUM</span><h3>${safe(p.name)}</h3><div class="plan-price">Rp ${Number(p.price||0).toLocaleString('id-ID')}</div><p>${safe(p.description||'Akses premium')}</p><p><b>${p.duration_days} hari</b></p><button class="btn primary" onclick="requestPremium('${p.id}')">Ajukan Paket</button></div>`).join('')||'<div class="data-card">Belum ada paket aktif.</div>'}</div><div id="paymentRequestArea"></div>`}catch(e){area.innerHTML='<div class="data-card">Gagal memuat Premium: '+safe(e.message)+'</div>'}}
