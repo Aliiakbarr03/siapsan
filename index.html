@@ -224,6 +224,31 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 /* HOME BANNER SYNC */
 .sa-home-banner-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);gap:16px;margin-bottom:18px}.sa-home-carousel{position:relative;min-height:270px;border-radius:22px;overflow:hidden;background:#2d245b}.sa-hero-slide{position:absolute;inset:0;display:none}.sa-hero-slide.active{display:block;animation:saFade .45s ease}.sa-hero-slide img,.sa-side-banner img{width:100%;height:100%;object-fit:cover;display:block}.sa-hero-slide:after,.sa-side-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,14,45,.88),rgba(18,14,45,.25),rgba(18,14,45,.1))}.sa-banner-overlay{position:absolute;z-index:2;left:26px;right:26px;bottom:24px;color:#fff}.sa-banner-overlay h3{font-size:28px;margin:5px 0}.sa-banner-overlay p{margin:0;opacity:.9}.sa-banner-cta{margin-top:14px;border:0;border-radius:11px;padding:10px 15px;font-weight:800;cursor:pointer}.sa-home-side-banners{display:grid;gap:12px}.sa-side-banner{position:relative;min-height:129px;border-radius:18px;overflow:hidden;background:#4b3e91}.sa-side-banner .sa-banner-overlay{left:17px;right:17px;bottom:15px}.sa-side-banner .sa-banner-overlay h3{font-size:17px}.sa-side-banner .sa-banner-overlay p{font-size:12px}.sa-side-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,14,45,.82),rgba(18,14,45,.22))}.sa-banner-fallback{background:linear-gradient(135deg,#5b50d6,#8f7bff)}@keyframes saFade{from{opacity:.2;transform:scale(1.01)}to{opacity:1;transform:scale(1)}}@media(max-width:820px){.sa-home-banner-layout{grid-template-columns:1fr}.sa-home-carousel{min-height:230px}.sa-home-side-banners{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.sa-home-side-banners{grid-template-columns:1fr}.sa-banner-overlay h3{font-size:23px}}
 </style>
+
+<style id="siap-asn-activities-ui">
+.siap-activity-view{max-width:980px;margin:0 auto;padding-top:8px}
+.sa-activity-tabs{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:7px;background:#f5f6fa;border:1px solid #e5e8ef;border-radius:16px;margin-bottom:14px}
+.sa-activity-tab{border:0;background:transparent;color:#7a8392;height:42px;border-radius:11px;font-weight:800;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.sa-activity-tab.active{background:#fff;color:#5547c9;box-shadow:0 5px 16px rgba(50,56,75,.08)}
+.sa-activity-tab em{display:none;min-width:18px;height:18px;padding:0 5px;border-radius:99px;background:#ef5c68;color:#fff;font-size:10px;font-style:normal;align-items:center;justify-content:center}
+.sa-activity-filters{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0 18px}
+.sa-activity-filter{height:34px;padding:0 14px;border:1px solid #dce1e9;border-radius:999px;background:#fff;color:#667182;font-size:12px;font-weight:800;cursor:pointer}
+.sa-activity-filter.active{background:#5d79a5;border-color:#5d79a5;color:#fff;box-shadow:0 6px 16px rgba(71,95,132,.16)}
+.sa-activity-list{display:grid;gap:12px}
+.sa-activity-card{position:relative;background:#fff;border:1px solid #e1e5ec;border-radius:16px;padding:16px 18px 16px 76px;min-height:112px;box-shadow:0 7px 22px rgba(38,45,61,.04)}
+.sa-activity-icon{position:absolute;left:18px;top:18px;width:42px;height:42px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,#5cc6b0,#3c8c88);color:#fff;font-size:20px}
+.sa-activity-meta{font-size:11px;color:#8a94a3;margin-bottom:4px}
+.sa-activity-title{font-size:15px;font-weight:900;color:#2f3745;margin-bottom:8px}
+.sa-activity-content{color:#586474;font-size:13px;line-height:1.55;white-space:pre-wrap;overflow-wrap:anywhere}
+.sa-activity-new{position:absolute;right:18px;top:16px;background:#ef5b5f;color:#fff;border-radius:99px;padding:3px 9px;font-size:10px;font-weight:900}
+.sa-activity-type{display:inline-flex;align-items:center;gap:5px;margin-top:10px;padding:4px 8px;border-radius:99px;background:#f3f5f8;color:#788393;font-size:10px;font-weight:800}
+.sa-activity-pagination{display:flex;justify-content:center;gap:8px;margin:20px 0}
+.sa-page-dot{width:34px;height:34px;border-radius:10px;border:1px solid #dfe3ea;background:#fff;color:#657080;font-weight:800;cursor:pointer}
+.sa-page-dot.active{background:#5d79a5;color:#fff;border-color:#5d79a5}
+.sa-activity-empty{padding:42px 20px;border:1px dashed #dce2ea;border-radius:16px;background:#fff;color:#7b8492;text-align:center}
+@media(max-width:650px){.siap-activity-view{padding:0}.sa-activity-tabs{grid-template-columns:1fr}.sa-activity-card{padding-left:68px}.sa-activity-icon{left:14px}.sa-activity-new{right:12px;top:12px}}
+</style>
+
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
@@ -236,7 +261,7 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div class="sa-top-brand"><span class="sa-logo-mark">SA</span><span><b>SIAP ASN</b><small>Persiapan Seleksi ASN</small></span></div>
       <div class="sa-top-links">
         <button type="button" onclick="showView('home')">Beranda</button>
-        <button type="button" onclick="showView('history')">Aktivitas</button>
+        <button type="button" onclick="showView('activities')">Aktivitas</button>
         <button type="button" onclick="showView('premium')">Pembelian</button>
       </div>
       <div class="profile-menu-wrap sa-account-wrap">
@@ -273,6 +298,17 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
           <div><div class="sa-section-head"><div><h2>Tryout Terbaru</h2><p>Ukur kemampuanmu secara berkala.</p></div><button class="sa-link-btn" onclick="showView('tryouts')">Semua tryout →</button></div><div id="saHomeTryouts" class="sa-stack"></div></div>
           <div><div class="sa-section-head"><div><h2>Ringkasan Performa</h2><p>Perkembangan terbaru akunmu.</p></div></div><div id="saHomePerf" class="sa-performance-card"></div></div>
         </div>
+      </div>
+
+
+      <div id="view-activities" class="view siap-activity-view">
+        <div class="sa-activity-tabs">
+          <button class="sa-activity-tab active" id="activityTabAnnouncements" type="button" onclick="setActivityTab('announcements')"><span>📣</span> Pengumuman <em id="activityNewBadge"></em></button>
+          <button class="sa-activity-tab" id="activityTabMine" type="button" onclick="setActivityTab('mine')"><span>🗂️</span> Aktivitas Saya</button>
+        </div>
+        <div class="sa-activity-filters" id="activityFilters"></div>
+        <div class="sa-activity-list" id="activitiesArea"><div class="sa-activity-empty">Memuat aktivitas...</div></div>
+        <div class="sa-activity-pagination" id="activityPagination"></div>
       </div>
 
       <div id="view-profile" class="view"><div class="profile-page-head"><div><div class="eyebrow">AKUN SAYA</div><h2>Profil Peserta</h2><p class="muted">Lengkapi biodata dan pasang foto profil langsung dari perangkatmu.</p></div><button class="btn dark" onclick="showView('home')">← Kembali</button></div><div id="profileArea"><div class="profile-loading">Memuat profil...</div></div></div>
@@ -888,6 +924,84 @@ showView=async function(name){
   window.showView=async function(name){
     if(['favorites','history','progress'].includes(name)) return window.showView('home');
     return baseShow(name);
+  };
+})();
+</script>
+
+
+<script id="siap-asn-activities-engine">
+(function(){
+  const state={tab:'announcements',filter:'all',page:1,perPage:6,rows:[],mine:[]};
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const labels={all:'Semua',information:'Informasi',system:'Update Sistem',quiz:'Kuisioner',payment:'Pembayaran',announcement:'Pengumuman'};
+  const icons={information:'📢',system:'⚙️',quiz:'📝',payment:'💳',announcement:'🔔'};
+  function fmt(d){
+    try{return new Intl.DateTimeFormat('id-ID',{weekday:'short',day:'numeric',month:'long',year:'numeric',hour:'2-digit',minute:'2-digit'}).format(new Date(d));}
+    catch(e){return d||''}
+  }
+  function currentRows(){
+    const src=state.tab==='mine'?state.mine:state.rows;
+    return state.filter==='all'?src:src.filter(x=>String(x.category||x.type||'information')===state.filter);
+  }
+  function renderFilters(){
+    const host=document.getElementById('activityFilters');if(!host)return;
+    const keys=state.tab==='mine'?['all','announcement','payment','information']:['all','information','system','quiz','payment'];
+    host.innerHTML=keys.map(k=>`<button class="sa-activity-filter ${state.filter===k?'active':''}" onclick="setActivityFilter('${k}')">${labels[k]||k}</button>`).join('');
+  }
+  function render(){
+    const host=document.getElementById('activitiesArea'),pager=document.getElementById('activityPagination');if(!host)return;
+    const rows=currentRows();const pages=Math.max(1,Math.ceil(rows.length/state.perPage));state.page=Math.min(state.page,pages);
+    const part=rows.slice((state.page-1)*state.perPage,state.page*state.perPage);
+    host.innerHTML=part.length?part.map(x=>{
+      const type=String(x.category||x.type||'information');
+      const title=esc(x.title||'Aktivitas terbaru');
+      const content=esc(x.content||x.message||'');
+      return `<article class="sa-activity-card"><div class="sa-activity-icon">${icons[type]||'📣'}</div>${x.is_new&&!x.is_read?'<span class="sa-activity-new">NEW</span>':''}<div class="sa-activity-meta">${esc(fmt(x.created_at))}</div><div class="sa-activity-title">${title}</div><div class="sa-activity-content">${content}</div><span class="sa-activity-type">${esc(labels[type]||type)}</span></article>`;
+    }).join(''):'<div class="sa-activity-empty">Belum ada aktivitas pada kategori ini.</div>';
+    pager.innerHTML=pages>1?Array.from({length:pages},(_,i)=>`<button class="sa-page-dot ${state.page===i+1?'active':''}" onclick="setActivityPage(${i+1})">${i+1}</button>`).join(''):'';
+  }
+  window.setActivityTab=function(tab){
+    state.tab=tab;state.filter='all';state.page=1;
+    document.getElementById('activityTabAnnouncements')?.classList.toggle('active',tab==='announcements');
+    document.getElementById('activityTabMine')?.classList.toggle('active',tab==='mine');
+    renderFilters();render();
+  };
+  window.setActivityFilter=function(filter){state.filter=filter;state.page=1;renderFilters();render();};
+  window.setActivityPage=function(page){state.page=page;render();document.getElementById('view-activities')?.scrollIntoView({block:'start',behavior:'smooth'});};
+  window.loadActivities=async function(){
+    const host=document.getElementById('activitiesArea');if(!host)return;
+    host.innerHTML='<div class="sa-activity-empty">Memuat aktivitas...</div>';
+    try{
+      const now=new Date().toISOString();
+      const [{data:ann,error:aerr},{data:{user}}]=await Promise.all([
+        sb.from('announcements').select('id,title,content,category,is_new,created_at').eq('is_active',true).order('created_at',{ascending:false}),
+        sb.auth.getUser()
+      ]);
+      if(aerr)throw aerr;
+      state.rows=(ann||[]).filter(x=>true);
+      state.mine=[];
+      if(user){
+        const {data:n,error:nerr}=await sb.from('notifications').select('id,title,message,type,is_read,created_at,action_url').eq('user_id',user.id).order('created_at',{ascending:false});
+        if(!nerr)state.mine=(n||[]).map(x=>({...x,category:x.type==='payment'?'payment':x.type==='announcement'?'announcement':'information',is_new:!x.is_read}));
+      }
+      const newCount=state.rows.filter(x=>x.is_new).length;
+      const badge=document.getElementById('activityNewBadge');
+      if(badge){badge.textContent=newCount>99?'99+':newCount;badge.style.display=newCount?'inline-flex':'none';}
+      renderFilters();render();
+    }catch(e){
+      host.innerHTML='<div class="sa-activity-empty">Gagal memuat aktivitas: '+esc(e.message||'Terjadi kesalahan')+'</div>';
+    }
+  };
+  const baseShow=window.showView;
+  window.showView=async function(name){
+    if(name==='activities'){
+      document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+      document.getElementById('view-activities')?.classList.add('active');
+      document.querySelectorAll('.navlinks button').forEach(b=>b.classList.toggle('active',b.textContent.trim()==='Aktivitas'));
+      await window.loadActivities();
+      return;
+    }
+    return typeof baseShow==='function'?baseShow(name):undefined;
   };
 })();
 </script>
