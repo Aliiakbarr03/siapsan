@@ -195,6 +195,15 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 .sa-course-icon .sa-pub-cat-icon{display:grid;place-items:center;width:30px;height:30px}
 .sa-course-icon .sa-pub-cat-icon svg{width:22px;height:22px;stroke-width:1.9}
 .sa-course-icon .sa-pub-cat-icon.legacy{font-size:22px;line-height:1}
+
+/* === SIAP ASN MATERIALS V2 === */
+.sa-material-hero{background:linear-gradient(135deg,#314f6d 0%,#466b8c 100%);border-radius:16px;padding:18px 20px;color:#fff;display:flex;align-items:center;gap:14px;margin-bottom:18px;box-shadow:0 10px 28px rgba(43,65,86,.10)}
+.sa-material-hero-icon{width:48px;height:48px;border-radius:11px;background:rgba(255,255,255,.17);display:grid;place-items:center;font-size:23px;flex:0 0 auto}.sa-material-hero h1{font:800 23px/1.15 "Plus Jakarta Sans",Inter,sans-serif;margin:0 0 5px}.sa-material-hero p{margin:0;color:rgba(255,255,255,.84);font-size:12px;line-height:1.45}
+.sa-material-controls{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px;margin:0 0 21px}.sa-material-bookmark{height:34px;border:1px solid #d8dee6;background:#fff;border-radius:9px;padding:0 16px;font-weight:800;color:#475567;cursor:pointer;display:flex;align-items:center;gap:8px}.sa-material-bookmark:hover{border-color:#8d84e8;color:#5b4fd2}.sa-material-select{width:100%;height:34px;border:1px solid #d8dee6;background:#fff;border-radius:9px;padding:0 12px;color:#687483;outline:none}.sa-material-search{grid-column:1/-1;width:100%;height:34px;border:1px solid #d8dee6;border-radius:9px;padding:0 13px;color:#596576;outline:none;background:#fff}.sa-material-search:focus,.sa-material-select:focus{border-color:#8c82e7;box-shadow:0 0 0 3px rgba(115,100,220,.10)}
+.sa-material-group{margin:0 0 24px}.sa-material-group-head{display:flex;align-items:flex-end;justify-content:space-between;margin:0 0 10px}.sa-material-group-title{margin:0;font:800 15px/1.2 "Plus Jakarta Sans",Inter,sans-serif;color:#2d3949;text-transform:uppercase}.sa-material-group-count{font-size:11px;color:#7d8794;margin-top:4px}.sa-material-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.sa-material-card{background:#fff;border:1px solid #dce1e7;border-radius:14px;padding:14px;min-height:198px;display:flex;flex-direction:column;position:relative;overflow:hidden}.sa-material-card:hover{border-color:#c7c1f3;box-shadow:0 9px 22px rgba(31,42,58,.07)}.sa-material-card-top{display:flex;gap:12px;align-items:flex-start}.sa-material-card-icon{width:45px;height:45px;border-radius:10px;background:#f0f3f7;display:grid;place-items:center;font-size:20px;flex:0 0 auto}.sa-material-card-main{min-width:0;flex:1}.sa-material-card h3{margin:0 0 5px;font-size:14px;color:#34404f;line-height:1.3}.sa-material-card-meta{font-size:11px;color:#667282}.sa-material-card p{font-size:12px;color:#75808e;line-height:1.45;margin:10px 0 9px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}.sa-material-free{position:absolute;right:0;top:0;background:#b7dfc1;color:#fff;font-size:10px;font-weight:900;padding:5px 14px;border-radius:0 13px 0 11px}.sa-material-premium{background:#d8c06f}.sa-material-sub{font-size:10px;color:#7b70d5;margin-top:3px;font-weight:700}.sa-material-progress{height:6px;background:#edf0f3;border-radius:999px;overflow:hidden;margin-top:auto}.sa-material-progress>i{display:block;height:100%;background:#7a70dc;border-radius:inherit}.sa-material-progress-meta{display:flex;justify-content:space-between;gap:8px;font-size:10px;color:#8a94a0;margin:6px 0 9px}.sa-material-start{height:33px;border:1px solid #cbd7e3;background:#fff;border-radius:8px;font-weight:800;color:#53687b;cursor:pointer}.sa-material-start:hover{border-color:#8e84e7;color:#5c50d2;background:#faf9ff}.sa-material-empty{background:#fff;border:1px dashed #ccd3dc;border-radius:14px;padding:30px;text-align:center;color:#7c8794}
+@media(max-width:800px){.sa-material-hero{align-items:flex-start}.sa-material-controls{grid-template-columns:1fr}.sa-material-grid{grid-template-columns:1fr}.sa-material-search{grid-column:auto}.sa-material-bookmark{justify-content:center}.sa-material-hero h1{font-size:20px}}
+
 </style>
 
 
@@ -275,9 +284,16 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div id="view-profile" class="view"><div class="profile-page-head"><div><div class="eyebrow">AKUN SAYA</div><h2>Profil Peserta</h2><p class="muted">Lengkapi biodata dan pasang foto profil langsung dari perangkatmu.</p></div><button class="btn dark" onclick="showView('home')">← Kembali</button></div><div id="profileArea"><div class="profile-loading">Memuat profil...</div></div></div>
 
       <div id="view-materials" class="view">
-        <div class="sa-page-title"><div><span class="sa-kicker">BELAJAR</span><h1>Materi CPNS</h1><p>Belajar materi secara bertahap dan lihat progresmu di setiap kategori.</p></div><button class="sa-outline-btn" onclick="showView('progress')">Lihat Progress →</button></div>
-        <div class="sa-filterbar"><button class="sa-filter active" type="button">Semua materi</button><button class="sa-filter" type="button" onclick="showView('favorites')">★ Bookmark</button><input id="materialSearch" class="sa-search" oninput="filterMaterials(this.value)" placeholder="Cari materi..."></div>
-        <div id="materialsArea" class="sa-course-grid"></div>
+        <div class="sa-material-hero">
+          <div class="sa-material-hero-icon">▦</div>
+          <div><h1>Materi CPNS</h1><p>Pelajari berbagai materi CPNS mulai dari informasi seleksi, kisi-kisi, tips persiapan, hingga pembahasan SKD untuk membantu persiapan seleksi ASN.</p></div>
+        </div>
+        <div class="sa-material-controls">
+          <button class="sa-material-bookmark" type="button" onclick="showView('favorites')">▱ &nbsp; Bookmark</button>
+          <select id="materialCategoryFilter" class="sa-material-select" onchange="applyMaterialFilters()"><option value="">Semua kategori</option></select>
+          <input id="materialSearch" class="sa-material-search" oninput="applyMaterialFilters()" placeholder="Cari materi...">
+        </div>
+        <div id="materialsArea"></div>
       </div>
 
       <div id="view-latsols" class="view">
@@ -587,12 +603,62 @@ async function loadHome(){
     }
   }catch(e){console.warn('loadHome view',e)}
 }
+let materialRows=[];
+function materialIconFor(name){
+  const n=String(name||'').toLowerCase();
+  if(n.includes('twk'))return '🇮🇩';
+  if(n.includes('tiu'))return '🧠';
+  if(n.includes('tkp'))return '🎯';
+  if(n.includes('informasi')||n.includes('kisi'))return '💬';
+  return '📚';
+}
+function populateMaterialCategories(rows){
+  const sel=document.getElementById('materialCategoryFilter'); if(!sel)return;
+  const current=sel.value;
+  const cats=[...new Set((rows||[]).map(x=>String(x.category_name||'Materi').trim()).filter(Boolean))].sort((a,b)=>a.localeCompare(b,'id'));
+  sel.innerHTML='<option value="">Semua kategori</option>'+cats.map(c=>`<option value="${safe(c)}">${safe(c)}</option>`).join('');
+  if(cats.includes(current))sel.value=current;
+}
+function applyMaterialFilters(){
+  const q=String(document.getElementById('materialSearch')?.value||'').trim().toLowerCase();
+  const cat=String(document.getElementById('materialCategoryFilter')?.value||'');
+  const filtered=materialRows.filter(x=>{
+    const hay=`${x.title||''} ${x.summary||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase();
+    return (!q||hay.includes(q)) && (!cat||String(x.category_name||'Materi')===cat);
+  });
+  renderMaterials(filtered);
+}
+function filterMaterials(q){
+  const input=document.getElementById('materialSearch');if(input&&q!==undefined)input.value=q;
+  applyMaterialFilters();
+}
 function renderMaterials(rows){
   const area=document.getElementById('materialsArea');if(!area)return;
-  area.innerHTML=((rows||[]).map(x=>`<div class="sa-course-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">${x.cover_url?`<img class="material-cover" src="${safe(x.cover_url)}" alt="">`:''}<div class="sa-card-top"><div class="sa-course-icon">▦</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:12px"><div class="sa-chip">${safe(x.category_name||'Materi')}</div>${x.subcategory?`<div class="sa-subcategory">${safe(x.subcategory)}</div>`:''}<h3>${safe(x.title)}</h3><p>${safe(x.summary||'')}</p></div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.progress_percent||0)))}%"></div></div><div class="sa-card-meta"><span>${Number(x.progress_percent||0)}% selesai</span><span>${safe(x.subcategory||x.category_name||'Materi')}</span></div><button class="sa-card-action" onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>=100?'Baca Lagi':'Mulai Belajar'} →</button></div>`).join('')||'<div class="sa-course-card">Belum ada materi yang tersedia.</div>');
+  if(!(rows||[]).length){area.innerHTML='<div class="sa-material-empty">Belum ada materi yang sesuai.</div>';return;}
+  const groups={};
+  (rows||[]).forEach(x=>{const key=String(x.category_name||'Materi').trim()||'Materi';(groups[key]||(groups[key]=[])).push(x)});
+  area.innerHTML=Object.entries(groups).sort((a,b)=>a[0].localeCompare(b[0],'id')).map(([name,list])=>{
+    const cards=list.map(x=>{
+      const pct=Math.max(0,Math.min(100,Number(x.progress_percent||0)));
+      const summary=safe(String(x.summary||'Materi pembelajaran untuk persiapan seleksi ASN.'));
+      const status=x.is_premium?'Premium':'Free';
+      return `<article class="sa-material-card material-item">
+        <span class="sa-material-free ${x.is_premium?'sa-material-premium':''}">${status}</span>
+        <div class="sa-material-card-top"><div class="sa-material-card-icon">${x.cover_url?`<img src="${safe(x.cover_url)}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:10px">`:materialIconFor(name)}</div><div class="sa-material-card-main"><h3>${safe(x.title||'Materi ASN')}</h3><div class="sa-material-card-meta">${safe(x.subcategory||name)}</div>${x.subcategory?`<div class="sa-material-sub">${safe(name)}</div>`:''}</div></div>
+        <p>${summary}</p>
+        <div class="sa-material-progress"><i style="width:${pct}%"></i></div>
+        <div class="sa-material-progress-meta"><span>${pct>=100?'Selesai':pct>0?'Sedang dipelajari':'Belum dimulai'}</span><span>${pct}%</span></div>
+        <button class="sa-material-start" onclick="openMaterial('${x.id}')">${pct>=100?'Baca Lagi':'Mulai Belajar'} &nbsp;→</button>
+      </article>`;
+    }).join('');
+    return `<section class="sa-material-group"><div class="sa-material-group-head"><div><h2 class="sa-material-group-title">${materialIconFor(name)} &nbsp;${safe(name)}</h2><div class="sa-material-group-count">${list.length} materi tersedia</div></div></div><div class="sa-material-grid">${cards}</div></section>`;
+  }).join('');
 }
-function filterMaterials(q){const s=String(q||'').trim().toLowerCase();document.querySelectorAll('.material-item').forEach(x=>{x.style.display=!s||x.dataset.search.includes(s)?'':'none'})}
-async function loadMaterials(){const area=document.getElementById('materialsArea');if(area)area.innerHTML='<div class="sa-course-card">Memuat materi...</div>';try{const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});if(error)throw error;renderMaterials(data||[])}catch(e){if(area)area.innerHTML=`<div class="sa-course-card">Gagal memuat materi: ${safe(e.message)}</div>`}}
+async function loadMaterials(){
+  const area=document.getElementById('materialsArea');if(area)area.innerHTML='<div class="sa-material-empty">Memuat materi...</div>';
+  try{const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});if(error)throw error;materialRows=data||[];populateMaterialCategories(materialRows);applyMaterialFilters();}
+  catch(e){if(area)area.innerHTML=`<div class="sa-material-empty">Gagal memuat materi: ${safe(e.message||'Terjadi kesalahan.')}</div>`}
+}
 async function loadTryouts(){const area=document.getElementById('tryoutsArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat tryout...</div>';try{const {data,error}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium,type').in('status',['published','scheduled']).neq('type','live').order('created_at',{ascending:false});if(error)throw error;area.innerHTML=(data||[]).map(x=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">▤</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:13px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Simulasi untuk mengukur kemampuanmu.')}</p></div><div class="sa-card-meta" style="margin-top:12px"><span>${Number(x.duration_minutes||100)} menit</span><span>${x.type==='practice'?'Latihan':'Tryout'}</span></div><button class="sa-card-action" onclick="startExam('${x.id}')">Kerjakan Tryout →</button></div>`).join('')||'<div class="sa-course-card">Belum ada tryout.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat tryout: ${safe(e.message)}</div>`}}
 async function loadFavorites(){const area=document.getElementById('favoritesArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat favorit...</div>';try{const {data,error}=await sb.rpc('get_my_favorites');if(error)throw error;const rows=data||[];area.innerHTML=rows.length?rows.map(q=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">★</div><button class="favorite-btn active" onclick="toggleFavorite('${q.question_id}',this)">★</button></div><div style="margin-top:13px"><h3>${safe(q.category_name||'Soal')} · ${safe(String(q.type||'').toUpperCase())}</h3><p style="font-weight:700;color:#414a57;line-height:1.6">${safe(q.question_text)}</p></div><p class="muted"><b>A.</b> ${safe(q.option_a)}<br><b>B.</b> ${safe(q.option_b)}<br><b>C.</b> ${safe(q.option_c)}<br><b>D.</b> ${safe(q.option_d)}${q.option_e?'<br><b>E.</b> '+safe(q.option_e):''}</p><div class="payment-box" style="margin-top:12px"><b>Kunci: ${safe(q.correct_answer||'-')}</b><div class="muted" style="margin-top:5px">${safe(q.explanation||'Belum ada pembahasan.')}</div></div></div>`).join(''):'<div class="sa-course-card">Belum ada soal favorit.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat favorit: ${safe(e.message)}</div>`}}
 async function loadLive(){const area=document.getElementById('liveArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat jadwal...</div>';clearInterval(liveCountdownTimer);try{const {data,error}=await sb.rpc('get_my_live_tryouts');if(error)throw error;const rows=data||[];area.innerHTML=rows.length?rows.map(x=>{const now=Date.now(),s=new Date(x.starts_at).getTime(),en=new Date(x.ends_at).getTime(),st=now<s?'waiting':now<en?'live':'done';return `<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon" style="background:${st==='live'?'#eaf8f2':'#fff0f0'};color:${st==='live'?'#168260':'#d04a59'}">●</div><span class="live-status ${st}">${st==='waiting'?'Akan dimulai':st==='live'?'Sedang berlangsung':'Selesai'}</span></div><div style="margin-top:13px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Live Tryout SIAP ASN.')}</p></div><div class="sa-card-meta" style="margin-top:12px"><span>${new Date(x.starts_at).toLocaleString('id-ID')}</span><span>${Number(x.participant_count||0)} peserta</span></div><div class="live-countdown" id="livecd-${x.tryout_id}" style="margin-top:12px">${st==='waiting'?formatCountdown(s-now):st==='live'?formatCountdown(en-now):'Berakhir'}</div><button class="sa-card-action" ${st!=='live'?'disabled':''} onclick="startLiveExam('${x.tryout_id}')">${st==='waiting'?'Belum dimulai':st==='live'?'Masuk Live':'Selesai'}</button></div>`}).join(''):'<div class="sa-course-card">Belum ada jadwal Live Tryout.</div>';if(rows.length)liveCountdownTimer=setInterval(()=>rows.forEach(x=>{const e=document.getElementById('livecd-'+x.tryout_id);if(!e)return;const n=Date.now(),s=new Date(x.starts_at).getTime(),en=new Date(x.ends_at).getTime();e.textContent=n<s?formatCountdown(s-n):n<en?formatCountdown(en-n):'Berakhir'}),1000)}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat Live: ${safe(e.message)}</div>`}}
