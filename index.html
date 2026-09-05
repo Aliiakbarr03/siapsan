@@ -668,11 +668,35 @@ async function startLatsol(id){
 }
 function renderPracticeQuestion(){
   const target=practiceState.target==='drilling'?'drillingArea':'latsolsArea';
-  const a=el(target),q=practiceState.rows[practiceState.index];if(!a||!q)return;const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+  const a=el(target),q=practiceState.rows[practiceState.index];
+  if(!a||!q)return;
+
+  const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
   const label=practiceState.target==='drilling'?'DRILLING':'LATSOL';
-  a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">${label}</span>${q.subcategory?`<div class="sa-subcategory">${safe(q.subcategory)}</div>`:''}<h2 style="margin:5px 0">Soal ${practiceState.index+1} dari ${practiceState.rows.length}</h2><p>${safe(practiceState.title)}</p></div><button class="sa-outline-btn" onclick="${practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()'}">Keluar</button></div><div class="data-card" style="padding:22px"><div class="question" style="margin:0 0 18px;font-size:19px">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${practiceState.selected===k?'selected':''}" onclick="choosePractice('${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}<div id="practiceFeedback"></div><div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px"><span class="muted">${practiceState.index+1}/${practiceState.rows.length}</span><button class="btn primary" ${practiceState.selected?'':'disabled'} onclick="nextPractice()">${practiceState.index===practiceState.rows.length-1?'Selesai':'Berikutnya →'}</button></div></div>`;
+  const locked=!!practiceState.selected;
+
+  a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">${label}</span>${q.subcategory?`<div class="sa-subcategory">${safe(q.subcategory)}</div>`:''}<h2 style="margin:5px 0">Soal ${practiceState.index+1} dari ${practiceState.rows.length}</h2><p>${safe(practiceState.title)}</p></div><button class="sa-outline-btn" onclick="${practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()'}">Keluar</button></div><div class="data-card" style="padding:22px"><div class="question" style="margin:0 0 18px;font-size:19px">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${practiceState.selected===k?'selected':''}" ${locked?'disabled':''} onclick="choosePractice('${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}<div id="practiceFeedback"></div><div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px"><span class="muted">${practiceState.index+1}/${practiceState.rows.length}</span><button class="btn primary" ${practiceState.selected?'':'disabled'} onclick="nextPractice()">${practiceState.index===practiceState.rows.length-1?'Selesai':'Berikutnya →'}</button></div></div>`;
+
+  if(locked){
+    const chosen=practiceState.selected;
+    const ok=String(chosen).toUpperCase()===String(q.correct_answer||'').toUpperCase();
+    const f=el('practiceFeedback');
+    if(f)f.innerHTML=`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;
+  }
 }
-function choosePractice(k){practiceState.selected=k;practiceState.answers[practiceState.rows[practiceState.index].id]=k;renderPracticeQuestion();const q=practiceState.rows[practiceState.index],f=el('practiceFeedback');const ok=String(k).toUpperCase()===String(q.correct_answer||'').toUpperCase();if(f)f.innerHTML=`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;}
+
+function choosePractice(k){
+  // Setelah satu jawaban dipilih, soal langsung dikunci dan jawaban tidak bisa diubah.
+  if(practiceState.selected)return;
+
+  const q=practiceState.rows[practiceState.index];
+  if(!q)return;
+
+  practiceState.selected=k;
+  practiceState.answers[q.id]=k;
+  renderPracticeQuestion();
+}
+
 async function nextPractice(){
   if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
   const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});if(error){alert(error.message);return;}
