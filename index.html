@@ -205,6 +205,9 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 <style id="real-drilling-ui">
 /* === REAL DRILLING DASHBOARD === */
 .sa-drill-wrap{display:grid;gap:18px}.sa-drill-hero-v2{background:linear-gradient(135deg,#23496d,#355f88);color:#fff;border-radius:22px;padding:24px 26px;display:grid;grid-template-columns:1.15fr .85fr;gap:22px;box-shadow:0 12px 28px rgba(31,65,99,.16)}.sa-drill-hero-v2 h2{color:#fff!important;margin:8px 0;font-size:26px}.sa-drill-hero-v2 p{margin:0;color:rgba(255,255,255,.78);line-height:1.6}.sa-drill-badge{display:inline-flex;gap:7px;align-items:center;background:rgba(255,255,255,.13);padding:7px 11px;border-radius:999px;font-size:11px;font-weight:800}.sa-drill-actions{display:flex;gap:10px;margin-top:18px;flex-wrap:wrap}.sa-drill-primary{border:0;background:#fff;color:#23496d;padding:11px 16px;border-radius:12px;font-weight:900;cursor:pointer}.sa-drill-secondary{border:1px solid rgba(255,255,255,.28);background:rgba(255,255,255,.08);color:#fff;padding:11px 16px;border-radius:12px;font-weight:800;cursor:pointer}.sa-drill-snapshot{border-left:1px solid rgba(255,255,255,.2);padding-left:22px;display:grid;grid-template-columns:1fr 1fr;gap:10px;align-content:center}.sa-drill-snapshot div{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.12);border-radius:13px;padding:12px}.sa-drill-snapshot span{display:block;font-size:10px;color:rgba(255,255,255,.62);text-transform:uppercase;font-weight:800}.sa-drill-snapshot b{display:block;font-size:21px;margin-top:5px}.sa-drill-kicker{font-size:10px;font-weight:900;letter-spacing:.1em;color:#7788a0;text-transform:uppercase}.sa-drill-section h3{margin:5px 0;font-size:17px}.sa-drill-section p{margin:0;color:#7c8797;font-size:12px}.sa-drill-indicators{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.sa-drill-indicator{background:#fff;border:1px solid #e5e8ed;border-radius:15px;padding:14px;box-shadow:0 5px 16px rgba(30,40,55,.035)}.sa-drill-indicator span{display:block;font-size:10px;color:#87909d;font-weight:800;text-transform:uppercase}.sa-drill-indicator b{display:block;font-size:22px;margin-top:8px}.sa-drill-modes{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.sa-drill-mode{border:1px solid #e2e6eb;background:#fff;border-radius:16px;padding:16px;text-align:left;cursor:pointer;transition:.18s;min-height:178px}.sa-drill-mode:hover{transform:translateY(-3px);border-color:#8294aa;box-shadow:0 12px 24px rgba(40,50,65,.08)}.sa-drill-mode.recommended{border-color:#416e95;box-shadow:0 0 0 3px rgba(65,110,149,.08)}.sa-drill-mode .ico{width:36px;height:36px;border-radius:11px;display:grid;place-items:center;background:#edf5ef;color:#28765c;font-weight:900;margin-bottom:13px}.sa-drill-mode:nth-child(2) .ico{background:#eef3fb;color:#3c6fa6}.sa-drill-mode:nth-child(3) .ico{background:#f4f4f6;color:#697280}.sa-drill-mode:nth-child(4) .ico{background:#f8eef1;color:#b65c78}.sa-drill-mode h4{margin:0 0 7px;font-size:14px}.sa-drill-mode p{font-size:11px;line-height:1.55;color:#7b8491;margin:0}.sa-drill-mode small{display:block;margin-top:15px;font-size:10px;color:#8c95a1}.sa-drill-master{background:#fff;border:1px dashed #d8dde5;border-radius:16px;overflow:hidden}.sa-drill-master-row{display:grid;grid-template-columns:1.6fr .5fr .8fr .8fr;gap:12px;align-items:center;padding:14px 16px;border-bottom:1px solid #edf0f3}.sa-drill-master-row:last-child{border-bottom:0}.sa-drill-master-row small{display:block;color:#87909c;margin-top:3px}.sa-drill-empty{padding:34px;text-align:center;background:#fff;border:1px dashed #d8dde5;border-radius:16px;color:#7d8795}.sa-drill-session{display:grid;grid-template-columns:58px 1fr 70px;gap:12px;align-items:center;background:#fff;border:1px solid #e4e8ed;border-radius:14px;padding:13px 15px;margin-top:8px}.sa-drill-score{text-align:right;font-weight:900}.sa-drill-config{background:#fff;border:1px solid #e2e6eb;border-radius:18px;padding:18px}.sa-drill-config-grid{display:grid;grid-template-columns:1fr 1fr 110px;gap:12px}.sa-drill-config select,.sa-drill-config input{width:100%;padding:11px;border:1px solid #dfe4ea;border-radius:11px;background:#fff}.sa-drill-config label{font-size:11px;font-weight:800;color:#737e8d;display:block;margin-bottom:6px}@media(max-width:950px){.sa-drill-modes{grid-template-columns:1fr 1fr}.sa-drill-indicators{grid-template-columns:1fr 1fr}.sa-drill-hero-v2{grid-template-columns:1fr}.sa-drill-snapshot{border-left:0;border-top:1px solid rgba(255,255,255,.2);padding-left:0;padding-top:18px}}@media(max-width:620px){.sa-drill-modes,.sa-drill-indicators{grid-template-columns:1fr}.sa-drill-snapshot{grid-template-columns:1fr 1fr}.sa-drill-master-row{grid-template-columns:1fr 60px}.sa-drill-master-row .drill-hide-mobile{display:none}.sa-drill-config-grid{grid-template-columns:1fr}}
+
+/* HOME BANNER SYNC */
+.sa-home-banner-layout{display:grid;grid-template-columns:minmax(0,2fr) minmax(230px,1fr);gap:16px;margin-bottom:18px}.sa-home-carousel{position:relative;min-height:270px;border-radius:22px;overflow:hidden;background:#2d245b}.sa-hero-slide{position:absolute;inset:0;display:none}.sa-hero-slide.active{display:block;animation:saFade .45s ease}.sa-hero-slide img,.sa-side-banner img{width:100%;height:100%;object-fit:cover;display:block}.sa-hero-slide:after,.sa-side-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,14,45,.88),rgba(18,14,45,.25),rgba(18,14,45,.1))}.sa-banner-overlay{position:absolute;z-index:2;left:26px;right:26px;bottom:24px;color:#fff}.sa-banner-overlay h3{font-size:28px;margin:5px 0}.sa-banner-overlay p{margin:0;opacity:.9}.sa-banner-cta{margin-top:14px;border:0;border-radius:11px;padding:10px 15px;font-weight:800;cursor:pointer}.sa-home-side-banners{display:grid;gap:12px}.sa-side-banner{position:relative;min-height:129px;border-radius:18px;overflow:hidden;background:#4b3e91}.sa-side-banner .sa-banner-overlay{left:17px;right:17px;bottom:15px}.sa-side-banner .sa-banner-overlay h3{font-size:17px}.sa-side-banner .sa-banner-overlay p{font-size:12px}.sa-side-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(18,14,45,.82),rgba(18,14,45,.22))}.sa-banner-fallback{background:linear-gradient(135deg,#5b50d6,#8f7bff)}@keyframes saFade{from{opacity:.2;transform:scale(1.01)}to{opacity:1;transform:scale(1)}}@media(max-width:820px){.sa-home-banner-layout{grid-template-columns:1fr}.sa-home-carousel{min-height:230px}.sa-home-side-banners{grid-template-columns:repeat(2,minmax(0,1fr))}}@media(max-width:520px){.sa-home-side-banners{grid-template-columns:1fr}.sa-banner-overlay h3{font-size:23px}}
 </style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
@@ -218,10 +221,9 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div class="sa-top-brand"><span class="sa-logo-mark">SA</span><span><b>SIAP ASN</b><small>Persiapan Seleksi ASN</small></span></div>
       <div class="sa-top-links">
         <button type="button" onclick="showView('home')">Beranda</button>
-        <button type="button" onclick="showView('home')">Aktivitas</button>
+        <button type="button" onclick="showView('history')">Aktivitas</button>
         <button type="button" onclick="showView('premium')">Pembelian</button>
       </div>
-      <button class="sa-top-notif" type="button" onclick="showView('notifications')" aria-label="Notifikasi">🔔<em id="saNotifBadgeTop"></em></button>
       <div class="profile-menu-wrap sa-account-wrap">
         <button id="profileMenuBtn" class="profile-trigger sa-profile-trigger" type="button" onclick="toggleProfileMenu()">
           <span class="top-avatar-wrap"><img id="topAvatar" class="top-avatar" alt="Profil"><span id="topAvatarFallback" class="top-avatar-fallback">P</span></span>
@@ -233,13 +235,23 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
   </div>
   <div class="sa-layout">
     <aside id="saSidebar" class="sa-sidebar">
+      <div class="sa-sidebar-label">BELAJAR</div>
       <button class="sa-nav active" data-sa-view="home" onclick="showView('home')"><span class="sa-icon i-home">⌂</span><span>Beranda</span></button>
       <button class="sa-nav" data-sa-view="materials" onclick="showView('materials')"><span class="sa-icon i-material">▦</span><span>Materi</span></button>
       <button class="sa-nav" data-sa-view="latsols" onclick="showView('latsols')"><span class="sa-icon i-latsol">▤</span><span>Latsol</span></button>
       <button class="sa-nav" data-sa-view="drilling" onclick="showView('drilling')"><span class="sa-icon i-drill">◈</span><span>Drilling Soal</span></button>
       <button class="sa-nav" data-sa-view="tryouts" onclick="showView('tryouts')"><span class="sa-icon i-tryout">▤</span><span>Tryout</span></button>
+      <button class="sa-nav" data-sa-view="favorites" onclick="showView('favorites')"><span class="sa-icon i-fav">★</span><span>Favorit</span></button>
+
+      <div class="sa-sidebar-label sa-label-gap">PERFORMA</div>
+      <button class="sa-nav" data-sa-view="history" onclick="showView('history')"><span class="sa-icon i-history">◷</span><span>Riwayat & Analisis</span></button>
       <button class="sa-nav" data-sa-view="ranking" onclick="showView('ranking')"><span class="sa-icon i-rank">♛</span><span>Ranking</span></button>
+      <button class="sa-nav" data-sa-view="progress" onclick="showView('progress')"><span class="sa-icon i-progress">▥</span><span>Progress Belajar</span></button>
+
+      <div class="sa-sidebar-label sa-label-gap">INFORMASI</div>
       <button class="sa-nav" data-sa-view="formations" onclick="showView('formations')"><span class="sa-icon i-formasi">▤</span><span>Formasi CPNS</span></button>
+      <button class="sa-nav sa-nav-notif" data-sa-view="notifications" onclick="showView('notifications')"><span class="sa-icon i-notif">●</span><span>Notifikasi</span><em id="saNotifBadge"></em></button>
+
       <div class="sa-side-premium" onclick="showView('premium')"><div class="sa-crown">♛</div><div><b>Upgrade Premium</b><small>Belajar tanpa batas</small></div><span>›</span></div>
     </aside>
 
@@ -247,34 +259,17 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
       <div class="sa-breadcrumb"><span>SIAP ASN</span><b>/</b><strong id="saPageLabel">Beranda</strong></div>
 
       <div id="view-home" class="view active">
-        <section class="sa-wow-home">
-          <div class="sa-wow-hero-row">
-            <div class="sa-wow-carousel-card" id="saWowCarousel">
-              <div id="bannerArea" class="sa-wow-slides"><div class="sa-wow-loading">Menyiapkan informasi terbaru...</div></div>
-              <div class="sa-wow-carousel-bottom"><div id="saWowDots" class="sa-wow-dots"></div><div class="sa-wow-controls"><button type="button" onclick="saWowPrev()">‹</button><button type="button" onclick="saWowNext()">›</button></div></div>
-            </div>
-            <div class="sa-wow-sidebanners">
-              <button class="sa-wow-mini-banner mini-blue" onclick="showView('drilling')"><span>🎯</span><div><small>LATIHAN CERDAS</small><b>Drilling adaptif</b><em>Perkuat kelemahan →</em></div></button>
-              <button class="sa-wow-mini-banner mini-purple" onclick="showView('tryouts')"><span>🏆</span><div><small>SIMULASI</small><b>Tryout terbaru</b><em>Ukur kemampuan →</em></div></button>
-              <button class="sa-wow-mini-banner mini-gold" onclick="showView('premium')"><span>👑</span><div><small>SIAP ASN PREMIUM</small><b>Belajar tanpa batas</b><em>Lihat benefit →</em></div></button>
-            </div>
-          </div>
-
-          <div class="sa-wow-progress-card">
-            <div class="sa-wow-progress-head"><div><span class="sa-kicker">PROGRES BELAJAR</span><h2 id="saWowGreeting">Lanjutkan perjalananmu</h2><p id="saWowProgressText">Kami sedang menyiapkan ringkasan belajarmu.</p></div><button class="sa-wow-primary" onclick="showView('materials')">Mulai Belajar <span>→</span></button></div>
-            <div class="sa-wow-progress-body"><div class="sa-wow-score"><small>RATA-RATA PROGRES</small><b id="saWowProgress">0%</b></div><div class="sa-wow-progress-track"><div id="saWowProgressFill"></div></div><div class="sa-wow-stat-row"><div><small>Materi</small><b id="saWowMaterialCount">0</b></div><div><small>Latsol</small><b id="saWowLatsolCount">0</b></div><div><small>Tryout</small><b id="saWowTryoutCount">0</b></div></div></div>
-          </div>
-
-          <div class="sa-wow-section"><div class="sa-wow-section-head"><div><span class="sa-kicker">LATIHAN</span><h2>Latsol Pilihan</h2><p>Paket latihan yang siap kamu kerjakan.</p></div><button onclick="showView('latsols')">Lihat Semua →</button></div><div id="saWowLatsols" class="sa-wow-card-grid"></div></div>
-
-          <div class="sa-wow-section"><div class="sa-wow-section-head"><div><span class="sa-kicker">BELAJAR</span><h2>Materi Pilihan</h2><p>Lanjutkan materi untuk memperkuat pemahamanmu.</p></div><button onclick="showView('materials')">Lihat Semua →</button></div><div id="saHomeMaterials" class="sa-wow-card-grid"></div></div>
-
-          <div class="sa-wow-bottom-grid">
-            <div class="sa-wow-section sa-wow-tryout-panel"><div class="sa-wow-section-head"><div><span class="sa-kicker">SIMULASI</span><h2>Tryout Terbaru</h2><p>Ukur kemampuanmu secara berkala.</p></div><button onclick="showView('tryouts')">Lihat Semua →</button></div><div id="saHomeTryouts" class="sa-wow-tryout-list"></div></div>
-            <div class="sa-wow-section sa-wow-performance-panel"><div class="sa-wow-section-head"><div><span class="sa-kicker">PERFORMA</span><h2>Ringkasan Performa</h2><p>Perkembangan terbaru akunmu.</p></div></div><div id="saHomePerf" class="sa-wow-perf-grid"></div></div>
-          </div>
-        </section>
+        <div class="sa-welcome-head"><div><span class="sa-kicker">RUANG BELAJAR</span><h1>Hai, <span id="userName"></span></h1><p>Siap meningkatkan peluangmu lolos seleksi ASN hari ini?</p></div><button class="sa-outline-btn" onclick="showView('materials')">Mulai Belajar →</button></div>
+        <div id="bannerArea"></div>
+        <div id="dashboardArea"></div>
+        <div class="sa-section-head"><div><h2>Lanjutkan Belajar</h2><p>Materi yang bisa langsung kamu lanjutkan.</p></div><button class="sa-link-btn" onclick="showView('materials')">Lihat semua →</button></div>
+        <div id="saHomeMaterials" class="sa-course-grid"></div>
+        <div class="sa-home-columns">
+          <div><div class="sa-section-head"><div><h2>Tryout Terbaru</h2><p>Ukur kemampuanmu secara berkala.</p></div><button class="sa-link-btn" onclick="showView('tryouts')">Semua tryout →</button></div><div id="saHomeTryouts" class="sa-stack"></div></div>
+          <div><div class="sa-section-head"><div><h2>Ringkasan Performa</h2><p>Perkembangan terbaru akunmu.</p></div></div><div id="saHomePerf" class="sa-performance-card"></div></div>
+        </div>
       </div>
+
       <div id="view-profile" class="view"><div class="profile-page-head"><div><div class="eyebrow">AKUN SAYA</div><h2>Profil Peserta</h2><p class="muted">Lengkapi biodata dan pasang foto profil langsung dari perangkatmu.</p></div><button class="btn dark" onclick="showView('home')">← Kembali</button></div><div id="profileArea"><div class="profile-loading">Memuat profil...</div></div></div>
 
       <div id="view-materials" class="view">
@@ -566,20 +561,35 @@ async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)r
 /* === FINAL SAFE VIEW RENDERERS === */
 async function loadHome(){
   try{
+    const now=new Date().toISOString();
     const [banners,liveCount]=await Promise.all([
-      sb.from('banners').select('title,subtitle,image_url,action_url').eq('is_active',true).order('sort_order').limit(3),
+      sb.from('banners').select('title,subtitle,image_url,action_url,sort_order,placement,cta_label,starts_at,ends_at').eq('is_active',true).order('sort_order'),
       sb.rpc('get_my_live_tryouts')
     ]);
+    if(banners.error)throw banners.error;
+    const active=(banners.data||[]).filter(x=>(!x.starts_at||x.starts_at<=now)&&(!x.ends_at||x.ends_at>=now));
+    const heroes=active.filter(x=>(x.placement||'hero')==='hero');
+    const sides=active.filter(x=>x.placement==='side');
     const ba=document.getElementById('bannerArea');
-    if(ba){ba.innerHTML=(banners.data||[]).map(x=>`<div class="sa-banner"><div><div class="sa-kicker">INFORMASI SIAP ASN</div><h3>${safe(x.title||'Persiapan ASN')}</h3><p>${safe(x.subtitle||'Tetap konsisten belajar dan ukur progresmu.')}</p></div>${x.image_url?`<img src="${safe(x.image_url)}" alt="">`:''}</div>`).join('')}
+    if(ba){
+      ba.innerHTML=`<div class="sa-home-banner-layout">
+        <div class="sa-home-carousel" id="saHomeCarousel"></div>
+        <div class="sa-home-side-banners" id="saHomeSideBanners"></div>
+      </div>`;
+      const heroBox=document.getElementById('saHomeCarousel');
+      const sideBox=document.getElementById('saHomeSideBanners');
+      const card=(x,cls='')=>`<article class="${cls}">${x.image_url?`<img src="${safe(x.image_url)}" alt="${safe(x.title||'Banner')}">`:''}<div class="sa-banner-overlay"><div class="sa-kicker">SIAP ASN</div><h3>${safe(x.title||'Persiapan ASN')}</h3>${x.subtitle?`<p>${safe(x.subtitle)}</p>`:''}${x.action_url?`<button class="sa-banner-cta" data-url="${safe(x.action_url)}">${safe(x.cta_label||'Lihat Selengkapnya')} →</button>`:''}</div></article>`;
+      heroBox.innerHTML=heroes.length?heroes.map((x,i)=>card(x,'sa-hero-slide'+(i?'':' active'))).join(''):'<article class="sa-hero-slide active sa-banner-fallback"><div class="sa-banner-overlay"><div class="sa-kicker">SIAP ASN</div><h3>Belajar Lebih Terarah</h3><p>Pilih materi, latsol, drilling, dan tryout sesuai kebutuhanmu.</p></div></article>';
+      sideBox.innerHTML=sides.length?sides.slice(0,3).map(x=>card(x,'sa-side-banner')).join(''):'<article class="sa-side-banner sa-banner-fallback"><div class="sa-banner-overlay"><div class="sa-kicker">SIAP ASN</div><h3>Mulai Belajar</h3><p>Latihan setiap hari untuk hasil terbaik.</p></div></article>';
+      ba.querySelectorAll('[data-url]').forEach(btn=>btn.addEventListener('click',()=>{const u=btn.dataset.url||''; if(['materials','latsols','drilling','tryouts','premium'].includes(u))showView(u); else if(/^https?:\/\//.test(u))window.open(u,'_blank','noopener');}));
+      const slides=[...heroBox.querySelectorAll('.sa-hero-slide')]; if(slides.length>1){let i=0;clearInterval(window.saHomeBannerTimer);window.saHomeBannerTimer=setInterval(()=>{slides[i].classList.remove('active');i=(i+1)%slides.length;slides[i].classList.add('active')},4500)}
+    }
     const live=liveCount.data||[];
     const liveBox=document.getElementById('saHomeTryouts');
-    if(liveBox&&live.length){
-      const first=live[0];
-      liveBox.innerHTML=`<div class="sa-mini-tryout"><div class="left"><div class="sa-mini-icon" style="background:#fff0f0;color:#d13e52">●</div><div><b>${safe(first.title)}</b><small>Live Tryout · ${Number(first.participant_count||0)} peserta</small></div></div><button class="sa-link-btn" onclick="showView('live')">Lihat →</button></div>`+(liveBox.innerHTML||'');
-    }
+    if(liveBox&&live.length){const first=live[0];liveBox.innerHTML=`<div class="sa-mini-tryout"><div class="left"><div class="sa-mini-icon" style="background:#fff0f0;color:#d13e52">●</div><div><b>${safe(first.title)}</b><small>Live Tryout · ${Number(first.participant_count||0)} peserta</small></div></div><button class="sa-link-btn" onclick="showView('live')">Lihat →</button></div>`+(liveBox.innerHTML||'')}
   }catch(e){console.warn('loadHome view',e)}
 }
+
 function renderMaterials(rows){
   const area=document.getElementById('materialsArea');if(!area)return;
   area.innerHTML=((rows||[]).map(x=>`<div class="sa-course-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">${x.cover_url?`<img class="material-cover" src="${safe(x.cover_url)}" alt="">`:''}<div class="sa-card-top"><div class="sa-course-icon">▦</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:12px"><div class="sa-chip">${safe(x.category_name||'Materi')}</div>${x.subcategory?`<div class="sa-subcategory">${safe(x.subcategory)}</div>`:''}<h3>${safe(x.title)}</h3><p>${safe(x.summary||'')}</p></div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.progress_percent||0)))}%"></div></div><div class="sa-card-meta"><span>${Number(x.progress_percent||0)}% selesai</span><span>${safe(x.subcategory||x.category_name||'Materi')}</span></div><button class="sa-card-action" onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>=100?'Baca Lagi':'Mulai Belajar'} →</button></div>`).join('')||'<div class="sa-course-card">Belum ada materi yang tersedia.</div>');
@@ -690,50 +700,4 @@ showView=async function(name){
   return _showViewLearningBaseV3(name);
 };
 </script>
-
-<style>
-/* === SIAP ASN WOW HOME v1 === */
-.sa-top-notif{position:relative;width:44px;height:44px;border:1px solid var(--sa-line);background:#fff;border-radius:14px;display:grid;place-items:center;font-size:18px;cursor:pointer;margin-right:8px;box-shadow:0 8px 20px rgba(26,39,66,.06)}
-.sa-top-notif em{position:absolute;right:-3px;top:-4px;min-width:17px;height:17px;padding:0 4px;border-radius:99px;background:#ef5b6b;color:#fff;font-size:10px;font-style:normal;display:none;place-items:center;font-weight:800}
-.sa-wow-home{display:grid;gap:18px}.sa-wow-hero-row{display:grid;grid-template-columns:minmax(0,1.7fr) 250px;gap:16px}.sa-wow-carousel-card{min-height:278px;border-radius:22px;overflow:hidden;background:#132b48;position:relative;box-shadow:0 16px 38px rgba(24,40,72,.14)}
-.sa-wow-slides{height:100%;min-height:278px;position:relative}.sa-wow-slide{position:absolute;inset:0;display:none;align-items:stretch;overflow:hidden}.sa-wow-slide.active{display:flex;animation:saFade .45s ease}.sa-wow-slide-bg{position:absolute;inset:0;background-size:cover;background-position:center;opacity:.82}.sa-wow-slide-bg:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(11,28,49,.94) 0%,rgba(13,36,61,.76) 47%,rgba(10,27,47,.20) 100%)}.sa-wow-slide-content{position:relative;z-index:2;display:flex;flex-direction:column;justify-content:center;padding:30px;max-width:65%;color:#fff}.sa-wow-slide-content .sa-kicker{color:#bcd8ff}.sa-wow-slide h2{font-size:30px;line-height:1.1;margin:9px 0;font-weight:900}.sa-wow-slide p{font-size:13px;line-height:1.6;color:#e3edf9;margin:0 0 18px}.sa-wow-cta{align-self:flex-start;border:0;border-radius:11px;padding:11px 15px;background:#fff;color:#17314f;font-weight:900;cursor:pointer}.sa-wow-empty{height:100%;min-height:278px;display:flex;align-items:center;padding:30px;color:#fff;background:linear-gradient(135deg,#17324f,#315b85)}
-.sa-wow-carousel-bottom{position:absolute;z-index:4;bottom:16px;left:18px;right:18px;display:flex;justify-content:space-between;align-items:center}.sa-wow-dots{display:flex;gap:6px}.sa-wow-dots button{width:7px;height:7px;border:0;border-radius:99px;background:rgba(255,255,255,.45);cursor:pointer;padding:0}.sa-wow-dots button.active{width:22px;background:#fff}.sa-wow-controls{display:flex;gap:6px}.sa-wow-controls button{width:32px;height:32px;border-radius:10px;border:1px solid rgba(255,255,255,.35);background:rgba(7,19,34,.32);color:#fff;font-size:22px;cursor:pointer}
-.sa-wow-sidebanners{display:grid;grid-template-rows:repeat(3,1fr);gap:12px}.sa-wow-mini-banner{border:0;border-radius:18px;padding:17px;text-align:left;display:flex;gap:11px;align-items:center;cursor:pointer;transition:.2s;box-shadow:0 9px 24px rgba(31,42,68,.07)}.sa-wow-mini-banner:hover{transform:translateY(-2px)}.sa-wow-mini-banner>span{font-size:27px}.sa-wow-mini-banner small,.sa-wow-mini-banner b,.sa-wow-mini-banner em{display:block}.sa-wow-mini-banner small{font-size:9px;font-weight:900;letter-spacing:.06em;opacity:.7}.sa-wow-mini-banner b{font-size:13px;margin:3px 0}.sa-wow-mini-banner em{font-size:10px;font-style:normal;opacity:.78}.mini-blue{background:linear-gradient(135deg,#edf7ff,#dceeff);color:#20506f}.mini-purple{background:linear-gradient(135deg,#f2edff,#e7ddff);color:#4c3c8b}.mini-gold{background:linear-gradient(135deg,#fff7df,#ffedb8);color:#72531b}
-.sa-wow-progress-card,.sa-wow-section{background:#fff;border:1px solid var(--sa-line);border-radius:21px;box-shadow:0 10px 28px rgba(25,35,56,.05)}.sa-wow-progress-card{padding:22px}.sa-wow-progress-head{display:flex;justify-content:space-between;gap:20px;align-items:center}.sa-wow-progress-head h2{margin:6px 0 4px;font-size:21px}.sa-wow-progress-head p{margin:0;color:#7b8796;font-size:12px}.sa-wow-primary{border:0;border-radius:13px;padding:12px 18px;background:linear-gradient(135deg,#5b4cc9,#7d68e8);color:#fff;font-weight:900;cursor:pointer}.sa-wow-primary span{margin-left:6px}.sa-wow-progress-body{display:grid;grid-template-columns:100px 1fr 300px;gap:18px;align-items:center;margin-top:18px}.sa-wow-score small,.sa-wow-stat-row small{display:block;color:#8792a0;font-size:9px;font-weight:800;letter-spacing:.05em}.sa-wow-score b{font-size:31px;color:#5d4dd1}.sa-wow-progress-track{height:10px;border-radius:99px;background:#eef0f5;overflow:hidden}.sa-wow-progress-track div{height:100%;width:0;background:linear-gradient(90deg,#6555d9,#9b8cff);border-radius:inherit;transition:width .5s}.sa-wow-stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.sa-wow-stat-row div{background:#fafbfe;border:1px solid #eef0f5;border-radius:12px;padding:9px}.sa-wow-stat-row b{font-size:18px;display:block;margin-top:3px}
-.sa-wow-section{padding:20px}.sa-wow-section-head{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:15px}.sa-wow-section-head h2{font-size:18px;margin:5px 0}.sa-wow-section-head p{margin:0;color:#84909f;font-size:12px}.sa-wow-section-head>button{border:0;background:transparent;color:#5f50c9;font-weight:900;cursor:pointer;padding-top:8px}.sa-wow-card-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}.sa-wow-course{border:1px solid #e9ecf2;border-radius:15px;padding:15px;background:linear-gradient(180deg,#fff,#fcfcfe);min-height:168px;display:flex;flex-direction:column}.sa-wow-course-top{display:flex;justify-content:space-between;align-items:center}.sa-wow-course-icon{width:38px;height:38px;border-radius:12px;display:grid;place-items:center;background:#f2f0ff;color:#5f50c9;font-weight:900}.sa-wow-pill{font-size:9px;border-radius:99px;padding:5px 8px;background:#effaf5;color:#20805c;font-weight:900}.sa-wow-course h3{font-size:14px;margin:13px 0 5px}.sa-wow-course p{font-size:11px;color:#7f8997;margin:0;line-height:1.5}.sa-wow-meta{margin-top:auto;display:flex;justify-content:space-between;color:#8993a1;font-size:10px;padding-top:13px}.sa-wow-course button{margin-top:10px;border:1px solid #dbe1eb;background:#fff;border-radius:9px;padding:9px;color:#3c5470;font-weight:900;cursor:pointer}.sa-wow-empty-card{border:1px dashed #dfe4ec;border-radius:14px;padding:25px;color:#87919d;text-align:center;grid-column:1/-1}
-.sa-wow-bottom-grid{display:grid;grid-template-columns:1.25fr .75fr;gap:16px}.sa-wow-tryout-list{display:grid;gap:10px}.sa-wow-tryout{display:flex;align-items:center;justify-content:space-between;gap:12px;border:1px solid #e8ebf1;border-radius:14px;padding:13px}.sa-wow-tryout-main{display:flex;gap:10px;align-items:center}.sa-wow-tryout-icon{width:38px;height:38px;border-radius:11px;background:#fff3e6;display:grid;place-items:center}.sa-wow-tryout b{display:block;font-size:13px}.sa-wow-tryout small{color:#87919d;font-size:10px}.sa-wow-tryout button{border:0;background:#f2f0ff;color:#5c4ec9;border-radius:9px;padding:8px 11px;font-weight:900;cursor:pointer}.sa-wow-perf-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}.sa-wow-perf{border:1px solid #eaedf3;border-radius:13px;padding:14px;background:#fafbfe}.sa-wow-perf span{display:block;color:#87919d;font-size:10px}.sa-wow-perf b{display:block;margin-top:5px;font-size:21px;color:#293548}
-@keyframes saFade{from{opacity:.2;transform:scale(1.01)}to{opacity:1;transform:none}}@media(max-width:1100px){.sa-wow-hero-row{grid-template-columns:1fr}.sa-wow-sidebanners{grid-template-columns:repeat(3,1fr);grid-template-rows:none}.sa-wow-progress-body{grid-template-columns:90px 1fr}.sa-wow-stat-row{grid-column:1/-1}.sa-wow-card-grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:760px){.sa-wow-home{gap:13px}.sa-wow-sidebanners{grid-template-columns:1fr}.sa-wow-carousel-card,.sa-wow-slides{min-height:255px}.sa-wow-slide-content{max-width:100%;padding:24px}.sa-wow-slide h2{font-size:24px}.sa-wow-progress-head,.sa-wow-progress-body,.sa-wow-bottom-grid{display:grid;grid-template-columns:1fr}.sa-wow-primary{width:100%}.sa-wow-card-grid{grid-template-columns:1fr}.sa-wow-section{padding:16px}.sa-wow-progress-card{padding:17px}.sa-wow-stat-row{grid-template-columns:repeat(3,1fr)}}
-</style>
-<script>
-/* === SIAP ASN WOW HOME ENGINE === */
-let saWowSlides=[],saWowIndex=0,saWowTimer=null;
-function saWowGo(i){if(!saWowSlides.length)return;saWowIndex=(i+saWowSlides.length)%saWowSlides.length;document.querySelectorAll('.sa-wow-slide').forEach((x,n)=>x.classList.toggle('active',n===saWowIndex));document.querySelectorAll('#saWowDots button').forEach((x,n)=>x.classList.toggle('active',n===saWowIndex))}
-function saWowNext(){saWowGo(saWowIndex+1)}function saWowPrev(){saWowGo(saWowIndex-1)}
-function saWowStart(){clearInterval(saWowTimer);if(saWowSlides.length>1)saWowTimer=setInterval(saWowNext,5000)}
-function saWowRenderBanners(rows){const area=document.getElementById('bannerArea'),dots=document.getElementById('saWowDots');if(!area)return;const fallback=[{title:'Belajar Lebih Terarah Bersama SIAP ASN',subtitle:'Materi, latihan soal, drilling, dan tryout dalam satu tempat.',action_url:'materials',image_url:''}];const items=(rows&&rows.length?rows:fallback);saWowSlides=items;area.innerHTML=items.map((x,i)=>`<article class="sa-wow-slide ${i===0?'active':''}"><div class="sa-wow-slide-bg" style="${x.image_url?`background-image:url('${safe(x.image_url)}')`:''}"></div><div class="sa-wow-slide-content"><span class="sa-kicker">INFORMASI SIAP ASN</span><h2>${safe(x.title||'Persiapan Seleksi ASN')}</h2><p>${safe(x.subtitle||'Tetap konsisten belajar dan ukur perkembanganmu.')}</p><button class="sa-wow-cta" onclick="saWowBannerAction('${safe(x.action_url||'')}')">Lihat Sekarang →</button></div></article>`).join('');if(dots)dots.innerHTML=items.map((_,i)=>`<button type="button" class="${i===0?'active':''}" onclick="saWowGo(${i})"></button>`).join('');saWowGo(0);saWowStart()}
-function saWowBannerAction(url){if(!url){showView('materials');return}const u=String(url).toLowerCase();if(['materials','latsols','drilling','tryouts','premium','formations'].includes(u)){showView(u);return}if(/^https?:\/\//i.test(url)){window.open(url,'_blank','noopener');return}showView('materials')}
-function saWowSetText(id,v){const e=document.getElementById(id);if(e)e.textContent=v}
-async function loadHome(){
-  try{
-    const [banners,mats,latsols,tryouts,dash]=await Promise.all([
-      sb.from('banners').select('title,subtitle,image_url,action_url,sort_order').eq('is_active',true).order('sort_order').limit(8),
-      sb.rpc('get_my_materials'),
-      sb.rpc('get_latsol_catalog_v2'),
-      sb.from('tryouts').select('id,title,description,duration_minutes,is_premium,created_at').eq('status','published').neq('type','live').order('created_at',{ascending:false}).limit(3),
-      sb.rpc('get_my_dashboard')
-    ]);
-    saWowRenderBanners(banners.data||[]);
-    const mr=mats.data||[],lr=latsols.data||[],tr=tryouts.data||[];const d=Array.isArray(dash.data)?dash.data[0]:dash.data||{};
-    const avg=mr.length?Math.round(mr.reduce((a,x)=>a+Number(x.progress_percent||0),0)/mr.length):0;
-    const user=await sb.auth.getUser();const name=(user.data?.user?.email||'Peserta').split('@')[0];saWowSetText('saWowGreeting','Hai, '+name+' 👋');saWowSetText('saWowProgress',avg+'%');saWowSetText('saWowProgressText',avg>0?'Pertahankan ritme belajarmu dan selesaikan target berikutnya.':'Mulai dari materi atau latihan pertama untuk membangun progresmu.');const fill=document.getElementById('saWowProgressFill');if(fill)fill.style.width=avg+'%';saWowSetText('saWowMaterialCount',String(mr.length));saWowSetText('saWowLatsolCount',String(lr.length));saWowSetText('saWowTryoutCount',String(tr.length));
-    const la=document.getElementById('saWowLatsols');if(la)la.innerHTML=lr.slice(0,3).map(x=>`<article class="sa-wow-course"><div class="sa-wow-course-top"><span class="sa-wow-course-icon">▤</span><span class="sa-wow-pill">${x.is_premium?'PREMIUM':'GRATIS'}</span></div><h3>${safe(x.title)}</h3><p>${safe(x.category_name||x.subcategory||'Latihan soal SIAP ASN')}</p><div class="sa-wow-meta"><span>${Number(x.question_count||0)} soal</span><span>${Number(x.duration_minutes||0)} menit</span></div><button onclick="startLatsol('${x.id}')">Mulai Latsol →</button></article>`).join('')||'<div class="sa-wow-empty-card">Belum ada paket Latsol yang dipublikasikan.</div>';
-    const ma=document.getElementById('saHomeMaterials');if(ma)ma.innerHTML=mr.slice(0,3).map(x=>`<article class="sa-wow-course"><div class="sa-wow-course-top"><span class="sa-wow-course-icon">▦</span><span class="sa-wow-pill">${Number(x.progress_percent||0)}%</span></div><h3>${safe(x.title)}</h3><p>${safe(x.category_name||'Materi SIAP ASN')}</p><div class="sa-wow-meta"><span>${safe(x.subcategory||'Belajar')}</span><span>${Number(x.progress_percent||0)}% selesai</span></div><button onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>0?'Lanjutkan':'Mulai Belajar'} →</button></article>`).join('')||'<div class="sa-wow-empty-card">Belum ada materi yang bisa ditampilkan.</div>';
-    const ta=document.getElementById('saHomeTryouts');if(ta)ta.innerHTML=tr.map(x=>`<article class="sa-wow-tryout"><div class="sa-wow-tryout-main"><span class="sa-wow-tryout-icon">🏆</span><div><b>${safe(x.title)}</b><small>${Number(x.duration_minutes||0)} menit · ${x.is_premium?'Premium':'Gratis'}</small></div></div><button onclick="startExam('${x.id}')">Mulai →</button></article>`).join('')||'<div class="sa-wow-empty-card">Belum ada tryout aktif.</div>';
-    const pa=document.getElementById('saHomePerf');if(pa)pa.innerHTML=`<div class="sa-wow-perf"><span>Nilai terbaik</span><b>${d.best_score??0}</b></div><div class="sa-wow-perf"><span>Rata-rata</span><b>${d.average_score??0}</b></div><div class="sa-wow-perf"><span>Total tryout</span><b>${d.tryout_count??0}</b></div><div class="sa-wow-perf"><span>Membership</span><b>${safe(String(d.membership||'FREE').toUpperCase())}</b></div>`;
-  }catch(e){console.warn('WOW home',e);const area=document.getElementById('bannerArea');if(area)saWowRenderBanners([])}
-}
-// Sync notification badge in its new top-right position without changing the existing notification backend.
-const saOldLoadNotifications=window.loadNotifications;window.loadNotifications=async function(){const r=await saOldLoadNotifications();const old=document.getElementById('saNotifBadge'),top=document.getElementById('saNotifBadgeTop');if(top&&old){top.textContent=old.textContent;top.style.display=old.style.display||'none'}return r};
-</script>
-
 </body></html>
