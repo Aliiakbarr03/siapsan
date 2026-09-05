@@ -657,14 +657,34 @@ async function loadLatsols(){
 }
 function renderLatsols(rows){
   const a=el('latsolsArea');if(!a)return;
-  a.innerHTML=(rows||[]).map(x=>`<div class="sa-course-card sa-latsol-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.category_icon||'clipboard-list')}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div><div style="margin-top:14px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Latihan soal terstruktur.')}</p><div class="sa-latsol-meta"><span class="sa-latsol-stat">${x.question_count} soal</span><span class="sa-latsol-stat">${x.duration_minutes} menit</span>${x.subcategory?`<span class="sa-latsol-stat">${safe(x.subcategory)}</span>`:''}</div></div><button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button></div>`).join('')||'<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+  a.innerHTML=(rows||[]).map(x=>{
+    const totalSoal=Math.max(0,Number(x.question_count)||0);
+    const durasi=Math.max(1,Number(x.duration_minutes)||15);
+    return `<div class="sa-course-card sa-latsol-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.category_icon||'clipboard-list')}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div><div style="margin-top:14px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Latihan soal terstruktur.')}</p><div class="sa-latsol-meta"><span class="sa-latsol-stat">${totalSoal} Soal</span><span class="sa-latsol-stat">${durasi} Menit</span>${x.subcategory?`<span class="sa-latsol-stat">${safe(x.subcategory)}</span>`:''}</div></div><button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button></div>`;
+  }).join('')||'<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
   refreshPublishedIcons();
 }
 function filterLatsols(v){const q=String(v||'').toLowerCase();renderLatsols(latsolRows.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)))}
 async function startLatsol(id){
   const a=el('latsolsArea');
-  try{a.innerHTML='<div class="sa-course-card">Menyiapkan Latsol...</div>';const {data:sid,error:se}=await sb.rpc('begin_practice_session',{p_activity_type:'latsol',p_mode:'preset',p_latsol_id:id,p_category_id:null,p_subcategory:null,p_limit:10});if(se)throw se;const sessionId=Array.isArray(sid)?sid[0]:sid;const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;const meta=latsolRows.find(x=>String(x.id)===String(id));practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'};if(!practiceState.rows.length)throw new Error('Paket Latsol belum memiliki soal.');renderPracticeQuestion()}
-  catch(e){a.innerHTML=`<div class="sa-course-card">${safe(e.message||'Gagal memulai Latsol.')}<br><button class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>`}
+  try{
+    a.innerHTML='<div class="sa-course-card">Menyiapkan Latsol...</div>';
+    const meta=latsolRows.find(x=>String(x.id)===String(id));
+    const configuredLimit=Math.max(1,Number(meta?.question_count)||10);
+    const {data:sid,error:se}=await sb.rpc('begin_practice_session',{
+      p_activity_type:'latsol',p_mode:'preset',p_latsol_id:id,
+      p_category_id:null,p_subcategory:null,p_limit:configuredLimit
+    });
+    if(se)throw se;
+    const sessionId=Array.isArray(sid)?sid[0]:sid;
+    const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});
+    if(error)throw error;
+    practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'};
+    if(!practiceState.rows.length)throw new Error('Paket Latsol belum memiliki soal.');
+    renderPracticeQuestion();
+  }catch(e){
+    a.innerHTML=`<div class="sa-course-card">${safe(e.message||'Gagal memulai Latsol.')}<br><button class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>`;
+  }
 }
 function renderPracticeQuestion(){
   const target=practiceState.target==='drilling'?'drillingArea':'latsolsArea';
