@@ -1443,4 +1443,135 @@ showView=async function(name){
 
 <div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span>Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span>Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span>Total Soal</span></div></div><div class="sa-result-actions sa-result-actions-v2"><button class="btn sa-review-btn" type="button" onclick="openResultReview()">🔍 Lihat Pembahasan</button><button class="btn sa-drill-btn" type="button" onclick="goResultDrilling()">🎯 Masuk Drilling</button><button class="btn sa-later-btn" type="button" onclick="closeWowResult()">Nanti</button></div></div></div>
 
+
+<script id="siap-asn-drilling-tkp-sync-patch">
+/* === PATCH MINIMAL: DRILLING TERAKHIR + PEMBAHASAN TKP 5-1 === */
+(function(){
+  const DRILL_KEY='siap_asn_latest_drilling_v1';
+  const upper=v=>String(v??'').trim().toUpperCase();
+  const scoreOf=(q,k)=>{
+    const key=String(k||'').toLowerCase();
+    const aliases=[
+      'option_'+key+'_score','option_'+key+'_weight','score_'+key,'weight_'+key,
+      'nilai_'+key,'bobot_'+key,
+      key+'_score',key+'_weight'
+    ];
+    for(const name of aliases){
+      const n=Number(q?.[name]);
+      if(Number.isFinite(n)&&n>=1&&n<=5)return n;
+    }
+    const maps=[q?.option_scores,q?.scores,q?.option_weights,q?.weights,q?.tkp_scores,q?.tkp_weights];
+    for(const map of maps){
+      if(map&&typeof map==='object'){
+        const raw=map[k]??map[upper(k)]??map[key];
+        const n=Number(raw);
+        if(Number.isFinite(n)&&n>=1&&n<=5)return n;
+      }
+    }
+    return null;
+  };
+  const optionText=(q,k)=>q?.['option_'+String(k).toLowerCase()]??q?.['option_'+upper(k)]??'';
+  const isTkp=q=>upper(q?.type)==='TKP';
+  const reviewState=(q,selected)=>{
+    if(isTkp(q)){
+      const selectedScore=scoreOf(q,selected);
+      const all=['A','B','C','D','E'].map(k=>({key:k,score:scoreOf(q,k)})).filter(x=>x.score!==null);
+      const optimal=all.find(x=>x.score===5)?.key||q?.correct_answer||'-';
+      return {selectedScore,optimal,isCorrect:selectedScore===5};
+    }
+    const correct=q?.correct_answer||'-';
+    return {selectedScore:null,optimal:correct,isCorrect:upper(selected)===upper(correct)};
+  };
+
+  window.renderReviewRows=function(review,filter='all'){
+    const rows=(review||[]).filter(q=>filter==='all'||(filter==='correct'?!!q.is_correct:!q.is_correct));
+    return rows.map(q=>{
+      const tkp=upper(q.type)==='TKP';
+      const ok=!!q.is_correct;
+      const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]||q.option_scores||q.scores||q.option_a_score!==undefined);
+      let tkpDetail='';
+      if(tkp){
+        const scoreMap=q.option_score_map||q.option_scores||{};
+        const getScore=k=>{
+          const n=Number(scoreMap[k]??scoreMap[k.toLowerCase()]??q['option_'+k.toLowerCase()+'_score']??q['score_'+k.toLowerCase()]??q['nilai_'+k.toLowerCase()]??q['bobot_'+k.toLowerCase()]);
+          return Number.isFinite(n)&&n>=1&&n<=5?n:null;
+        };
+        const rowsScore=opts.map(k=>({k,text:q['option_'+k.toLowerCase()]||'',score:getScore(k)})).filter(x=>x.score!==null).sort((a,b)=>b.score-a.score);
+        if(rowsScore.length){
+          tkpDetail=`<div class="sa-review-explanation" style="margin-top:14px"><b>🏆 Urutan Nilai TKP</b><div style="display:grid;gap:8px;margin-top:10px">${rowsScore.map(x=>`<div style="padding:10px 12px;border-radius:10px;background:${x.score===5?'#eefaf4':'#f7f9fc'};border:1px solid ${x.score===5?'#bfe8d2':'#e5e7eb'}"><b>Nilai ${x.score} — ${x.k}</b>${upper(q.selected_answer)===x.k?' <span style="color:#2563eb">✓ Pilihan kamu</span>':''}<div style="margin-top:4px;color:#475467">${safe(x.text||'-')}</div></div>`).join('')}</div></div>`;
+        }else{
+          tkpDetail=`<div class="sa-review-explanation"><b>⚠️ Bobot TKP belum ikut terbaca</b><div>Data soal ini tidak membawa bobot Nilai 1–5 ke Web Publish, sehingga urutan jawaban belum dapat ditampilkan.</div></div>`;
+        }
+      }
+      const yourLabel=tkp?'Pilihan Kamu':'Jawaban Kamu';
+      const rightLabel=tkp?'Respons Optimal (Nilai 5)':'Jawaban Benar';
+      return `<article class="sa-review-row ${ok?'is-correct':'is-wrong'}"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><b>Soal ${safe(q.question_order||'-')} • ${safe(q.category_name||q.category||'Latihan')}</b></div><span class="sa-review-status ${ok?'correct':'wrong'}">${tkp?(ok?'★ OPTIMAL':'✕ PERLU EVALUASI'):(ok?'✓ BENAR':'✕ PERLU EVALUASI')}</span></div><div style="margin:12px 0;font-size:16px;line-height:1.65">${safe(q.question_text||'')}</div><div class="sa-review-answer-grid"><div class="sa-review-answer"><b>${yourLabel}</b>${safe(q.selected_answer||'-')}${tkp&&q.selected_score!=null?`<div style="margin-top:4px">Nilai: <b>${safe(q.selected_score)}</b></div>`:''}</div><div class="sa-review-answer"><b>${rightLabel}</b>${safe(q.correct_answer||'-')}</div></div>${tkpDetail}<div class="sa-review-explanation"><b>💡 Pembahasan</b>${safe(q.explanation||'Belum ada pembahasan untuk soal ini.')}</div></article>`;
+    }).join('')||'<div class="data-card">Tidak ada soal pada filter ini.</div>';
+  };
+
+  window.openPracticeResultReview=function(ctx,title){
+    const rows=(ctx?.rows||[]).map((q,i)=>{
+      const selected=(ctx.answers||{})[q.id]||'-';
+      const state=reviewState(q,selected);
+      const scoreMap={}; ['A','B','C','D','E'].forEach(k=>{const n=scoreOf(q,k);if(n!==null)scoreMap[k]=n;});
+      return {
+        question_order:i+1,category_name:q.category_name||q.category||ctx.title||'Latihan',type:q.type||'',question_text:q.question_text||'',
+        selected_answer:selected,selected_score:state.selectedScore,correct_answer:state.optimal,is_correct:state.isCorrect,explanation:q.explanation||'',
+        option_a:q.option_a||'',option_b:q.option_b||'',option_c:q.option_c||'',option_d:q.option_d||'',option_e:q.option_e||'',option_score_map:scoreMap
+      };
+    });
+    const correct=rows.filter(x=>x.is_correct).length,wrong=rows.length-correct;
+    el('analysisTitle').textContent=title||'Pembahasan Latihan';
+    el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Benar / Optimal</b><div style="font-size:28px;font-weight:800">${correct}</div></div><div class="data-card"><b>Perlu Evaluasi</b><div style="font-size:28px;font-weight:800">${wrong}</div></div></div>`;
+    el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
+    installReviewFilters(rows);
+  };
+
+  const baseNext=window.nextPractice;
+  window.nextPractice=async function(){
+    if(!window.practiceState||practiceState.index<practiceState.rows.length-1){return baseNext();}
+    const snapshot={
+      target:practiceState.target,title:practiceState.title,rows:practiceState.rows.slice(),answers:{...practiceState.answers},sessionId:practiceState.sessionId,
+      category_name:practiceState.rows[0]?.category_name||practiceState.rows[0]?.category||'Drilling',subcategory:practiceState.rows[0]?.subcategory||'',mode:practiceState.title
+    };
+    const originalRpc=sb.rpc.bind(sb);
+    let completed=null;
+    sb.rpc=async function(name,args){
+      const res=await originalRpc(name,args);
+      if(name==='complete_practice_session')completed=res;
+      return res;
+    };
+    try{
+      await baseNext();
+      if(snapshot.target==='drilling'&&completed&&!completed.error){
+        const r=Array.isArray(completed.data)?completed.data[0]:completed.data||{};
+        const local={
+          id:snapshot.sessionId,mode:snapshot.mode||'drilling',category_name:snapshot.category_name,subcategory:snapshot.subcategory,
+          correct_count:Number(r.correct_count||0),wrong_count:Number(r.wrong_count||0),total_questions:snapshot.rows.length,score:Number(r.score||0),completed_at:new Date().toISOString(),_local:true
+        };
+        try{localStorage.setItem(DRILL_KEY,JSON.stringify(local));}catch(_){ }
+        await window.loadDrilling();
+      }
+    }finally{sb.rpc=originalRpc;}
+  };
+
+  const baseLoad=window.loadDrilling;
+  window.loadDrilling=async function(){
+    await baseLoad();
+    const host=el('drillingArea');if(!host)return;
+    let local=null;try{local=JSON.parse(localStorage.getItem(DRILL_KEY)||'null');}catch(_){ }
+    if(!local)return;
+    const section=[...host.querySelectorAll('.sa-drill-section')].find(x=>/Sesi Drilling Terakhir/i.test(x.textContent||''));
+    if(!section)return;
+    const list=section.nextElementSibling;
+    if(!list)return;
+    if(list.querySelector(`[data-local-drill-id="${CSS.escape(String(local.id||''))}"]`))return;
+    const row=document.createElement('div');
+    row.className='sa-drill-session';row.dataset.localDrillId=String(local.id||'');
+    row.innerHTML=`<span class="sa-chip">TERBARU</span><div><b>${safe(local.category_name||'Drilling')}${local.subcategory?` · ${safe(local.subcategory)}`:''}</b><small>${Number(local.correct_count||0)} benar · ${Number(local.wrong_count||0)} salah · ${Number(local.total_questions||0)} soal</small></div><div class="sa-drill-score">${Number(local.score||0)}%</div>`;
+    list.prepend(row);
+  };
+})();
+</script>
+
 </body></html>
