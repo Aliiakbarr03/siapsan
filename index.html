@@ -988,7 +988,7 @@ async function loadDrilling(){
   a.innerHTML='<div class="sa-drill-empty">Memuat dashboard drilling...</div>';
   try{
     const [{data:st,error:se},{data:mastery,error:me},{data:recentData,error:re},{data:cats,error:ce}]=await Promise.all([
-      sb.rpc('get_drill_stats'),sb.rpc('get_drill_mastery'),sb.rpc('get_drilling_recent_sessions',{p_limit:5}),sb.from('categories').select('id,name').eq('is_active',true).order('sort_order')
+      sb.rpc('get_drill_stats'),sb.rpc('get_drill_mastery'),sb.rpc('get_recent_practice_sessions',{p_limit:5}),sb.from('categories').select('id,name').eq('is_active',true).order('sort_order')
     ]);
     if(se)throw se;if(me)throw me;if(re)throw re;if(ce)throw ce;
     const s=Array.isArray(st)?st[0]:st, rows=mastery||[], recent=recentData||[], categories=cats||[];
@@ -997,7 +997,7 @@ async function loadDrilling(){
     const recommendation=weak?`${safe(weak.category_name)} · ${safe(weak.subcategory)}`:'Mulai dengan Latihan Bebas';
     const categoryOptions=categories.map(c=>`<option value="${c.id}">${safe(c.name)}</option>`).join('');
     const masteryRows=rows.slice(0,12).map(x=>`<div class="sa-drill-master-row"><div><b>${safe(x.category_name||'Subtest')}</b><small>${safe(x.subcategory||'Belum dikategorikan')}</small></div><div class="drill-hide-mobile">${Number(x.questions_done||0)} soal</div><div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.accuracy||0)))}%"></div></div><small>${Number(x.accuracy||0)}%</small></div><div class="drill-hide-mobile"><span class="sa-chip ${x.mastered?'ok':''}">${x.mastered?'Mastered':'Perlu latihan'}</span></div></div>`).join('');
-    const recentRows=recent.length?recent.map(x=>`<div class="sa-drill-session"><span class="sa-chip">${safe((x.mode||'drilling').toUpperCase())}</span><div><b>${safe(x.category_name||'Drilling')} ${x.subcategory?`· ${safe(x.subcategory)}`:''}</b><small>${Number(x.correct_count||0)} benar · ${Number(x.wrong_count||0)} salah · ${Number(x.total_questions||0)} soal</small></div><div class="sa-drill-score">${Number(x.score||0)}%</div></div>`).join(''):'<div class="sa-drill-empty">Belum ada sesi drilling. Pilih mode latihan di atas untuk mulai.</div>';
+    const recentRows=recent.length?recent.map(x=>{const kind=String(x.activity_type||'drilling').toLowerCase();const chip=kind==='latsol'?'LATSOL':kind==='drilling'?'DRILLING':safe(kind.toUpperCase());const title=x.session_title||`${x.category_name||'Latihan'}${x.subcategory?` · ${x.subcategory}`:''}`;const pts=Number(x.total_points);const maxPts=Number(x.max_points);const meta=(Number.isFinite(pts)&&Number.isFinite(maxPts)&&maxPts>0)?`${pts}/${maxPts} poin · `:'';return `<div class="sa-drill-session"><span class="sa-chip">${safe(chip)}</span><div><b>${safe(title)}</b><small>${meta}${Number(x.correct_count||0)} optimal/benar · ${Number(x.wrong_count||0)} perlu evaluasi · ${Number(x.total_questions||0)} soal</small></div><div class="sa-drill-score">${Number(x.score||0)}%</div></div>`;}).join(''):'<div class="sa-drill-empty">Belum ada riwayat latihan. Selesaikan Latsol atau Drilling untuk melihat hasil terbaru.</div>';
     a.innerHTML=`<div class="sa-drill-wrap">
       <div class="sa-drill-hero-v2"><div><span class="sa-drill-badge">● Rekomendasi untuk hari ini</span><h2>${recommendation}</h2><p>${weak?`Akurasi terakhir ${Number(weak.accuracy||0)}%. Perkuat area ini agar mastery meningkat.`:'Pilih mode latihan dan mulai membangun data performamu.'}</p><div class="sa-drill-actions"><button class="sa-drill-primary" onclick="startDrilling('weakness')">▶ Mulai sekarang</button><button class="sa-drill-secondary" onclick="document.getElementById('drillModes').scrollIntoView({behavior:'smooth'})">Pilih mode lain</button></div></div><div class="sa-drill-snapshot"><div><span>Akurasi</span><b>${Number(s?.average_accuracy||0)}%</b></div><div><span>Soal latihan</span><b>${Number(s?.questions_done||0)}</b></div><div><span>Soal salah</span><b>${wrongPool}</b></div><div><span>Mastery</span><b>${mastered}/${total}</b></div></div></div>
       <div class="sa-drill-section"><div class="sa-drill-kicker">Indikator Performa</div><h3>Snapshot 30 hari terakhir</h3><p>Semua indikator dihitung dari jawaban latihan yang benar-benar tersimpan.</p></div>
@@ -1006,7 +1006,7 @@ async function loadDrilling(){
       <div class="sa-drill-modes"><button class="sa-drill-mode recommended" onclick="openFreeDrilling()"><div class="ico">◎</div><h4>Latihan Bebas</h4><p>Pilih kategori dan jumlah soal sendiri.</p><small>Bank soal aktif →</small></button><button class="sa-drill-mode" onclick="startDrilling('adaptive')"><div class="ico">↗</div><h4>Drilling Adaptif</h4><p>Target dan kesulitan menyesuaikan performa terakhir.</p><small>Personalized →</small></button><button class="sa-drill-mode" onclick="startDrilling('wrong')"><div class="ico">↻</div><h4>Ulang Salah</h4><p>Mengambil soal yang pernah kamu jawab salah.</p><small>${wrongPool} soal tersedia →</small></button><button class="sa-drill-mode" onclick="startDrilling('weakness')"><div class="ico">◉</div><h4>Drilling Kelemahan</h4><p>Fokus ke subkategori dengan akurasi paling rendah.</p><small>${weak?'Target tersedia':'Butuh data awal'} →</small></button></div>
       <div class="sa-drill-section"><div class="sa-drill-kicker">Mastery per Subtest</div><h3>Penguasaan berdasarkan performa</h3><p>Target mastery tercapai saat akurasi minimal 80%.</p></div>
       <div class="sa-drill-master">${masteryRows||'<div class="sa-drill-empty">Belum ada subkategori yang bisa dianalisis.</div>'}</div>
-      <div class="sa-drill-section"><div class="sa-drill-kicker">Sesi Drilling Terakhir</div><h3>Riwayat latihan terbaru</h3></div><div>${recentRows}</div>
+      <div class="sa-drill-section"><div class="sa-drill-kicker">Sesi Terakhir</div><h3>Riwayat latihan terbaru</h3><p>Menampilkan ujian/latihan yang paling terakhir diselesaikan, dari Latsol maupun Drilling.</p></div><div>${recentRows}</div>
     </div>`;
     window._drillCategories=categories;
   }catch(e){a.innerHTML=`<div class="sa-drill-empty">Gagal memuat drilling: ${safe(e.message||'Terjadi kesalahan.')}</div>`;}
@@ -1563,28 +1563,12 @@ showView=async function(name){
           id:snapshot.sessionId,mode:snapshot.mode||'drilling',category_name:snapshot.category_name,subcategory:snapshot.subcategory,
           correct_count:Number(r.correct_count||0),wrong_count:Number(r.wrong_count||0),total_questions:snapshot.rows.length,score:Number(r.score||0),completed_at:new Date().toISOString(),_local:true
         };
-        try{localStorage.setItem(DRILL_KEY,JSON.stringify(local));}catch(_){ }
         await window.loadDrilling();
       }
     }finally{sb.rpc=originalRpc;}
   };
 
-  const baseLoad=window.loadDrilling;
-  window.loadDrilling=async function(){
-    await baseLoad();
-    const host=el('drillingArea');if(!host)return;
-    let local=null;try{local=JSON.parse(localStorage.getItem(DRILL_KEY)||'null');}catch(_){ }
-    if(!local)return;
-    const section=[...host.querySelectorAll('.sa-drill-section')].find(x=>/Sesi Drilling Terakhir/i.test(x.textContent||''));
-    if(!section)return;
-    const list=section.nextElementSibling;
-    if(!list)return;
-    if(list.querySelector(`[data-local-drill-id="${CSS.escape(String(local.id||''))}"]`))return;
-    const row=document.createElement('div');
-    row.className='sa-drill-session';row.dataset.localDrillId=String(local.id||'');
-    row.innerHTML=`<span class="sa-chip">TERBARU</span><div><b>${safe(local.category_name||'Drilling')}${local.subcategory?` · ${safe(local.subcategory)}`:''}</b><small>${Number(local.correct_count||0)} benar · ${Number(local.wrong_count||0)} salah · ${Number(local.total_questions||0)} soal</small></div><div class="sa-drill-score">${Number(local.score||0)}%</div>`;
-    list.prepend(row);
-  };
+
 })();
 </script>
 
