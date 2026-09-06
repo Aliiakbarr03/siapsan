@@ -1154,6 +1154,53 @@ showView=async function(name){
 .sa-wow-summary{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;margin-bottom:14px}.sa-wow-stat{background:#fff;border:1px solid #dfe5ec;border-radius:12px;padding:12px;box-shadow:0 6px 18px rgba(36,50,70,.04)}.sa-wow-stat span{font-size:10px;color:#8390a0;display:block}.sa-wow-stat b{font-size:21px;display:block;margin-top:5px}
 @media(max-width:980px){.sa-home-banner-layout{grid-template-columns:1fr}.sa-home-side-banners{grid-template-columns:repeat(3,1fr);grid-template-rows:none;min-height:100px}.sa-side-banner{min-height:110px}.sa-home-carousel{min-height:300px}.sa-wow-summary{grid-template-columns:repeat(2,1fr)}}
 @media(max-width:680px){.sa-wow-home .sa-welcome-head{align-items:flex-start}.sa-home-carousel{min-height:210px}.sa-home-side-banners{grid-template-columns:1fr;min-height:auto}.sa-side-banner{height:130px}.sa-promo-grid,.sa-wow-grid{grid-template-columns:1fr}.sa-promo-discount{min-height:110px}.sa-wow-summary{grid-template-columns:1fr 1fr}.sa-home-banner-layout{gap:10px}}
+
+/* ===== Banner mobile jadi kartu geser samping (bukan numpuk ke bawah) + font mobile lebih tebal ===== */
+@media(max-width:800px){
+  .sa-home-banner-layout{
+    display:flex!important;
+    grid-template-columns:none!important;
+    gap:12px!important;
+    overflow-x:auto;
+    overflow-y:hidden;
+    padding:2px 15px 14px;
+    margin:0 -15px 14px;
+    scroll-snap-type:x mandatory;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+  .sa-home-banner-layout::-webkit-scrollbar{display:none}
+  .sa-home-carousel{
+    flex:0 0 82%!important;
+    min-height:190px!important;
+    border-radius:20px!important;
+    scroll-snap-align:start;
+    box-shadow:0 10px 28px rgba(20,24,38,.16);
+  }
+  .sa-home-side-banners{
+    display:contents!important;
+  }
+  .sa-side-banner{
+    flex:0 0 68%!important;
+    height:190px!important;
+    min-height:190px!important;
+    border-radius:20px!important;
+    scroll-snap-align:start;
+    box-shadow:0 8px 22px rgba(20,24,38,.14);
+  }
+  .sa-hero-slide,.sa-side-banner article{border-radius:20px}
+
+  /* Font mobile dibuat lebih tebal & mewah */
+  body{font-weight:500}
+  .sa-welcome-head h1,.sa-page-title h1,.view h2{font-weight:900!important;letter-spacing:-.01em}
+  .data-card h3,.card h3{font-weight:800!important}
+  .sa-nav span,.sa-nav-toplink-mobile span,.profile-trigger-text b,.sa-top-brand b{font-weight:700!important}
+  .sa-kicker{font-weight:900!important;letter-spacing:.08em}
+  .lead,.muted{font-weight:500!important}
+  .btn,.sa-outline-btn{font-weight:800!important}
+  .stat b,.score-big,.plan-price{font-weight:900!important}
+  th{font-weight:800!important}
+}
 </style>
 
 <script id="siap-asn-wow-home-engine">
