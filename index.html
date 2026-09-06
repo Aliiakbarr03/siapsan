@@ -728,11 +728,76 @@ async function loadLatsols(){
 }
 function renderLatsols(rows){
   const a=el('latsolsArea');if(!a)return;
-  a.innerHTML=(rows||[]).map(x=>{
-    const totalSoal=Math.max(0,Number(x.question_count)||0);
-    const durasi=Math.max(1,Number(x.duration_minutes)||15);
-    return `<div class="sa-course-card sa-latsol-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.category_icon||'clipboard-list')}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div><div style="margin-top:14px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Latihan soal terstruktur.')}</p><div class="sa-latsol-meta"><span class="sa-latsol-stat">${totalSoal} Soal</span><span class="sa-latsol-stat">${durasi} Menit</span>${x.subcategory?`<span class="sa-latsol-stat">${safe(x.subcategory)}</span>`:''}</div></div><button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button></div>`;
-  }).join('')||'<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+
+  const list=Array.isArray(rows)?rows:[];
+  if(!list.length){
+    a.innerHTML='<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+    refreshPublishedIcons();
+    return;
+  }
+
+  // Kelompok utama mengikuti kategori dari Supabase.
+  // Fallback judul hanya dipakai bila data kategori lama belum tersedia.
+  const getGroup=x=>{
+    const raw=String(x.category_name||x.category||'').trim();
+    if(raw)return raw.toUpperCase();
+    const title=String(x.title||'').trim();
+    const m=title.match(/^(TWK|TIU|TKP)\b/i);
+    return m?m[1].toUpperCase():'LAINNYA';
+  };
+
+  const preferred=['TWK','TIU','TKP'];
+  const groups=new Map();
+  list.forEach(x=>{
+    const key=getGroup(x);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(x);
+  });
+
+  const keys=[...groups.keys()].sort((a,b)=>{
+    const ia=preferred.indexOf(a),ib=preferred.indexOf(b);
+    if(ia===-1&&ib===-1)return a.localeCompare(b,'id');
+    if(ia===-1)return 1;
+    if(ib===-1)return -1;
+    return ia-ib;
+  });
+
+  a.innerHTML=keys.map(key=>{
+    const items=groups.get(key)||[];
+    const cards=items.map(x=>{
+      const totalSoal=Math.max(0,Number(x.question_count)||0);
+      const durasi=Math.max(1,Number(x.duration_minutes)||15);
+      const subtitle=x.subcategory||x.title||'Latihan soal';
+      return `<div class="sa-course-card sa-latsol-card">
+        <div class="sa-card-top">
+          <div class="sa-course-icon">${renderCategoryIcon(x.category_icon||'clipboard-list')}</div>
+          <span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span>
+        </div>
+        <div style="margin-top:14px">
+          <h3>${safe(x.title)}</h3>
+          <p>${safe(x.description||'Latihan soal terstruktur.')}</p>
+          <div class="sa-latsol-meta">
+            <span class="sa-latsol-stat">${totalSoal} Soal</span>
+            <span class="sa-latsol-stat">${durasi} Menit</span>
+            ${x.subcategory?`<span class="sa-latsol-stat">${safe(subtitle)}</span>`:''}
+          </div>
+        </div>
+        <button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button>
+      </div>`;
+    }).join('');
+
+    return `<section class="sa-latsol-category" data-latsol-category="${safe(key)}">
+      <div class="sa-latsol-category-head">
+        <div>
+          <span class="sa-latsol-category-kicker">LATIHAN TERSTRUKTUR</span>
+          <h2>${safe(key)}</h2>
+        </div>
+        <span class="sa-latsol-category-count">${items.length} Paket</span>
+      </div>
+      <div class="sa-course-grid sa-latsol-group-grid">${cards}</div>
+    </section>`;
+  }).join('');
+
   refreshPublishedIcons();
 }
 function filterLatsols(v){const q=String(v||'').toLowerCase();renderLatsols(latsolRows.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)))}
@@ -1201,6 +1266,17 @@ showView=async function(name){
   .stat b,.score-big,.plan-price{font-weight:900!important}
   th{font-weight:800!important}
 }
+
+
+/* === LATSOL PER KATEGORI: TWK / TIU / TKP === */
+.sa-latsol-category{margin:0 0 30px}
+.sa-latsol-category:last-child{margin-bottom:0}
+.sa-latsol-category-head{display:flex;align-items:end;justify-content:space-between;gap:16px;margin:0 0 13px;padding:0 2px 11px;border-bottom:1px solid #e8eaf0}
+.sa-latsol-category-kicker{display:block;font-size:10px;letter-spacing:.14em;font-weight:900;color:#6d5dfc;margin-bottom:5px}
+.sa-latsol-category-head h2{margin:0;font:900 24px/1.15 "Plus Jakarta Sans",Inter,sans-serif;color:#252b38}
+.sa-latsol-category-count{display:inline-flex;align-items:center;border-radius:999px;padding:7px 11px;background:#f0edff;color:#5c4bd2;font-size:11px;font-weight:900;white-space:nowrap}
+.sa-latsol-group-grid{margin-top:0}
+@media(max-width:700px){.sa-latsol-category{margin-bottom:24px}.sa-latsol-category-head{align-items:center}.sa-latsol-category-head h2{font-size:21px}}
 </style>
 
 <script id="siap-asn-wow-home-engine">
