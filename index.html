@@ -456,6 +456,120 @@ html,body,.sa-app-shell{color:var(--sa-ink)!important;background:#fff!important}
 /* Focus visibility */
 .sa-app-shell :focus-visible{outline:3px solid rgba(31,95,153,.35)!important;outline-offset:2px}
 </style>
+
+<!-- === SIAP ASN — PREMIUM MULTI-ACCENT DESIGN POLISH (UI ONLY) === -->
+<style id="siap-asn-premium-multi-accent">
+:root{
+  --premium-black:#111827;
+  --premium-navy:#102A43;
+  --premium-blue:#145DA0;
+  --premium-green:#176B4D;
+  --premium-red:#8B2E2E;
+  --premium-gold:#8A6512;
+  --premium-slate:#344054;
+  --premium-line:#CBD5E1;
+  --premium-blue-light:#DCEEFF;
+}
+/* Global typography: dark, crisp, comfortable */
+html,body,#app,.sa-app-shell{color:var(--premium-black)!important;background:#fff!important}
+.sa-app-shell :is(p,small,span,li,td,th,label,.muted,.sa-muted,.lead){color:var(--premium-slate)!important}
+.sa-app-shell :is(h1,h2,h3,h4,h5,h6,strong,b){color:var(--premium-navy)!important}
+
+/* Recommendation: white premium surface, with one intentional light-blue highlight */
+.sa-drill-hero-v2{
+  background:#fff!important;
+  color:var(--premium-black)!important;
+  border:1px solid var(--premium-line)!important;
+  border-top:4px solid var(--premium-navy)!important;
+  box-shadow:0 14px 32px rgba(16,42,67,.10)!important;
+}
+.sa-drill-hero-v2 h2{color:var(--premium-navy)!important}
+.sa-drill-hero-v2 p{color:var(--premium-slate)!important}
+.sa-drill-badge{
+  background:var(--premium-blue-light)!important;
+  color:var(--premium-blue)!important;
+  border:1px solid #9FC4E8!important;
+  font-weight:900!important;
+  letter-spacing:.1px;
+}
+.sa-drill-primary{background:var(--premium-navy)!important;color:#fff!important;border-color:var(--premium-navy)!important}
+.sa-drill-primary:hover{background:#0B2238!important;color:#fff!important;transform:translateY(-1px)}
+.sa-drill-secondary{background:#fff!important;color:var(--premium-blue)!important;border:1px solid var(--premium-blue)!important}
+.sa-drill-secondary:hover{background:#fff!important;color:var(--premium-navy)!important;border-color:var(--premium-navy)!important}
+
+/* Four stats: same clean white base, different premium accent identity */
+.sa-drill-snapshot{border-left-color:var(--premium-line)!important}
+.sa-drill-snapshot>div{background:#fff!important;border:1px solid var(--premium-line)!important;box-shadow:0 5px 14px rgba(16,42,67,.05)!important;border-top-width:4px!important}
+.sa-drill-snapshot>div:nth-child(1){border-top-color:var(--premium-blue)!important}
+.sa-drill-snapshot>div:nth-child(2){border-top-color:var(--premium-navy)!important}
+.sa-drill-snapshot>div:nth-child(3){border-top-color:var(--premium-red)!important}
+.sa-drill-snapshot>div:nth-child(4){border-top-color:var(--premium-green)!important}
+.sa-drill-snapshot>div:nth-child(1) span,.sa-drill-snapshot>div:nth-child(1) b{color:var(--premium-blue)!important}
+.sa-drill-snapshot>div:nth-child(2) span,.sa-drill-snapshot>div:nth-child(2) b{color:var(--premium-navy)!important}
+.sa-drill-snapshot>div:nth-child(3) span,.sa-drill-snapshot>div:nth-child(3) b{color:var(--premium-red)!important}
+.sa-drill-snapshot>div:nth-child(4) span,.sa-drill-snapshot>div:nth-child(4) b{color:var(--premium-green)!important}
+.sa-drill-snapshot b{font-weight:900!important}
+
+/* Performance cards: premium variation without pastel backgrounds */
+.sa-drill-indicator{background:#fff!important;border:1px solid var(--premium-line)!important;border-top:4px solid var(--premium-navy)!important}
+.sa-drill-indicator:nth-child(1){border-top-color:var(--premium-gold)!important}
+.sa-drill-indicator:nth-child(2){border-top-color:var(--premium-blue)!important}
+.sa-drill-indicator:nth-child(3){border-top-color:var(--premium-navy)!important}
+.sa-drill-indicator:nth-child(4){border-top-color:var(--premium-green)!important}
+.sa-drill-indicator span,.sa-drill-indicator small{color:var(--premium-slate)!important}
+.sa-drill-indicator b{color:var(--premium-navy)!important}
+.sa-drill-indicator:nth-child(1) b{color:var(--premium-gold)!important}
+.sa-drill-indicator:nth-child(2) b{color:var(--premium-blue)!important}
+.sa-drill-indicator:nth-child(4) b{color:var(--premium-green)!important}
+
+/* Mode cards get elegant category accents */
+.sa-drill-mode{background:#fff!important;color:var(--premium-black)!important;border-color:var(--premium-line)!important;border-top:4px solid var(--premium-blue)!important}
+.sa-drill-mode:nth-child(2){border-top-color:var(--premium-navy)!important}
+.sa-drill-mode:nth-child(3){border-top-color:var(--premium-red)!important}
+.sa-drill-mode:nth-child(4){border-top-color:var(--premium-gold)!important}
+.sa-drill-mode h4{color:var(--premium-navy)!important}
+.sa-drill-mode p,.sa-drill-mode small{color:var(--premium-slate)!important}
+.sa-drill-mode .ico{color:var(--premium-blue)!important}
+.sa-drill-mode:nth-child(3) .ico{color:var(--premium-red)!important}
+.sa-drill-mode:nth-child(4) .ico{color:var(--premium-gold)!important}
+
+/* Semantic colors */
+.ok,.success,.correct,.mastered,.sa-chip.ok{color:var(--premium-green)!important}
+.wrong,.error,.sa-review-status.wrong{color:var(--premium-red)!important}
+.warning,.gold,.premium{color:var(--premium-gold)!important}
+a,.sa-review-link{color:var(--premium-blue)!important}
+
+/* Recent history: clean spacing and readable semantic colors */
+.sa-recent-session,.sa-drill-session,.sa-drill-session-clickable{background:#fff!important;border-color:var(--premium-line)!important}
+.sa-recent-session b,.sa-drill-session b,.sa-drill-session-clickable b{color:var(--premium-navy)!important}
+.sa-recent-session small,.sa-drill-session small,.sa-drill-session-clickable small,.sa-recent-meta{color:var(--premium-slate)!important}
+.sa-drill-score{color:var(--premium-gold)!important}
+
+/* Hover: never wash out text; retain readable dark colors */
+.sa-recent-session:hover,.sa-drill-session:hover,.sa-drill-session-clickable:hover,
+.sa-latsol-card:hover,.sa-mode-card:hover,.sa-drill-mode:hover,.sa-mastery-table .row:hover{
+  background:#fff!important;border-color:var(--premium-blue)!important;
+  box-shadow:0 12px 28px rgba(16,42,67,.12)!important;
+  transform:translateY(-2px);
+}
+.sa-recent-session:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-drill-session:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-drill-session-clickable:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-latsol-card:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-mode-card:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-drill-mode:hover :is(b,h1,h2,h3,h4,h5,h6),
+.sa-mastery-table .row:hover :is(b,h1,h2,h3,h4,h5,h6){color:var(--premium-navy)!important}
+.sa-recent-session:hover :is(p,small,span),.sa-drill-session:hover :is(p,small,span),.sa-drill-session-clickable:hover :is(p,small,span),.sa-latsol-card:hover :is(p,small,span),.sa-mode-card:hover :is(p,small,span),.sa-drill-mode:hover :is(p,small,span),.sa-mastery-table .row:hover :is(p,small,span){color:var(--premium-slate)!important}
+/* Keep button text correct on hover */
+.sa-drill-primary:hover,.sa-drill-primary:hover *{color:#fff!important}
+
+/* No pale gray metadata */
+.sa-app-shell .sa-course-meta,.sa-app-shell .sa-latsol-meta,.sa-app-shell .sa-page-title p,
+.sa-app-shell .sa-description,.sa-app-shell .sa-help,.sa-app-shell .sa-top-brand small{color:var(--premium-slate)!important}
+
+@media(max-width:950px){.sa-drill-snapshot{border-top-color:var(--premium-line)!important}}
+</style>
+
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
