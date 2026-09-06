@@ -327,6 +327,68 @@ body.sa-noscroll{overflow:hidden}
 @media(max-width:1050px){.sa-mastery-card-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:620px){.sa-mastery-card-grid{grid-template-columns:1fr}.sa-drill-session{grid-template-columns:62px minmax(0,1fr) 58px;gap:10px;padding:12px}.sa-drill-session>div:nth-child(2)>b{font-size:14px}.sa-recent-meta{font-size:11px;gap:4px 6px}.sa-drill-score{font-size:16px}}
 </style>
+
+<!-- === SIAP ASN FINAL WHITE + NAVY TEXT POLISH (UI ONLY) === -->
+<style id="siap-asn-white-navy-final">
+/* Global text contrast: dark navy / black, never washed-out dark gray */
+:root{--sa-ink:#071b33;--sa-navy:#0b2f55;--sa-black:#07111f;--sa-soft-ink:#183b61;}
+body,#app,.sa-shell,.sa-main,.sa-content,.view{color:var(--sa-ink)!important;}
+#app h1,#app h2,#app h3,#app h4,#app h5,#app h6,.sa-page-title h1,.sa-page-title h2,.sa-page-title h3{color:var(--sa-black)!important;}
+#app p,#app label,#app small,.muted,.sa-muted,.sa-page-title p,.sa-subtitle,.sa-description,.sa-help,.sa-kicker,.sa-drill-kicker{color:var(--sa-soft-ink)!important;}
+#app input,#app select,#app textarea{color:var(--sa-ink)!important;}
+#app th,#app td,#app li{color:var(--sa-ink)!important;}
+/* Keep text on intentionally dark/colored controls readable */
+#app .primary,#app .btn.primary,#app .sa-nav.active{color:#fff!important;}
+
+/* Drilling recommendation: white premium card instead of blue block */
+.sa-drill-hero-v2{
+  background:#fff!important;
+  color:var(--sa-ink)!important;
+  border:1px solid #d7e1eb!important;
+  box-shadow:0 10px 28px rgba(7,27,51,.08)!important;
+}
+.sa-drill-hero-v2 h2{color:var(--sa-black)!important;}
+.sa-drill-hero-v2 p{color:var(--sa-soft-ink)!important;}
+.sa-drill-badge{
+  background:#eef4f8!important;
+  color:var(--sa-navy)!important;
+  border:1px solid #d9e4ee!important;
+}
+.sa-drill-primary{
+  background:var(--sa-navy)!important;
+  color:#fff!important;
+  border:1px solid var(--sa-navy)!important;
+}
+.sa-drill-secondary{
+  background:#fff!important;
+  color:var(--sa-navy)!important;
+  border:1px solid #b8c8d8!important;
+}
+.sa-drill-snapshot{
+  border-left-color:#d7e1eb!important;
+}
+.sa-drill-snapshot div{
+  background:#fff!important;
+  border-color:#d7e1eb!important;
+  box-shadow:0 4px 14px rgba(7,27,51,.04)!important;
+}
+.sa-drill-snapshot span{color:var(--sa-navy)!important;}
+.sa-drill-snapshot b{color:var(--sa-black)!important;}
+.sa-drill-kicker{color:var(--sa-navy)!important;}
+.sa-drill-section h3{color:var(--sa-black)!important;}
+.sa-drill-section p{color:var(--sa-soft-ink)!important;}
+.sa-drill-indicator{background:#fff!important;border-color:#dbe4ed!important;}
+.sa-drill-indicator span,.sa-drill-indicator small{color:var(--sa-navy)!important;}
+.sa-drill-indicator b{color:var(--sa-black)!important;}
+.sa-drill-mode,.sa-mode-card,.sa-drill-config,.sa-mastery-table,.sa-drill-session-clickable{color:var(--sa-ink)!important;}
+.sa-drill-mode p,.sa-mode-card p,.sa-drill-config p,.sa-mastery-table .head{color:var(--sa-soft-ink)!important;}
+
+/* Responsive border switch retained for the white hero */
+@media(max-width:950px){
+  .sa-drill-snapshot{border-left:0!important;border-top:1px solid #d7e1eb!important;}
+}
+</style>
+
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
