@@ -255,6 +255,8 @@ body.sa-noscroll{overflow:hidden}
 .sa-review-answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.sa-review-answer{padding:12px;border-radius:12px;background:#f4f9fc}.sa-review-answer b{display:block;color:#173b56;margin-bottom:4px}
 .sa-review-explanation{margin-top:14px;padding:14px 15px;border-radius:14px;background:#eef8ff;border:1px solid #d4eaf7;color:#34536a}.sa-review-explanation b{display:block;color:#1971a5;margin-bottom:6px}
 @media(max-width:560px){.sa-result-actions-v2{grid-template-columns:1fr}.sa-result-actions-v2 .sa-later-btn{grid-column:auto}.sa-review-answer-grid{grid-template-columns:1fr}}
+
+.sa-drill-session-clickable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.sa-drill-session-clickable:hover{transform:translateY(-1px);border-color:#8ca7c0;box-shadow:0 10px 22px rgba(38,66,94,.08)}.sa-drill-session-clickable:focus{outline:3px solid rgba(65,110,149,.22);outline-offset:2px}.sa-review-link{display:block!important;margin-top:5px;color:#35698f!important;font-weight:800;font-size:11px!important}
 </style>
 
 
@@ -997,7 +999,7 @@ async function loadDrilling(){
     const recommendation=weak?`${safe(weak.category_name)} · ${safe(weak.subcategory)}`:'Mulai dengan Latihan Bebas';
     const categoryOptions=categories.map(c=>`<option value="${c.id}">${safe(c.name)}</option>`).join('');
     const masteryRows=rows.slice(0,12).map(x=>`<div class="sa-drill-master-row"><div><b>${safe(x.category_name||'Subtest')}</b><small>${safe(x.subcategory||'Belum dikategorikan')}</small></div><div class="drill-hide-mobile">${Number(x.questions_done||0)} soal</div><div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.accuracy||0)))}%"></div></div><small>${Number(x.accuracy||0)}%</small></div><div class="drill-hide-mobile"><span class="sa-chip ${x.mastered?'ok':''}">${x.mastered?'Mastered':'Perlu latihan'}</span></div></div>`).join('');
-    const recentRows=recent.length?recent.map(x=>{const kind=String(x.activity_type||'drilling').toLowerCase();const chip=kind==='latsol'?'LATSOL':kind==='drilling'?'DRILLING':safe(kind.toUpperCase());const title=x.session_title||`${x.category_name||'Latihan'}${x.subcategory?` · ${x.subcategory}`:''}`;const pts=Number(x.total_points);const maxPts=Number(x.max_points);const meta=(Number.isFinite(pts)&&Number.isFinite(maxPts)&&maxPts>0)?`${pts}/${maxPts} poin · `:'';return `<div class="sa-drill-session"><span class="sa-chip">${safe(chip)}</span><div><b>${safe(title)}</b><small>${meta}${Number(x.correct_count||0)} optimal/benar · ${Number(x.wrong_count||0)} perlu evaluasi · ${Number(x.total_questions||0)} soal</small></div><div class="sa-drill-score">${Number(x.score||0)}%</div></div>`;}).join(''):'<div class="sa-drill-empty">Belum ada riwayat latihan. Selesaikan Latsol atau Drilling untuk melihat hasil terbaru.</div>';
+    const recentRows=recent.length?recent.map(x=>{const kind=String(x.activity_type||'drilling').toLowerCase();const chip=kind==='latsol'?'LATSOL':kind==='drilling'?'DRILLING':safe(kind.toUpperCase());const title=x.session_title||`${x.category_name||'Latihan'}${x.subcategory?` · ${x.subcategory}`:''}`;const pts=Number(x.total_points);const maxPts=Number(x.max_points);const meta=(Number.isFinite(pts)&&Number.isFinite(maxPts)&&maxPts>0)?`${pts}/${maxPts} poin · `:'';const reviewTitle=safe(title).replace(/'/g,'&#39;');return `<div class="sa-drill-session sa-drill-session-clickable" role="button" tabindex="0" onclick="openRecentPracticeReview('${x.id}','${reviewTitle}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRecentPracticeReview('${x.id}','${reviewTitle}')}" title="Klik untuk melihat evaluasi dan pembahasan"><span class="sa-chip">${safe(chip)}</span><div><b>${safe(title)}</b><small>${meta}${Number(x.correct_count||0)} optimal/benar · ${Number(x.wrong_count||0)} perlu evaluasi · ${Number(x.total_questions||0)} soal</small><small class="sa-review-link">Klik untuk lihat evaluasi & pembahasan →</small></div><div class="sa-drill-score">${Number(x.score||0)}%</div></div>`;}).join(''):'<div class="sa-drill-empty">Belum ada riwayat latihan. Selesaikan Latsol atau Drilling untuk melihat hasil terbaru.</div>';
     a.innerHTML=`<div class="sa-drill-wrap">
       <div class="sa-drill-hero-v2"><div><span class="sa-drill-badge">● Rekomendasi untuk hari ini</span><h2>${recommendation}</h2><p>${weak?`Akurasi terakhir ${Number(weak.accuracy||0)}%. Perkuat area ini agar mastery meningkat.`:'Pilih mode latihan dan mulai membangun data performamu.'}</p><div class="sa-drill-actions"><button class="sa-drill-primary" onclick="startDrilling('weakness')">▶ Mulai sekarang</button><button class="sa-drill-secondary" onclick="document.getElementById('drillModes').scrollIntoView({behavior:'smooth'})">Pilih mode lain</button></div></div><div class="sa-drill-snapshot"><div><span>Akurasi</span><b>${Number(s?.average_accuracy||0)}%</b></div><div><span>Soal latihan</span><b>${Number(s?.questions_done||0)}</b></div><div><span>Soal salah</span><b>${wrongPool}</b></div><div><span>Mastery</span><b>${mastered}/${total}</b></div></div></div>
       <div class="sa-drill-section"><div class="sa-drill-kicker">Indikator Performa</div><h3>Snapshot 30 hari terakhir</h3><p>Semua indikator dihitung dari jawaban latihan yang benar-benar tersimpan.</p></div>
@@ -1519,6 +1521,41 @@ showView=async function(name){
       const rightLabel=tkp?'Respons Optimal (Nilai 5)':'Jawaban Benar';
       return `<article class="sa-review-row ${ok?'is-correct':'is-wrong'}"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><b>Soal ${safe(q.question_order||'-')} • ${safe(q.category_name||q.category||'Latihan')}</b></div><span class="sa-review-status ${ok?'correct':'wrong'}">${tkp?(ok?'★ OPTIMAL':'✕ PERLU EVALUASI'):(ok?'✓ BENAR':'✕ PERLU EVALUASI')}</span></div><div style="margin:12px 0;font-size:16px;line-height:1.65">${safe(q.question_text||'')}</div><div class="sa-review-answer-grid"><div class="sa-review-answer"><b>${yourLabel}</b>${safe(q.selected_answer||'-')}${tkp&&q.selected_score!=null?`<div style="margin-top:4px">Nilai: <b>${safe(q.selected_score)}</b></div>`:''}</div><div class="sa-review-answer"><b>${rightLabel}</b>${safe(q.correct_answer||'-')}</div></div>${tkpDetail}<div class="sa-review-explanation"><b>💡 Pembahasan</b>${safe(q.explanation||'Belum ada pembahasan untuk soal ini.')}</div></article>`;
     }).join('')||'<div class="data-card">Tidak ada soal pada filter ini.</div>';
+  };
+
+  window.openRecentPracticeReview=async function(sessionId,title){
+    el('analysisTitle').textContent=title||'Evaluasi & Pembahasan';
+    el('analysisSummary').innerHTML='<div class="data-card">Memuat evaluasi...</div>';
+    el('analysisArea').innerHTML='';
+    el('analysisModal').classList.add('show');
+    try{
+      const {data,error}=await sb.rpc('get_practice_session_review',{p_session_id:sessionId});
+      if(error)throw error;
+      const review=(data||[]).map(q=>{
+        const copy={...q};
+        if(upper(copy.type)==='TKP'&&upper(copy.selected_answer)){
+          const derived=scoreOf(copy,copy.selected_answer);
+          if(derived!==null&&(copy.selected_score==null||Number(copy.selected_score)===0))copy.selected_score=derived;
+          if(!copy.correct_answer){
+            const optimal=['A','B','C','D','E'].find(k=>scoreOf(copy,k)===5);
+            if(optimal)copy.correct_answer=optimal;
+          }
+          copy.is_correct=Number(copy.selected_score)===5;
+        }
+        return copy;
+      });
+      if(!review.length)throw new Error('Data evaluasi untuk sesi ini tidak ditemukan.');
+      const totalPoints=review.reduce((sum,q)=>sum+(Number.isFinite(Number(q.selected_score))?Number(q.selected_score):(q.is_correct?5:0)),0);
+      const maxPoints=review.length*5;
+      const score=maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0;
+      const optimal=review.filter(q=>q.is_correct).length;
+      const need=review.length-optimal;
+      el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${review.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints} / ${maxPoints}</div><small>Total nilai yang diperoleh</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${score}%</div><small>${optimal} optimal/benar · ${need} perlu evaluasi</small></div></div>`;
+      installReviewFilters(review);
+    }catch(e){
+      el('analysisSummary').innerHTML='';
+      el('analysisArea').innerHTML='<div class="data-card">Gagal memuat evaluasi: '+safe(e.message||'Terjadi kesalahan.')+'</div>';
+    }
   };
 
   window.openPracticeResultReview=function(ctx,title){
