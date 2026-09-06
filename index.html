@@ -219,6 +219,9 @@ body.sa-noscroll{overflow:hidden}
 @media(max-width:820px){.sa-home-banner-layout{grid-template-columns:1fr}.sa-home-carousel{min-height:230px}.sa-home-side-banners{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:520px){.sa-home-side-banners{grid-template-columns:1fr}}
 
+
+/* WOW RESULT MODAL */
+#saResultModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(5,12,28,.72);backdrop-filter:blur(8px);z-index:99999}#saResultModal.show{display:flex}.sa-result-card{width:min(520px,100%);background:linear-gradient(145deg,#102a56,#07152c);border:1px solid rgba(255,255,255,.18);border-radius:28px;padding:30px;color:#fff;text-align:center;box-shadow:0 30px 90px rgba(0,0,0,.5);animation:saPop .35s ease-out}.sa-result-icon{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:linear-gradient(135deg,#ffd76a,#ff9f1a);font-size:42px;box-shadow:0 12px 35px rgba(255,180,40,.35)}.sa-result-score{font-size:48px;font-weight:900;line-height:1;margin:18px 0 6px}.sa-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.sa-result-grid div{padding:13px 8px;border-radius:16px;background:rgba(255,255,255,.07)}.sa-result-grid b{display:block;font-size:18px}.sa-result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}@keyframes saPop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
 </style>
 
 
@@ -621,7 +624,9 @@ async function markAllNotificationsRead(){try{const {error}=await sb.rpc('mark_n
 async function loadProfileAndHeader(){const {data:{user}}=await sb.auth.getUser();if(!user)return;const {data}=await sb.from('profiles').select('id,full_name,avatar_url,phone,birth_date,gender,domicile,education,target_formasi,membership,membership_expires_at,created_at').eq('id',user.id).maybeSingle();if(data)updateTopProfile(data,user.email)}
 
 function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);const fav=favoriteQuestionIds.has(q.id);el('examArea').innerHTML='<div class="feature-top"><p style="margin:0">'+(examIndex+1)+' / '+examQuestions.length+'</p><button class="favorite-btn '+(fav?'active':'')+'" onclick="toggleFavorite(\''+q.id+'\',this)">'+(fav?'★ Tersimpan':'☆ Favorit')+'</button></div><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>'}
-async function finishExam(){if(!currentExam)return;clearInterval(timerInt);const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});if(error){alert('Gagal mengirim jawaban: '+error.message);showView('tryouts');return}const result=Array.isArray(data)?data[0]:data;alert('Tryout selesai! Nilai kamu: '+(result?.score??0));showView('history')}
+
+function showWowResult(o={}){const m=el('saResultModal');if(!m)return;el('saResultIcon').textContent=o.icon||'🏆';el('saResultTitle').textContent=o.title||'UJIAN TELAH SELESAI!';el('saResultText').textContent=o.text||'Hasilmu sudah tersimpan.';el('saResultScore').textContent=(Number(o.score||0)%1===0?Number(o.score||0):Number(o.score||0).toFixed(2));el('saResultCorrect').textContent=o.correct??0;el('saResultWrong').textContent=o.wrong??0;el('saResultTotal').textContent=o.total??0;m.dataset.target=o.target||'history';m.classList.add('show')}function closeWowResult(){el('saResultModal')?.classList.remove('show')}function goWowResult(){const t=el('saResultModal')?.dataset.target||'history';closeWowResult();showView(t);if(t==='drilling')loadDrilling?.();}
+async function finishExam(){if(!currentExam)return;clearInterval(timerInt);const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});if(error){alert('Gagal mengirim jawaban: '+error.message);showView('tryouts');return}const result=Array.isArray(data)?data[0]:data;showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Nilai kamu sudah tersimpan. Rekap dan latihan lanjutan tersedia di akunmu.',score:result?.score??0,correct:result?.correct_count??0,wrong:result?.wrong_count??0,total:examQuestions.length,target:'history'});currentExam=null;}
 document.getElementById('materialModal').addEventListener('click',e=>{if(e.target.id==='materialModal')closeMaterial()});
 document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
 
@@ -835,9 +840,10 @@ function renderPracticeQuestion(){
 
   if(locked){
     const chosen=practiceState.selected;
+    const isTkp=String(q.type||'').toLowerCase()==='tkp';
     const ok=String(chosen).toUpperCase()===String(q.correct_answer||'').toUpperCase();
     const f=el('practiceFeedback');
-    if(f)f.innerHTML=`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;
+    if(f)f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef5ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Nilai final dihitung oleh Supabase saat latihan selesai.</div>${q.explanation?`<div style="margin-top:7px;color:#667085">${safe(q.explanation)}</div>`:''}</div>`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;
   }
 }
 
@@ -856,7 +862,7 @@ function choosePractice(k){
 async function nextPractice(){
   if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
   const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});if(error){alert(error.message);return;}
-  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;alert(`${practiceState.title} selesai! Akurasi: ${r?.score??0}%`);practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
+  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:doneTarget==='drilling'?'Performa drilling sudah diperbarui.':'Latihan selesai dan hasilmu sudah direkap.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,target:doneTarget==='drilling'?'drilling':'latsols'});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
 }
 
 /* Drilling is measurement-only: no question list, no drilling session, no question selection. */
@@ -1329,4 +1335,7 @@ showView=async function(name){
   };
 })();
 </script>
+
+<div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span>Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span>Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span>Total Soal</span></div></div><div class="sa-result-actions"><button class="btn dark" onclick="closeWowResult()">Nanti</button><button class="btn primary" onclick="goWowResult()">📊 Lihat Rekap & Drilling</button></div></div></div>
+
 </body></html>
