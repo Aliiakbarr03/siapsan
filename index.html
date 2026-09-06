@@ -389,6 +389,73 @@ body,#app,.sa-shell,.sa-main,.sa-content,.view{color:var(--sa-ink)!important;}
 }
 </style>
 
+
+<style id="sa-dark-premium-palette">
+/* === SIAP ASN — FINAL DARK PREMIUM COLOR SYSTEM (UI ONLY) === */
+:root{
+  --sa-ink:#101820;
+  --sa-navy:#102a43;
+  --sa-blue-dark:#174a7c;
+  --sa-blue:#1f5f99;
+  --sa-green-dark:#176b4d;
+  --sa-red-dark:#8a3030;
+  --sa-gold-dark:#8a6512;
+  --sa-slate-dark:#344054;
+  --sa-line-dark:#cfd6df;
+}
+/* Global readable typography: no pale/washed-out text */
+html,body,.sa-app-shell{color:var(--sa-ink)!important;background:#fff!important}
+.sa-app-shell{background:linear-gradient(180deg,#fff 0%,#fbfcfe 100%)!important}
+.sa-app-shell :is(p,small,span,li,td,th,label,.muted,.sa-muted,.lead,.sa-top-brand small){color:var(--sa-slate-dark)}
+.sa-app-shell :is(h1,h2,h3,h4,h5,h6,strong,b,.sa-page-title,.sa-section-title,.sa-top-brand b){color:var(--sa-navy)!important}
+/* Keep semantic colors dark and premium */
+.sa-app-shell .ok,.sa-app-shell .success,.sa-app-shell .correct,.sa-app-shell .mastered,.sa-chip.ok{color:var(--sa-green-dark)!important}
+.sa-app-shell .wrong,.sa-app-shell .error,.sa-review-status.wrong{color:var(--sa-red-dark)!important}
+.sa-app-shell .warning,.sa-app-shell .gold,.sa-app-shell .premium{color:var(--sa-gold-dark)!important}
+.sa-app-shell a,.sa-app-shell .sa-review-link{color:var(--sa-blue-dark)!important}
+/* Main category accents */
+.sa-latsol-category[data-category="TWK"] .sa-latsol-category-title,
+.sa-latsol-category .sa-latsol-category-title.twk{color:var(--sa-red-dark)!important}
+.sa-latsol-category[data-category="TIU"] .sa-latsol-category-title,
+.sa-latsol-category .sa-latsol-category-title.tiu{color:var(--sa-blue-dark)!important}
+.sa-latsol-category[data-category="TKP"] .sa-latsol-category-title,
+.sa-latsol-category .sa-latsol-category-title.tkp{color:var(--sa-green-dark)!important}
+/* White cards, dark text, clean premium borders */
+.sa-app-shell :is(.sa-card,.sa-mode-card,.sa-latsol-card,.sa-recent-session,.sa-stat-card,.data-card,.notice-item,.sa-review-card,.sa-drill-hero,.sa-mastery-card){background:#fff!important;border-color:var(--sa-line-dark)!important}
+.sa-app-shell :is(.sa-latsol-stat,.sa-subcategory,.sa-chip,.sa-review-answer,.sa-review-explanation,.sa-mastery-table .head){color:var(--sa-slate-dark)!important}
+/* Drill hero must stay white and readable */
+.sa-drill-hero{background:#fff!important;color:var(--sa-ink)!important;box-shadow:0 10px 28px rgba(16,42,67,.07)!important}
+.sa-drill-hero p,.sa-drill-hero .muted{color:var(--sa-slate-dark)!important}
+/* Remove pale muted text from stats, subtitles and metadata */
+.sa-app-shell .sa-course-meta,.sa-app-shell .sa-latsol-meta,.sa-app-shell .sa-latsol-card p,.sa-app-shell .sa-mode-card p,.sa-app-shell .sa-top-brand small,.sa-app-shell .sa-mastery-table .head,.sa-app-shell .sa-mastery-table .row span:first-child small{color:var(--sa-slate-dark)!important}
+/* Interactive rows/cards: hover must NEVER turn text white on a light background */
+.sa-app-shell :is(.sa-recent-session,.sa-drill-session-clickable,.sa-latsol-card,.sa-mode-card,.sa-mastery-table .row,.notice-item,[role="button"]):hover{
+  background:#fff!important;
+  color:var(--sa-ink)!important;
+  border-color:#7b8da1!important;
+  box-shadow:0 12px 26px rgba(16,42,67,.10)!important;
+}
+.sa-app-shell :is(.sa-recent-session,.sa-drill-session-clickable,.sa-latsol-card,.sa-mode-card,.sa-mastery-table .row,.notice-item,[role="button"]):hover *{
+  color:inherit!important;
+}
+/* Restore semantic/link accents inside hover states */
+.sa-app-shell :is(.sa-recent-session,.sa-drill-session-clickable,.sa-latsol-card,.sa-mode-card,.sa-mastery-table .row,.notice-item,[role="button"]):hover :is(a,.sa-review-link){color:var(--sa-blue-dark)!important}
+.sa-app-shell :is(.sa-recent-session,.sa-drill-session-clickable,.sa-latsol-card,.sa-mode-card,.sa-mastery-table .row,.notice-item,[role="button"]):hover :is(.correct,.ok,.success,.sa-chip.ok){color:var(--sa-green-dark)!important}
+.sa-app-shell :is(.sa-recent-session,.sa-drill-session-clickable,.sa-latsol-card,.sa-mode-card,.sa-mastery-table .row,.notice-item,[role="button"]):hover :is(.wrong,.error,.sa-review-status.wrong){color:var(--sa-red-dark)!important}
+/* Buttons: keep contrast clear; no white text on pale hover */
+.sa-app-shell .btn,.sa-app-shell button{color:var(--sa-navy)}
+.sa-app-shell .btn:hover,.sa-app-shell button:hover{color:var(--sa-navy)!important}
+.sa-app-shell .primary{background:#fff!important;color:var(--sa-blue-dark)!important;border:1px solid var(--sa-blue-dark)!important}
+.sa-app-shell .primary:hover{background:#f7faff!important;color:var(--sa-navy)!important}
+/* Existing badges/chips: dark typography */
+.sa-app-shell .badge,.sa-app-shell .sa-chip,.sa-app-shell .sa-latsol-stat,.sa-app-shell .sa-subcategory{color:var(--sa-navy)!important}
+.sa-app-shell .sa-review-status.correct{color:var(--sa-green-dark)!important}
+.sa-app-shell .sa-review-status.wrong{color:var(--sa-red-dark)!important}
+/* Dark palette for icons and important labels */
+.sa-app-shell .sa-icon,.sa-app-shell [data-lucide]{color:var(--sa-blue-dark)}
+/* Focus visibility */
+.sa-app-shell :focus-visible{outline:3px solid rgba(31,95,153,.35)!important;outline-offset:2px}
+</style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
