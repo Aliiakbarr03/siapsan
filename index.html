@@ -570,6 +570,203 @@ a,.sa-review-link{color:var(--premium-blue)!important}
 @media(max-width:950px){.sa-drill-snapshot{border-top-color:var(--premium-line)!important}}
 </style>
 
+
+<!-- SIAP ASN PROFESSIONAL DRILLING REDESIGN -->
+<style id="siap-asn-professional-drilling-redesign">
+:root{
+  --sa-ink:#10233f;
+  --sa-navy:#153a67;
+  --sa-blue:#2167b2;
+  --sa-sky:#eaf5ff;
+  --sa-green:#13745d;
+  --sa-green-bg:#eaf8f2;
+  --sa-red:#a9363f;
+  --sa-red-bg:#fff0f1;
+  --sa-gold:#9a6811;
+  --sa-gold-bg:#fff7e6;
+  --sa-line:#d8e1ec;
+  --sa-muted:#41536a;
+}
+
+/* readable, bright, premium canvas */
+#drillingArea,.sa-drill-wrap{color:var(--sa-ink)}
+.sa-drill-wrap{gap:22px}
+.sa-drill-section{margin:2px 0 0}
+.sa-drill-section h3{color:#10233f;font-size:20px;letter-spacing:-.02em}
+.sa-drill-section p{color:#41536a;font-size:13px}
+.sa-drill-kicker{color:#2167b2!important;letter-spacing:.12em}
+
+/* Hero: strong focal point without black */
+.sa-drill-hero-v2{
+  position:relative;overflow:hidden;
+  background:
+    radial-gradient(circle at 88% 12%,rgba(101,198,255,.34),transparent 29%),
+    radial-gradient(circle at 15% 100%,rgba(35,184,150,.20),transparent 34%),
+    linear-gradient(135deg,#173b67 0%,#1e548d 56%,#286aa5 100%);
+  border:0!important;
+  box-shadow:0 18px 42px rgba(21,58,103,.22)!important;
+  padding:28px 30px!important;
+}
+.sa-drill-hero-v2:before,.sa-drill-hero-v2:after{
+  content:"";position:absolute;border-radius:50%;pointer-events:none
+}
+.sa-drill-hero-v2:before{width:270px;height:270px;right:-115px;bottom:-160px;border:38px solid rgba(255,255,255,.055)}
+.sa-drill-hero-v2:after{width:190px;height:190px;left:43%;top:-155px;border:30px solid rgba(255,255,255,.045)}
+.sa-drill-hero-v2>div{position:relative;z-index:1}
+.sa-drill-badge{
+  background:#dff1ff!important;color:#15426f!important;
+  border:1px solid rgba(255,255,255,.42);
+  box-shadow:0 5px 16px rgba(0,0,0,.12);
+}
+.sa-drill-hero-v2 h2{font-size:29px!important;line-height:1.15}
+.sa-drill-hero-v2 p{font-size:14px!important;color:#f1f7ff!important;max-width:650px}
+.sa-drill-primary{
+  background:linear-gradient(135deg,#ffffff,#eaf5ff)!important;
+  color:#173b67!important;box-shadow:0 8px 18px rgba(0,0,0,.13);
+}
+.sa-drill-primary:hover{transform:translateY(-2px);filter:brightness(1.02)}
+.sa-drill-secondary{
+  background:rgba(8,33,63,.18)!important;border-color:rgba(255,255,255,.55)!important;
+  color:#fff!important;
+}
+.sa-drill-secondary:hover{background:rgba(255,255,255,.14)!important}
+.sa-drill-snapshot{border-left-color:rgba(255,255,255,.26)!important}
+.sa-drill-snapshot div{
+  background:rgba(255,255,255,.13)!important;
+  border-color:rgba(255,255,255,.24)!important;
+  box-shadow:inset 0 1px 0 rgba(255,255,255,.1);
+}
+.sa-drill-snapshot div:nth-child(1){border-top:3px solid #7dd3fc!important}
+.sa-drill-snapshot div:nth-child(2){border-top:3px solid #dbeafe!important}
+.sa-drill-snapshot div:nth-child(3){border-top:3px solid #fda4af!important}
+.sa-drill-snapshot div:nth-child(4){border-top:3px solid #86efac!important}
+.sa-drill-snapshot span{color:#e8f3ff!important}
+.sa-drill-snapshot b{color:#fff!important}
+
+/* Indicators: same structure, different meaning */
+.sa-drill-indicators{gap:14px}
+.sa-drill-indicator{
+  position:relative;overflow:hidden;background:#fff!important;
+  border:1px solid var(--sa-line)!important;border-radius:18px!important;
+  padding:17px!important;box-shadow:0 8px 22px rgba(24,53,87,.055)!important;
+}
+.sa-drill-indicator:before{content:"";position:absolute;left:0;right:0;top:0;height:4px;background:#2167b2}
+.sa-drill-indicator:nth-child(1):before{background:linear-gradient(90deg,#2167b2,#61a8e8)}
+.sa-drill-indicator:nth-child(2):before{background:linear-gradient(90deg,#18755e,#36a987)}
+.sa-drill-indicator:nth-child(3):before{background:linear-gradient(90deg,#27486e,#5b7699)}
+.sa-drill-indicator:nth-child(4):before{background:linear-gradient(90deg,#9a6811,#d5a33a)}
+.sa-drill-indicator span{color:#53667d!important}
+.sa-drill-indicator b{color:#10233f!important;font-size:25px!important}
+.sa-drill-indicator small{color:#41536a!important}
+
+/* Mode cards: distinctive, professional and clearly clickable */
+.sa-drill-modes{gap:16px}
+.sa-drill-mode{
+  position:relative;overflow:hidden;isolation:isolate;
+  min-height:202px!important;padding:20px 19px!important;
+  border:1px solid var(--sa-line)!important;border-radius:20px!important;
+  background:linear-gradient(180deg,#fff 0%,#fbfdff 100%)!important;
+  box-shadow:0 8px 22px rgba(24,53,87,.055)!important;
+  transition:transform .22s ease,box-shadow .22s ease,border-color .22s ease!important;
+}
+.sa-drill-mode:before{
+  content:"";position:absolute;left:0;right:0;top:0;height:5px;
+  background:linear-gradient(90deg,#18755e,#39b78c);z-index:-1
+}
+.sa-drill-mode:nth-child(2):before{background:linear-gradient(90deg,#2167b2,#69aeea)}
+.sa-drill-mode:nth-child(3):before{background:linear-gradient(90deg,#a9363f,#d26b70)}
+.sa-drill-mode:nth-child(4):before{background:linear-gradient(90deg,#9a6811,#d7a334)}
+.sa-drill-mode:hover{
+  transform:translateY(-7px)!important;
+  box-shadow:0 18px 35px rgba(24,53,87,.14)!important;
+  border-color:#b7c8db!important;
+}
+.sa-drill-mode.recommended{
+  border-color:#67aa91!important;
+  box-shadow:0 0 0 3px rgba(24,117,94,.08),0 10px 25px rgba(24,53,87,.07)!important;
+}
+.sa-drill-mode.recommended:after{
+  content:"Rekomendasi";position:absolute;right:15px;top:15px;
+  padding:5px 9px;border-radius:999px;background:#e7f7ef;color:#13745d;
+  font-size:9px;font-weight:900;letter-spacing:.03em;
+}
+.sa-drill-mode .ico{
+  width:48px!important;height:48px!important;border-radius:15px!important;
+  margin-bottom:16px!important;font-size:21px;
+  background:linear-gradient(135deg,#e7f8ef,#d7f0e3)!important;color:#13745d!important;
+  box-shadow:0 8px 16px rgba(19,116,93,.10);
+}
+.sa-drill-mode:nth-child(2) .ico{
+  background:linear-gradient(135deg,#e8f3ff,#d7e9fb)!important;color:#2167b2!important;
+  box-shadow:0 8px 16px rgba(33,103,178,.10);
+}
+.sa-drill-mode:nth-child(3) .ico{
+  background:linear-gradient(135deg,#fff0f1,#fde0e2)!important;color:#a9363f!important;
+  box-shadow:0 8px 16px rgba(169,54,63,.10);
+}
+.sa-drill-mode:nth-child(4) .ico{
+  background:linear-gradient(135deg,#fff7e6,#f8e8bd)!important;color:#9a6811!important;
+  box-shadow:0 8px 16px rgba(154,104,17,.10);
+}
+.sa-drill-mode h4{font-size:16px!important;color:#10233f!important}
+.sa-drill-mode p{color:#41536a!important;font-size:12px!important;line-height:1.65!important}
+.sa-drill-mode small{
+  position:absolute;left:19px;right:19px;bottom:17px;
+  padding-top:11px;border-top:1px solid #e5ebf2;
+  color:#2167b2!important;font-size:10px!important;font-weight:800!important;
+}
+.sa-drill-mode:nth-child(1) small{color:#13745d!important}
+.sa-drill-mode:nth-child(3) small{color:#a9363f!important}
+.sa-drill-mode:nth-child(4) small{color:#9a6811!important}
+
+/* Latsol summary: better visual hierarchy */
+.sa-latsol-summary{gap:16px}
+.sa-latsol-card{
+  border-radius:20px!important;border-color:var(--sa-line)!important;
+  box-shadow:0 8px 24px rgba(24,53,87,.055)!important;
+}
+.sa-latsol-card h4,.sa-latsol-card .sa-latsol-score{color:#153a67!important}
+.sa-latsol-card small,.sa-latsol-progress-top{color:#41536a!important}
+.sa-latsol-stat{background:#f5f8fc!important;border:1px solid #e6edf5}
+.sa-latsol-stat span{color:#53667d!important}
+.sa-latsol-stat b{color:#10233f!important}
+.sa-latsol-progress-line{background:#e6edf5!important}
+.sa-latsol-progress-line>div{background:linear-gradient(90deg,#2167b2,#18755e)!important}
+
+/* Mastery cards and recent sessions */
+.sa-mastery-card{
+  border:1px solid var(--sa-line)!important;border-radius:18px!important;
+  box-shadow:0 7px 20px rgba(24,53,87,.045)!important;
+}
+.sa-mastery-card b,.sa-mastery-card strong{color:#10233f!important}
+.sa-mastery-card small,.sa-mastery-card-metrics span{color:#41536a!important}
+.sa-chip.ok{background:#e7f7ef!important;color:#13745d!important}
+.sa-drill-session{
+  border:1px solid var(--sa-line)!important;border-radius:18px!important;
+  box-shadow:0 6px 18px rgba(24,53,87,.04);
+}
+.sa-drill-session:hover{background:#f8fbff!important;border-color:#9ab9d8!important}
+.sa-drill-session b{color:#10233f!important}
+.sa-drill-session small{color:#41536a!important}
+.sa-review-link{color:#2167b2!important;font-weight:800!important}
+.sa-drill-score{color:#153a67!important}
+
+/* No pale unreadable text */
+#drillingArea .muted,#drillingArea .sa-muted,
+#drillingArea p,#drillingArea small{color:inherit}
+#drillingArea .sa-drill-hero-v2 p{color:#f1f7ff!important}
+@media(max-width:950px){
+ .sa-drill-modes{grid-template-columns:repeat(2,1fr)!important}
+}
+@media(max-width:620px){
+ .sa-drill-hero-v2{padding:22px 18px!important}
+ .sa-drill-hero-v2 h2{font-size:23px!important}
+ .sa-drill-snapshot{padding-left:0!important;border-left:0!important;border-top:1px solid rgba(255,255,255,.25);padding-top:15px!important}
+ .sa-drill-modes{grid-template-columns:1fr!important}
+ .sa-drill-mode{min-height:190px!important}
+}
+</style>
+
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
