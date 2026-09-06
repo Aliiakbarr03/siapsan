@@ -575,7 +575,7 @@ async function saveProfile(){
   }catch(e){msg('profileMsg',e.message||'Gagal menyimpan profil.','err');btn.textContent='Simpan Perubahan'}finally{btn.disabled=false}
 }
 
-async function loadHistory(){try{const {data,error}=await sb.rpc('get_my_tryout_history',{p_limit:50});if(error)throw error;const rows=data||[];if(!rows.length){el('historyArea').innerHTML='<div class="data-card">Belum ada riwayat tryout.</div>';return}el('historyArea').innerHTML=rows.map(r=>'<div class="data-card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>'+safe(r.title)+'</h3><div class="chip">'+new Date(r.submitted_at).toLocaleString('id-ID')+'</div></div><div class="score-big" style="font-size:32px">'+(r.score??0)+'</div></div><p>Benar <b>'+r.correct_count+'</b> • Salah <b>'+r.wrong_count+'</b> • Kosong <b>'+r.unanswered_count+'</b> • '+Math.round((r.duration_seconds||0)/60)+' menit</p><button class="btn primary" onclick="openAnalysis(\''+r.attempt_id+'\',\''+safe(r.title).replace(/'/g,'&#39;')+'\')">Lihat Analisis</button></div>').join('')}catch(e){el('historyArea').innerHTML='<div class="data-card">Gagal memuat riwayat: '+safe(e.message)+'</div>'}}
+async function loadHistory(){try{const {data,error}=await sb.rpc('get_my_tryout_history',{p_limit:50});if(error)throw error;const rows=data||[];if(!rows.length){el('historyArea').innerHTML='<div class="data-card">Belum ada riwayat tryout.</div>';return}el('historyArea').innerHTML=rows.map(r=>'<div class="data-card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>'+safe(r.title)+'</h3><div class="chip">'+new Date(r.submitted_at).toLocaleString('id-ID')+'</div></div><div class="score-big" style="font-size:32px">'+(r.score??0)+'</div></div><p>'+(r.total_points!=null?('Total Poin <b>'+r.total_points+'</b>'+(r.max_points!=null?' / <b>'+r.max_points+'</b>':'')+' • '):'')+'Benar/Optimal <b>'+r.correct_count+'</b> • Perlu Evaluasi <b>'+r.wrong_count+'</b> • Kosong <b>'+r.unanswered_count+'</b> • '+Math.round((r.duration_seconds||0)/60)+' menit</p><button class="btn primary" onclick="openAnalysis(\''+r.attempt_id+'\',\''+safe(r.title).replace(/'/g,'&#39;')+'\')">Lihat Analisis</button></div>').join('')}catch(e){el('historyArea').innerHTML='<div class="data-card">Gagal memuat riwayat: '+safe(e.message)+'</div>'}}
 function renderReviewRows(review,filter='all'){
  const rows=(review||[]).filter(q=>filter==='all'||(filter==='correct'?!!q.is_correct:!q.is_correct));
  return rows.map(q=>{
@@ -600,7 +600,12 @@ async function openAnalysis(id,title){
   const [a,r]=await Promise.all([sb.rpc('get_my_attempt_category_analysis',{p_attempt_id:id}),sb.rpc('get_my_attempt_review',{p_attempt_id:id})]);
   if(a.error)throw a.error;if(r.error)throw r.error;
   const cats=a.data||[],review=r.data||[];
-  el('analysisSummary').innerHTML='<div class="analysis-grid">'+cats.map(c=>'<div class="data-card"><b>'+safe(c.category_name||'Tanpa kategori')+'</b><div style="font-size:28px;font-weight:800">'+(c.score_percent??0)+'%</div><div class="progress"><div style="width:'+Math.min(100,Math.max(0,Number(c.score_percent||0)))+'%"></div></div><small>'+c.correct_count+' benar dari '+c.total_questions+'</small></div>').join('')+'</div>';
+  const totalPoints=review.reduce((sum,q)=>sum+(Number.isFinite(Number(q.selected_score))?Number(q.selected_score):(q.is_correct?5:0)),0);
+  const maxPoints=review.length*5;
+  const scorePercent=maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0;
+  const overall='<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">'+review.length+'</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">'+totalPoints+' / '+maxPoints+'</div><small>Total nilai yang diperoleh</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">'+scorePercent+'%</div><div class="progress"><div style="width:'+Math.min(100,Math.max(0,scorePercent))+'%"></div></div></div></div>';
+  const byCategory=cats.length?'<div class="analysis-grid">'+cats.map(c=>'<div class="data-card"><b>'+safe(c.category_name||'Tanpa kategori')+'</b><div style="font-size:24px;font-weight:800">'+Number(c.total_points??0)+' / '+Number(c.max_points??(Number(c.total_questions||0)*5))+'</div><small>Poin · '+(c.score_percent??0)+'%</small></div>').join('')+'</div>':'';
+  el('analysisSummary').innerHTML=overall+byCategory;
   installReviewFilters(review);
  }catch(e){el('analysisArea').innerHTML='<div class="data-card">Gagal memuat analisis: '+safe(e.message)+'</div>'}
 }
@@ -699,11 +704,18 @@ function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','
 let lastResultReview={mode:'',attemptId:null,title:'',practice:null};
 function showWowResult(o={}){
  const m=el('saResultModal');if(!m)return;
+ const hasPoints=Number.isFinite(Number(o.totalPoints))&&Number.isFinite(Number(o.maxPoints));
  el('saResultIcon').textContent=o.icon||'🏆';
  el('saResultTitle').textContent=o.title||'UJIAN TELAH SELESAI!';
  el('saResultText').textContent=o.text||'Hasilmu sudah tersimpan.';
- el('saResultScore').textContent=(Number(o.score||0)%1===0?Number(o.score||0):Number(o.score||0).toFixed(2));
- el('saResultCorrect').textContent=o.correct??0;el('saResultWrong').textContent=o.wrong??0;el('saResultTotal').textContent=o.total??0;
+ el('saResultScore').textContent=hasPoints?`${Number(o.totalPoints)} / ${Number(o.maxPoints)}`:(Number(o.score||0)%1===0?Number(o.score||0):Number(o.score||0).toFixed(2));
+ el('saResultCorrect').textContent=hasPoints?Number(o.totalPoints):o.correct??0;
+ el('saResultWrong').textContent=hasPoints?Number(o.maxPoints):o.wrong??0;
+ el('saResultTotal').textContent=hasPoints?`${Number(o.total||0)} Soal`:o.total??0;
+ const cLabel=el('saResultCorrectLabel'),wLabel=el('saResultWrongLabel'),tLabel=el('saResultTotalLabel');
+ if(cLabel)cLabel.textContent=hasPoints?'Total Poin':'Optimal/Benar';
+ if(wLabel)wLabel.textContent=hasPoints?'Poin Maksimal':'Perlu Evaluasi';
+ if(tLabel)tLabel.textContent=hasPoints?'Total Soal':'Total Soal';
  lastResultReview={mode:o.reviewMode||'',attemptId:o.attemptId||null,title:o.reviewTitle||o.title||'Hasil Latihan',practice:o.practice||null};
  m.classList.add('show');
 }
@@ -726,7 +738,7 @@ async function finishExam(){
  const result=Array.isArray(data)?data[0]:data||{};
  const attemptId=result.attempt_id||result.id||result.tryout_attempt_id||null;
  const title=el('examTitle')?.textContent||'TRYOUT';
- showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Sekarang kamu bisa melihat soal benar, salah, dan pembahasannya.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:examQuestions.length,reviewMode:'attempt',attemptId,reviewTitle:title});
+ showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Total poin dihitung dengan bobot yang sama untuk TKP dan Tryout.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:examQuestions.length,totalPoints:result.total_points,maxPoints:result.max_points,reviewMode:'attempt',attemptId,reviewTitle:title});
  currentExam=null;
 }
 document.getElementById('materialModal').addEventListener('click',e=>{if(e.target.id==='materialModal')closeMaterial()});
@@ -967,7 +979,7 @@ function choosePractice(k){
 async function nextPractice(){
   if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
   const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});if(error){alert(error.message);return;}
-  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;const reviewPractice={rows:practiceState.rows.slice(),answers:{...practiceState.answers},title:doneTitle};showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:'Latihan selesai. Kamu sekarang bisa melihat soal benar, perlu evaluasi, dan pembahasan lengkap.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,reviewMode:'practice',reviewTitle:doneTitle,practice:reviewPractice});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
+  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;const reviewPractice={rows:practiceState.rows.slice(),answers:{...practiceState.answers},title:doneTitle};showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:'Latihan selesai. Total poin dihitung dari nilai setiap jawaban TKP dan sistem yang sama dipakai pada Tryout.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,totalPoints:r?.total_points,maxPoints:r?.max_points,reviewMode:'practice',reviewTitle:doneTitle,practice:reviewPractice});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
 }
 
 /* Drilling is measurement-only: no question list, no drilling session, no question selection. */
@@ -1441,7 +1453,7 @@ showView=async function(name){
 })();
 </script>
 
-<div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span>Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span>Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span>Total Soal</span></div></div><div class="sa-result-actions sa-result-actions-v2"><button class="btn sa-review-btn" type="button" onclick="openResultReview()">🔍 Lihat Pembahasan</button><button class="btn sa-drill-btn" type="button" onclick="goResultDrilling()">🎯 Masuk Drilling</button><button class="btn sa-later-btn" type="button" onclick="closeWowResult()">Nanti</button></div></div></div>
+<div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span id="saResultCorrectLabel">Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span id="saResultWrongLabel">Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span id="saResultTotalLabel">Total Soal</span></div></div><div class="sa-result-actions sa-result-actions-v2"><button class="btn sa-review-btn" type="button" onclick="openResultReview()">🔍 Lihat Pembahasan</button><button class="btn sa-drill-btn" type="button" onclick="goResultDrilling()">🎯 Masuk Drilling</button><button class="btn sa-later-btn" type="button" onclick="closeWowResult()">Nanti</button></div></div></div>
 
 
 <script id="siap-asn-drilling-tkp-sync-patch">
@@ -1521,8 +1533,10 @@ showView=async function(name){
       };
     });
     const correct=rows.filter(x=>x.is_correct).length,wrong=rows.length-correct;
+    const totalPoints=rows.reduce((sum,x)=>sum+(Number.isFinite(Number(x.selected_score))?Number(x.selected_score):(x.is_correct?5:0)),0);
+    const maxPoints=rows.length*5;
     el('analysisTitle').textContent=title||'Pembahasan Latihan';
-    el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Benar / Optimal</b><div style="font-size:28px;font-weight:800">${correct}</div></div><div class="data-card"><b>Perlu Evaluasi</b><div style="font-size:28px;font-weight:800">${wrong}</div></div></div>`;
+    el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints}</div><small>dari ${maxPoints} poin maksimal</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0}%</div><small>${correct} optimal/benar · ${wrong} perlu evaluasi</small></div></div>`;
     el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
     installReviewFilters(rows);
   };
