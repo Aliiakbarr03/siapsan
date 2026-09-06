@@ -947,7 +947,7 @@ function renderPracticeQuestion(){
     const f=el('practiceFeedback');
     if(f){
       const explanation=q.explanation?`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>${safe(q.explanation)}</div></div>`:`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>Belum ada pembahasan untuk soal ini.</div><div class="sa-explanation-note">Admin dapat menambahkan pembahasan dari Bank Soal.</div></div>`;
-      f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef8ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Nilai final dihitung oleh Supabase saat latihan selesai.</div></div>${explanation}`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b></div>${explanation}`;
+      f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef8ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Bobot jawaban tersimpan dan dibaca dari Supabase saat latihan selesai.</div></div>${explanation}`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b></div>${explanation}`;
     }
   }
 }
