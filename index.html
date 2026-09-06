@@ -230,6 +230,31 @@ body.sa-noscroll{overflow:hidden}
 .sa-explanation-card{margin-top:16px;padding:18px;border-radius:16px;background:#f4faff;border:1px solid #cfe7f7;color:#24435f;line-height:1.65}
 .sa-explanation-title{display:flex;align-items:center;gap:9px;font-weight:900;color:#1769aa;margin-bottom:8px;font-size:15px}
 .sa-explanation-note{font-size:13px;color:#66829b;margin-top:8px}
+
+/* === SIAP ASN RESULT + REVIEW V2 (SAFE, DEFINITIVE) === */
+#saResultModal{background:linear-gradient(135deg,rgba(220,241,255,.88),rgba(238,248,255,.84))!important;backdrop-filter:blur(14px)!important}
+#saResultModal .sa-result-card{background:linear-gradient(180deg,#ffffff 0%,#f3faff 100%)!important;color:#18324a!important;border:1px solid #cfe6f7!important;box-shadow:0 28px 90px rgba(42,114,166,.24)!important}
+#saResultModal .sa-result-card h2{color:#15334f!important}
+#saResultModal .sa-result-card p,#saResultModal .sa-result-card .muted{color:#587088!important}
+#saResultModal .sa-result-grid div{background:#eaf6ff!important;border:1px solid #d4eafb!important}
+#saResultModal .sa-result-grid b{color:#145f93!important}
+#saResultModal .sa-result-grid span{color:#60788e!important}
+#saResultModal .sa-result-icon{box-shadow:0 12px 34px rgba(48,145,209,.22)!important}
+.sa-result-actions-v2{display:grid!important;grid-template-columns:1fr 1fr;gap:10px;margin-top:18px}
+.sa-result-actions-v2 .btn{min-height:48px}
+.sa-result-actions-v2 .sa-review-btn{background:linear-gradient(135deg,#2496d4,#5ab7eb)!important;color:#fff!important;border:none!important}
+.sa-result-actions-v2 .sa-drill-btn{background:linear-gradient(135deg,#6658d8,#8478ee)!important;color:#fff!important;border:none!important}
+.sa-result-actions-v2 .sa-later-btn{grid-column:1/-1;background:#eef5fa!important;color:#466077!important;border:1px solid #d6e5ef!important}
+.sa-review-toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 14px}
+.sa-review-filter{border:1px solid #d7e4ee;background:#f7fbfe;color:#38556c;padding:9px 13px;border-radius:999px;font-weight:800;cursor:pointer}
+.sa-review-filter.active{background:#2a91ca;color:#fff;border-color:#2a91ca}
+.sa-review-row{border:1px solid #dce8f0;border-radius:18px;padding:18px;margin:12px 0;background:#fff;box-shadow:0 8px 24px rgba(44,85,116,.06)}
+.sa-review-row.is-correct{border-left:5px solid #27a66f}.sa-review-row.is-wrong{border-left:5px solid #e35b5b}
+.sa-review-status{display:inline-flex;align-items:center;gap:7px;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}
+.sa-review-status.correct{background:#e8f8ef;color:#16764d}.sa-review-status.wrong{background:#fff0f0;color:#b43e3e}
+.sa-review-answer-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.sa-review-answer{padding:12px;border-radius:12px;background:#f4f9fc}.sa-review-answer b{display:block;color:#173b56;margin-bottom:4px}
+.sa-review-explanation{margin-top:14px;padding:14px 15px;border-radius:14px;background:#eef8ff;border:1px solid #d4eaf7;color:#34536a}.sa-review-explanation b{display:block;color:#1971a5;margin-bottom:6px}
+@media(max-width:560px){.sa-result-actions-v2{grid-template-columns:1fr}.sa-result-actions-v2 .sa-later-btn{grid-column:auto}.sa-review-answer-grid{grid-template-columns:1fr}}
 </style>
 
 
@@ -551,8 +576,46 @@ async function saveProfile(){
 }
 
 async function loadHistory(){try{const {data,error}=await sb.rpc('get_my_tryout_history',{p_limit:50});if(error)throw error;const rows=data||[];if(!rows.length){el('historyArea').innerHTML='<div class="data-card">Belum ada riwayat tryout.</div>';return}el('historyArea').innerHTML=rows.map(r=>'<div class="data-card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>'+safe(r.title)+'</h3><div class="chip">'+new Date(r.submitted_at).toLocaleString('id-ID')+'</div></div><div class="score-big" style="font-size:32px">'+(r.score??0)+'</div></div><p>Benar <b>'+r.correct_count+'</b> • Salah <b>'+r.wrong_count+'</b> • Kosong <b>'+r.unanswered_count+'</b> • '+Math.round((r.duration_seconds||0)/60)+' menit</p><button class="btn primary" onclick="openAnalysis(\''+r.attempt_id+'\',\''+safe(r.title).replace(/'/g,'&#39;')+'\')">Lihat Analisis</button></div>').join('')}catch(e){el('historyArea').innerHTML='<div class="data-card">Gagal memuat riwayat: '+safe(e.message)+'</div>'}}
-async function openAnalysis(id,title){el('analysisTitle').textContent=title||'Hasil Tryout';el('analysisSummary').innerHTML='<div class="data-card">Memuat hasil...</div>';el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');try{const [a,r]=await Promise.all([sb.rpc('get_my_attempt_category_analysis',{p_attempt_id:id}),sb.rpc('get_my_attempt_review',{p_attempt_id:id})]);if(a.error)throw a.error;if(r.error)throw r.error;const cats=a.data||[],review=r.data||[];el('analysisSummary').innerHTML='<div class="analysis-grid">'+cats.map(c=>'<div class="data-card"><b>'+safe(c.category_name||'Tanpa kategori')+'</b><div style="font-size:28px;font-weight:800">'+(c.score_percent??0)+'%</div><div class="progress"><div style="width:'+Math.min(100,Math.max(0,Number(c.score_percent||0)))+'%"></div></div><small>'+c.correct_count+' benar dari '+c.total_questions+'</small></div>').join('')+'</div>';el('analysisArea').innerHTML=review.map(q=>'<div class="review-row"><div><b>No. '+q.question_order+' • '+safe(q.category_name||'Tanpa kategori')+'</b></div><div style="margin:8px 0">'+safe(q.question_text)+'</div><div><span class="chip">Jawaban kamu: '+safe(q.selected_answer||'-')+'</span> <span class="chip">Kunci: '+safe(q.correct_answer||'-')+'</span> <span class="chip '+(q.is_correct?'correct':'wrong')+'">'+(q.is_correct?'Benar':'Salah')+'</span></div><p class="muted">'+safe(q.explanation||'Belum ada pembahasan.')+'</p></div>').join('')||'<div class="data-card">Tidak ada detail soal.</div>'}catch(e){el('analysisArea').innerHTML='<div class="data-card">Gagal memuat analisis: '+safe(e.message)+'</div>'}}
-function closeAnalysis(){el('analysisModal').classList.remove('show')}
+function renderReviewRows(review,filter='all'){
+ const rows=(review||[]).filter(q=>filter==='all'||(filter==='correct'?!!q.is_correct:!q.is_correct));
+ return rows.map(q=>{
+   const ok=!!q.is_correct;
+   return `<article class="sa-review-row ${ok?'is-correct':'is-wrong'}"><div style="display:flex;justify-content:space-between;gap:12px;align-items:flex-start"><div><b>Soal ${safe(q.question_order||'-')} • ${safe(q.category_name||q.category||'Latihan')}</b></div><span class="sa-review-status ${ok?'correct':'wrong'}">${ok?'✓ BENAR':'✕ PERLU EVALUASI'}</span></div><div style="margin:12px 0;font-size:16px;line-height:1.65">${safe(q.question_text||'')}</div><div class="sa-review-answer-grid"><div class="sa-review-answer"><b>Jawaban Kamu</b>${safe(q.selected_answer||'-')}</div><div class="sa-review-answer"><b>${String(q.type||'').toLowerCase()==='tkp'?'Respons Optimal':'Jawaban Benar'}</b>${safe(q.correct_answer||'-')}</div></div><div class="sa-review-explanation"><b>💡 Pembahasan</b>${safe(q.explanation||'Belum ada pembahasan untuk soal ini.')}</div></article>`;
+ }).join('')||'<div class="data-card">Tidak ada soal pada filter ini.</div>';
+}
+function installReviewFilters(review){
+ const area=el('analysisArea');const bar=el('analysisSummary');
+ const counts={all:review.length,correct:review.filter(x=>x.is_correct).length,wrong:review.filter(x=>!x.is_correct).length};
+ const toolbar=`<div class="sa-review-toolbar" id="saReviewToolbar"><button class="sa-review-filter active" data-filter="all">Semua ${counts.all}</button><button class="sa-review-filter" data-filter="correct">✓ Benar ${counts.correct}</button><button class="sa-review-filter" data-filter="wrong">✕ Perlu Evaluasi ${counts.wrong}</button></div>`;
+ if(bar)bar.insertAdjacentHTML('beforeend',toolbar);
+ const apply=f=>{area.innerHTML=renderReviewRows(review,f);document.querySelectorAll('#saReviewToolbar .sa-review-filter').forEach(b=>b.classList.toggle('active',b.dataset.filter===f));};
+ document.querySelectorAll('#saReviewToolbar .sa-review-filter').forEach(b=>b.addEventListener('click',()=>apply(b.dataset.filter)));
+ apply('all');
+}
+async function openAnalysis(id,title){
+ el('analysisTitle').textContent=title||'Pembahasan & Hasil';
+ el('analysisSummary').innerHTML='<div class="data-card">Memuat hasil...</div>';
+ el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
+ try{
+  const [a,r]=await Promise.all([sb.rpc('get_my_attempt_category_analysis',{p_attempt_id:id}),sb.rpc('get_my_attempt_review',{p_attempt_id:id})]);
+  if(a.error)throw a.error;if(r.error)throw r.error;
+  const cats=a.data||[],review=r.data||[];
+  el('analysisSummary').innerHTML='<div class="analysis-grid">'+cats.map(c=>'<div class="data-card"><b>'+safe(c.category_name||'Tanpa kategori')+'</b><div style="font-size:28px;font-weight:800">'+(c.score_percent??0)+'%</div><div class="progress"><div style="width:'+Math.min(100,Math.max(0,Number(c.score_percent||0)))+'%"></div></div><small>'+c.correct_count+' benar dari '+c.total_questions+'</small></div>').join('')+'</div>';
+  installReviewFilters(review);
+ }catch(e){el('analysisArea').innerHTML='<div class="data-card">Gagal memuat analisis: '+safe(e.message)+'</div>'}
+}
+function openPracticeResultReview(ctx,title){
+ const rows=(ctx.rows||[]).map((q,i)=>{
+   const selected=(ctx.answers||{})[q.id]||'-';
+   const correct=q.correct_answer||'-';
+   return {question_order:i+1,category_name:q.category_name||q.category||ctx.title||'Latihan',type:q.type||'',question_text:q.question_text||'',selected_answer:selected,correct_answer:correct,is_correct:String(selected).toUpperCase()===String(correct).toUpperCase(),explanation:q.explanation||''};
+ });
+ el('analysisTitle').textContent=title||'Pembahasan Latihan';
+ const correct=rows.filter(x=>x.is_correct).length,wrong=rows.length-correct;
+ el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Benar / Optimal</b><div style="font-size:28px;font-weight:800">${correct}</div></div><div class="data-card"><b>Perlu Evaluasi</b><div style="font-size:28px;font-weight:800">${wrong}</div></div></div>`;
+ el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
+ installReviewFilters(rows);
+}function closeAnalysis(){el('analysisModal').classList.remove('show')}
 el('analysisModal').addEventListener('click',e=>{if(e.target.id==='analysisModal')closeAnalysis()});
 el('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
 async function loadRanking(period){try{const [{data,error},{data:ud}]=await Promise.all([sb.rpc('get_ranking',{p_period:period,p_limit:50}),sb.auth.getUser()]);if(error)throw error;const me=ud?.user?.id;const rows=data||[];el('rankingArea').innerHTML=rows.length?'<div class="data-card">'+rows.map(r=>'<div class="rank-row"><div><b>#'+r.rank+'</b></div><div><b>'+safe(r.full_name||'Peserta')+'</b><div class="muted">'+r.attempt_count+' tryout</div></div><div><b>'+r.best_score+'</b></div><div>'+((r.user_id&&me===r.user_id)?'<span class="chip">Kamu</span>':'')+'</div></div>').join('')+'</div>':'<div class="data-card">Belum ada ranking.</div>'}catch(e){el('rankingArea').innerHTML='<div class="data-card">Gagal memuat ranking: '+safe(e.message)+'</div>'}}
@@ -633,8 +696,39 @@ async function loadProfileAndHeader(){const {data:{user}}=await sb.auth.getUser(
 
 function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);const fav=favoriteQuestionIds.has(q.id);el('examArea').innerHTML='<div class="feature-top"><p style="margin:0">'+(examIndex+1)+' / '+examQuestions.length+'</p><button class="favorite-btn '+(fav?'active':'')+'" onclick="toggleFavorite(\''+q.id+'\',this)">'+(fav?'★ Tersimpan':'☆ Favorit')+'</button></div><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>'}
 
-function showWowResult(o={}){const m=el('saResultModal');if(!m)return;el('saResultIcon').textContent=o.icon||'🏆';el('saResultTitle').textContent=o.title||'UJIAN TELAH SELESAI!';el('saResultText').textContent=o.text||'Hasilmu sudah tersimpan.';el('saResultScore').textContent=(Number(o.score||0)%1===0?Number(o.score||0):Number(o.score||0).toFixed(2));el('saResultCorrect').textContent=o.correct??0;el('saResultWrong').textContent=o.wrong??0;el('saResultTotal').textContent=o.total??0;m.dataset.target=o.target||'history';m.classList.add('show')}function closeWowResult(){el('saResultModal')?.classList.remove('show')}function goWowResult(){const t=el('saResultModal')?.dataset.target||'history';closeWowResult();showView(t);if(t==='drilling')loadDrilling?.();}
-async function finishExam(){if(!currentExam)return;clearInterval(timerInt);const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});if(error){alert('Gagal mengirim jawaban: '+error.message);showView('tryouts');return}const result=Array.isArray(data)?data[0]:data;showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Nilai kamu sudah tersimpan. Rekap dan latihan lanjutan tersedia di akunmu.',score:result?.score??0,correct:result?.correct_count??0,wrong:result?.wrong_count??0,total:examQuestions.length,target:'history'});currentExam=null;}
+let lastResultReview={mode:'',attemptId:null,title:'',practice:null};
+function showWowResult(o={}){
+ const m=el('saResultModal');if(!m)return;
+ el('saResultIcon').textContent=o.icon||'🏆';
+ el('saResultTitle').textContent=o.title||'UJIAN TELAH SELESAI!';
+ el('saResultText').textContent=o.text||'Hasilmu sudah tersimpan.';
+ el('saResultScore').textContent=(Number(o.score||0)%1===0?Number(o.score||0):Number(o.score||0).toFixed(2));
+ el('saResultCorrect').textContent=o.correct??0;el('saResultWrong').textContent=o.wrong??0;el('saResultTotal').textContent=o.total??0;
+ lastResultReview={mode:o.reviewMode||'',attemptId:o.attemptId||null,title:o.reviewTitle||o.title||'Hasil Latihan',practice:o.practice||null};
+ m.classList.add('show');
+}
+function closeWowResult(){el('saResultModal')?.classList.remove('show')}
+async function goResultDrilling(){closeWowResult();await showView('drilling');}
+async function openResultReview(){
+ const ctx=lastResultReview;closeWowResult();
+ if(ctx.mode==='practice'&&ctx.practice){openPracticeResultReview(ctx.practice,ctx.title);return;}
+ if(ctx.attemptId){openAnalysis(ctx.attemptId,ctx.title);return;}
+ // Fallback: buka riwayat, supaya hasil tetap dapat diakses tanpa membuat aplikasi error.
+ await showView('history');
+ alert('Hasil tersimpan di Riwayat. Pilih "Lihat Analisis" untuk membuka pembahasan.');
+}
+async function finishExam(){
+ if(!currentExam)return;
+ clearInterval(timerInt);
+ const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);
+ const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});
+ if(error){alert('Gagal mengirim jawaban: '+error.message);showView('tryouts');return}
+ const result=Array.isArray(data)?data[0]:data||{};
+ const attemptId=result.attempt_id||result.id||result.tryout_attempt_id||null;
+ const title=el('examTitle')?.textContent||'TRYOUT';
+ showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Sekarang kamu bisa melihat soal benar, salah, dan pembahasannya.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:examQuestions.length,reviewMode:'attempt',attemptId,reviewTitle:title});
+ currentExam=null;
+}
 document.getElementById('materialModal').addEventListener('click',e=>{if(e.target.id==='materialModal')closeMaterial()});
 document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
 
@@ -873,7 +967,7 @@ function choosePractice(k){
 async function nextPractice(){
   if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
   const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});if(error){alert(error.message);return;}
-  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:doneTarget==='drilling'?'Performa drilling sudah diperbarui.':'Latihan selesai dan hasilmu sudah direkap.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,target:doneTarget==='drilling'?'drilling':'latsols'});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
+  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;const reviewPractice={rows:practiceState.rows.slice(),answers:{...practiceState.answers},title:doneTitle};showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:'Latihan selesai. Kamu sekarang bisa melihat soal benar, perlu evaluasi, dan pembahasan lengkap.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,reviewMode:'practice',reviewTitle:doneTitle,practice:reviewPractice});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
 }
 
 /* Drilling is measurement-only: no question list, no drilling session, no question selection. */
@@ -1347,6 +1441,6 @@ showView=async function(name){
 })();
 </script>
 
-<div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span>Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span>Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span>Total Soal</span></div></div><div class="sa-result-actions"><button class="btn dark" onclick="closeWowResult()">Nanti</button><button class="btn primary" onclick="goWowResult()">📊 Lihat Rekap & Drilling</button></div></div></div>
+<div id="saResultModal"><div class="sa-result-card"><div class="sa-result-icon" id="saResultIcon">🏆</div><div class="sa-kicker" id="saResultKicker">SIAP ASN</div><h2 id="saResultTitle">UJIAN TELAH SELESAI!</h2><p id="saResultText">Kerja bagus, hasilmu sudah tersimpan.</p><div class="sa-result-score" id="saResultScore">0</div><div class="muted">SKOR</div><div class="sa-result-grid"><div><b id="saResultCorrect">0</b><span>Optimal/Benar</span></div><div><b id="saResultWrong">0</b><span>Perlu Evaluasi</span></div><div><b id="saResultTotal">0</b><span>Total Soal</span></div></div><div class="sa-result-actions sa-result-actions-v2"><button class="btn sa-review-btn" type="button" onclick="openResultReview()">🔍 Lihat Pembahasan</button><button class="btn sa-drill-btn" type="button" onclick="goResultDrilling()">🎯 Masuk Drilling</button><button class="btn sa-later-btn" type="button" onclick="closeWowResult()">Nanti</button></div></div></div>
 
 </body></html>
