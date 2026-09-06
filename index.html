@@ -222,6 +222,14 @@ body.sa-noscroll{overflow:hidden}
 
 /* WOW RESULT MODAL */
 #saResultModal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(5,12,28,.72);backdrop-filter:blur(8px);z-index:99999}#saResultModal.show{display:flex}.sa-result-card{width:min(520px,100%);background:linear-gradient(145deg,#102a56,#07152c);border:1px solid rgba(255,255,255,.18);border-radius:28px;padding:30px;color:#fff;text-align:center;box-shadow:0 30px 90px rgba(0,0,0,.5);animation:saPop .35s ease-out}.sa-result-icon{width:82px;height:82px;border-radius:50%;display:grid;place-items:center;margin:0 auto 14px;background:linear-gradient(135deg,#ffd76a,#ff9f1a);font-size:42px;box-shadow:0 12px 35px rgba(255,180,40,.35)}.sa-result-score{font-size:48px;font-weight:900;line-height:1;margin:18px 0 6px}.sa-result-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:20px 0}.sa-result-grid div{padding:13px 8px;border-radius:16px;background:rgba(255,255,255,.07)}.sa-result-grid b{display:block;font-size:18px}.sa-result-actions{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}@keyframes saPop{from{opacity:0;transform:translateY(18px) scale(.96)}to{opacity:1;transform:none}}
+
+/* === RESULT & EXPLANATION POLISH — SAFE OVERRIDE === */
+#saResultModal{background:rgba(225,242,255,.72)!important;backdrop-filter:blur(12px)!important}
+#saResultModal .sa-result-box{background:linear-gradient(180deg,#ffffff 0%,#f5fbff 100%)!important;border:1px solid #cfe8fb!important;box-shadow:0 28px 80px rgba(45,125,190,.18)!important;color:#17324d!important}
+#saResultModal .sa-result-orb{background:radial-gradient(circle,#e9f7ff 0%,#cfeeff 70%,#b7e3fb 100%)!important}
+.sa-explanation-card{margin-top:16px;padding:18px;border-radius:16px;background:#f4faff;border:1px solid #cfe7f7;color:#24435f;line-height:1.65}
+.sa-explanation-title{display:flex;align-items:center;gap:9px;font-weight:900;color:#1769aa;margin-bottom:8px;font-size:15px}
+.sa-explanation-note{font-size:13px;color:#66829b;margin-top:8px}
 </style>
 
 
@@ -843,7 +851,10 @@ function renderPracticeQuestion(){
     const isTkp=String(q.type||'').toLowerCase()==='tkp';
     const ok=String(chosen).toUpperCase()===String(q.correct_answer||'').toUpperCase();
     const f=el('practiceFeedback');
-    if(f)f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef5ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Nilai final dihitung oleh Supabase saat latihan selesai.</div>${q.explanation?`<div style="margin-top:7px;color:#667085">${safe(q.explanation)}</div>`:''}</div>`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b><div style="margin-top:5px;color:#667085">${safe(q.explanation||'Belum ada pembahasan.')}</div></div>`;
+    if(f){
+      const explanation=q.explanation?`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>${safe(q.explanation)}</div></div>`:`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>Belum ada pembahasan untuk soal ini.</div><div class="sa-explanation-note">Admin dapat menambahkan pembahasan dari Bank Soal.</div></div>`;
+      f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef8ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Nilai final dihitung oleh Supabase saat latihan selesai.</div></div>${explanation}`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b></div>${explanation}`;
+    }
   }
 }
 
