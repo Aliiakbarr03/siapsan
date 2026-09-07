@@ -257,18 +257,6 @@ body.sa-noscroll{overflow:hidden}
 @media(max-width:560px){.sa-result-actions-v2{grid-template-columns:1fr}.sa-result-actions-v2 .sa-later-btn{grid-column:auto}.sa-review-answer-grid{grid-template-columns:1fr}}
 
 .sa-drill-session-clickable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.sa-drill-session-clickable:hover{transform:translateY(-1px);border-color:#8ca7c0;box-shadow:0 10px 22px rgba(38,66,94,.08)}.sa-drill-session-clickable:focus{outline:3px solid rgba(65,110,149,.22);outline-offset:2px}.sa-review-link{display:block!important;margin-top:5px;color:#35698f!important;font-weight:800;font-size:11px!important}
-
-/* === CBT NAVIGATOR: integrated into original exam flow === */
-.sa-cbt-shell{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:18px;align-items:start}
-.sa-cbt-nav{background:#f7fbff;border:1px solid #d9e8f5;border-radius:18px;padding:16px;position:sticky;top:88px}
-.sa-cbt-nav h4{margin:0 0 6px;color:#0b2f4f}.sa-cbt-nav p{margin:0 0 12px;font-size:12px;color:#506070}
-.sa-cbt-grid{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
-.sa-qnum{height:38px;border-radius:10px;border:1px solid #cbd5df;background:#fff;color:#17324d;font-weight:800;cursor:pointer}
-.sa-qnum.answered{background:#0b4f8a;border-color:#0b4f8a;color:#fff}.sa-qnum.active{outline:3px solid rgba(42,120,190,.22);outline-offset:1px}
-.sa-cbt-progress{display:flex;justify-content:space-between;gap:8px;margin:0 0 14px;color:#52606d;font-size:13px}
-@media(max-width:860px){.sa-cbt-shell{grid-template-columns:1fr}.sa-cbt-nav{position:static;order:-1}.sa-cbt-grid{grid-template-columns:repeat(8,1fr)}.sa-qnum{height:34px}}
-@media(max-width:480px){.sa-cbt-grid{grid-template-columns:repeat(6,1fr);gap:7px}}
-
 </style>
 
 
@@ -1170,9 +1158,8 @@ function openPracticeResultReview(ctx,title){
    return {question_order:i+1,category_name:q.category_name||q.category||ctx.title||'Latihan',type:q.type||'',question_text:q.question_text||'',selected_answer:selected,correct_answer:correct,is_correct:String(selected).toUpperCase()===String(correct).toUpperCase(),explanation:q.explanation||''};
  });
  el('analysisTitle').textContent=title||'Pembahasan Latihan';
- const recap=rows.map((x,i)=>`<button type="button" class="sa-qnum ${x.selected_answer==='-'?'':'answered'}" style="background:${x.selected_answer==='-'?'#fff':x.is_correct?'#0f7a4b':'#b42318'};border-color:${x.selected_answer==='-'?'#cbd5df':x.is_correct?'#0f7a4b':'#b42318'};color:${x.selected_answer==='-'?'#17324d':'#fff'}" onclick="document.querySelectorAll('#analysisArea .data-card')[${i}]?.scrollIntoView({behavior:'smooth',block:'center'})">${i+1}</button>`).join('');
  const correct=rows.filter(x=>x.is_correct).length,wrong=rows.length-correct;
- el('analysisSummary').innerHTML=`<div class="sa-cbt-nav" style="position:static;margin-bottom:16px"><h4>Rekap Jawaban</h4><p>Hijau = benar/optimal · Merah = salah · Putih = kosong</p><div class="sa-cbt-grid">${recap}</div></div><div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Benar / Optimal</b><div style="font-size:28px;font-weight:800">${correct}</div></div><div class="data-card"><b>Perlu Evaluasi</b><div style="font-size:28px;font-weight:800">${wrong}</div></div></div>`;
+ el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Benar / Optimal</b><div style="font-size:28px;font-weight:800">${correct}</div></div><div class="data-card"><b>Perlu Evaluasi</b><div style="font-size:28px;font-weight:800">${wrong}</div></div></div>`;
  el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
  installReviewFilters(rows);
 }function closeAnalysis(){el('analysisModal').classList.remove('show')}
@@ -1254,13 +1241,7 @@ async function markAllNotificationsRead(){try{const {error}=await sb.rpc('mark_n
 
 async function loadProfileAndHeader(){const {data:{user}}=await sb.auth.getUser();if(!user)return;const {data}=await sb.from('profiles').select('id,full_name,avatar_url,phone,birth_date,gender,domicile,education,target_formasi,membership,membership_expires_at,created_at').eq('id',user.id).maybeSingle();if(data)updateTopProfile(data,user.email)}
 
-function renderQuestion(){
- const q=examQuestions[examIndex];if(!q)return;const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);const fav=favoriteQuestionIds.has(q.id);
- const nav=`<aside class="sa-cbt-nav"><h4>Navigasi Soal</h4><p>Biru = sudah dijawab · Putih = belum dijawab</p><div class="sa-cbt-grid">${examQuestions.map((row,i)=>`<button type="button" class="sa-qnum ${answers[row.id]?'answered':''} ${i===examIndex?'active':''}" onclick="jumpExam(${i})">${i+1}</button>`).join('')}</div></aside>`;
- const body=`<div class="data-card" style="padding:22px"><div class="feature-top"><div class="sa-cbt-progress"><span>Soal ${examIndex+1} / ${examQuestions.length}</span><span>${Object.keys(answers).length} terjawab</span></div><button class="favorite-btn ${fav?'active':''}" onclick="toggleFavorite('${q.id}',this)">${fav?'★ Tersimpan':'☆ Favorit'}</button></div><div class="question">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${answers[q.id]===k?'selected':''}" onclick="choose('${q.id}','${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}<div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px"><button class="btn dark" ${examIndex===0?'disabled':''} onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="${examIndex===examQuestions.length-1?'finishExam()':'nextQ()'}">${examIndex===examQuestions.length-1?'Selesai':'Berikutnya →'}</button></div></div>`;
- el('examArea').innerHTML=`<div class="sa-cbt-shell"><div>${body}</div>${nav}</div>`;
-}
-function jumpExam(i){if(i>=0&&i<examQuestions.length){examIndex=i;renderQuestion();}}
+function renderQuestion(){const q=examQuestions[examIndex];const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);const fav=favoriteQuestionIds.has(q.id);el('examArea').innerHTML='<div class="feature-top"><p style="margin:0">'+(examIndex+1)+' / '+examQuestions.length+'</p><button class="favorite-btn '+(fav?'active':'')+'" onclick="toggleFavorite(\''+q.id+'\',this)">'+(fav?'★ Tersimpan':'☆ Favorit')+'</button></div><div class="question">'+safe(q.question_text)+'</div>'+opts.map(k=>'<button class="option '+(answers[q.id]===k?'selected':'')+'" onclick="choose(\''+q.id+'\',\''+k+'\')">'+k+'. '+safe(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div style="display:flex;justify-content:space-between;margin-top:20px;gap:10px"><button class="btn dark" onclick="prevQ()">← Sebelumnya</button><button class="btn primary" onclick="nextQ()">'+(examIndex===examQuestions.length-1?'Selesai':'Berikutnya →')+'</button></div>'}
 
 let lastResultReview={mode:'',attemptId:null,title:'',practice:null};
 function showWowResult(o={}){
@@ -1292,8 +1273,6 @@ async function openResultReview(){
 }
 async function finishExam(){
  if(!currentExam)return;
- const unanswered=examQuestions.filter(q=>!answers[q.id]).length;
- if(unanswered&&!confirm(`Masih ada ${unanswered} soal belum dijawab. Tetap selesai?`))return;
  clearInterval(timerInt);
  const durationSeconds=Math.max(examTotalSeconds-Math.max(examSecondsLeft,0),0);
  const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:currentExam,p_answers:answers,p_duration_seconds:durationSeconds});
@@ -1508,28 +1487,41 @@ function renderPracticeQuestion(){
   const target=practiceState.target==='drilling'?'drillingArea':'latsolsArea';
   const a=el(target),q=practiceState.rows[practiceState.index];
   if(!a||!q)return;
+
   const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
   const label=practiceState.target==='drilling'?'DRILLING':'LATSOL';
-  const isCbt=practiceState.target==='latsols';
-  const nav=isCbt?`<aside class="sa-cbt-nav"><h4>Navigasi Soal</h4><p>Biru = sudah dijawab · Putih = belum dijawab</p><div class="sa-cbt-grid">${practiceState.rows.map((row,i)=>`<button type="button" class="sa-qnum ${practiceState.answers[row.id]?'answered':''} ${i===practiceState.index?'active':''}" onclick="jumpPractice(${i})">${i+1}</button>`).join('')}</div></aside>`:'';
-  const buttons=`<div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px"><button class="btn dark" ${practiceState.index===0?'disabled':''} onclick="prevPractice()">← Sebelumnya</button><button class="btn primary" onclick="${practiceState.index===practiceState.rows.length-1?'finishPractice()':'nextPractice()'}">${practiceState.index===practiceState.rows.length-1?'Selesai':'Berikutnya →'}</button></div>`;
-  const body=`<div class="data-card" style="padding:22px"><div class="sa-cbt-progress"><span>Soal ${practiceState.index+1} dari ${practiceState.rows.length}</span><span>${Object.keys(practiceState.answers).length} terjawab</span></div><div class="question" style="margin:0 0 18px;font-size:19px">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${practiceState.answers[q.id]===k?'selected':''}" onclick="choosePractice('${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}${buttons}</div>`;
-  a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">${label}</span>${q.subcategory?`<div class="sa-subcategory">${safe(q.subcategory)}</div>`:''}<h2 style="margin:5px 0">${safe(practiceState.title)}</h2><p>Kerjakan dengan bebas. Hasil dan pembahasan muncul setelah selesai.</p></div><button class="sa-outline-btn" onclick="${practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()'}">Keluar</button></div>${isCbt?`<div class="sa-cbt-shell"><div>${body}</div>${nav}</div>`:body}`;
+  const locked=!!practiceState.selected;
+
+  a.innerHTML=`<div class="sa-exam-head"><div><span class="sa-kicker">${label}</span>${q.subcategory?`<div class="sa-subcategory">${safe(q.subcategory)}</div>`:''}<h2 style="margin:5px 0">Soal ${practiceState.index+1} dari ${practiceState.rows.length}</h2><p>${safe(practiceState.title)}</p></div><button class="sa-outline-btn" onclick="${practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()'}">Keluar</button></div><div class="data-card" style="padding:22px"><div class="question" style="margin:0 0 18px;font-size:19px">${safe(q.question_text)}</div>${opts.map(k=>`<button class="option ${practiceState.selected===k?'selected':''}" ${locked?'disabled':''} onclick="choosePractice('${k}')">${k}. ${safe(q['option_'+k.toLowerCase()])}</button>`).join('')}<div id="practiceFeedback"></div><div style="display:flex;justify-content:space-between;gap:10px;margin-top:18px"><span class="muted">${practiceState.index+1}/${practiceState.rows.length}</span><button class="btn primary" ${practiceState.selected?'':'disabled'} onclick="nextPractice()">${practiceState.index===practiceState.rows.length-1?'Selesai':'Berikutnya →'}</button></div></div>`;
+
+  if(locked){
+    const chosen=practiceState.selected;
+    const isTkp=String(q.type||'').toLowerCase()==='tkp';
+    const ok=String(chosen).toUpperCase()===String(q.correct_answer||'').toUpperCase();
+    const f=el('practiceFeedback');
+    if(f){
+      const explanation=q.explanation?`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>${safe(q.explanation)}</div></div>`:`<div class="sa-explanation-card"><div class="sa-explanation-title">💡 Pembahasan</div><div>Belum ada pembahasan untuk soal ini.</div><div class="sa-explanation-note">Admin dapat menambahkan pembahasan dari Bank Soal.</div></div>`;
+      f.innerHTML=isTkp?`<div style="margin-top:15px;padding:13px;border-radius:12px;background:#eef8ff;color:#245b9f"><b>Jawaban terkunci ✓</b><div style="margin-top:5px;color:#667085">TKP dinilai dengan bobot 1–5. Bobot jawaban tersimpan dan dibaca dari Supabase saat latihan selesai.</div></div>${explanation}`:`<div style="margin-top:15px;padding:13px;border-radius:12px;background:${ok?'#eaf8f2':'#fff0ee'};color:${ok?'#13795b':'#ba3c2d'}"><b>${ok?'Benar':'Belum tepat'}</b></div>${explanation}`;
+    }
+  }
 }
-function choosePractice(k){const q=practiceState.rows[practiceState.index];if(!q)return;practiceState.answers[q.id]=k;practiceState.selected=k;renderPracticeQuestion();}
-function jumpPractice(i){if(i>=0&&i<practiceState.rows.length){practiceState.index=i;practiceState.selected=practiceState.answers[practiceState.rows[i].id]||null;renderPracticeQuestion();}}
-function prevPractice(){jumpPractice(practiceState.index-1)}
-function nextPractice(){jumpPractice(Math.min(practiceState.rows.length-1,practiceState.index+1))}
-async function finishPractice(){
-  const unanswered=practiceState.rows.filter(q=>!practiceState.answers[q.id]).length;
-  if(unanswered&&!confirm(`Masih ada ${unanswered} soal belum dijawab. Tetap selesai?`))return;
-  const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});
-  if(error){alert(error.message);return;}
-  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;
-  const reviewPractice={rows:practiceState.rows.slice(),answers:{...practiceState.answers},title:doneTitle};
-  showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:'Latihan selesai. Lihat rekap dan pembahasan untuk mengevaluasi jawabanmu.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,totalPoints:r?.total_points,maxPoints:r?.max_points,reviewMode:'practice',reviewTitle:doneTitle,practice:reviewPractice});
-  practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};
-  if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
+
+function choosePractice(k){
+  // Setelah satu jawaban dipilih, soal langsung dikunci dan jawaban tidak bisa diubah.
+  if(practiceState.selected)return;
+
+  const q=practiceState.rows[practiceState.index];
+  if(!q)return;
+
+  practiceState.selected=k;
+  practiceState.answers[q.id]=k;
+  renderPracticeQuestion();
+}
+
+async function nextPractice(){
+  if(practiceState.index<practiceState.rows.length-1){practiceState.index++;practiceState.selected=null;renderPracticeQuestion();return;}
+  const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:practiceState.sessionId,p_answers:practiceState.answers,p_duration_seconds:0});if(error){alert(error.message);return;}
+  const r=Array.isArray(data)?data[0]:data;const doneTarget=practiceState.target;const doneTitle=practiceState.title;const total=practiceState.rows.length;const reviewPractice={rows:practiceState.rows.slice(),answers:{...practiceState.answers},title:doneTitle};showWowResult({icon:doneTarget==='drilling'?'🎯':'🎉',title:doneTitle+' SELESAI!',text:'Latihan selesai. Total poin dihitung dari nilai setiap jawaban TKP dan sistem yang sama dipakai pada Tryout.',score:r?.score??0,correct:r?.correct_count??0,wrong:r?.wrong_count??0,total,totalPoints:r?.total_points,maxPoints:r?.max_points,reviewMode:'practice',reviewTitle:doneTitle,practice:reviewPractice});practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};if(doneTarget==='drilling')await loadDrilling();else await Promise.allSettled([loadLatsols(),loadDrilling()]);
 }
 
 /* Drilling is measurement-only: no question list, no drilling session, no question selection. */
@@ -2101,7 +2093,7 @@ showView=async function(name){
       const score=maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0;
       const optimal=review.filter(q=>q.is_correct).length;
       const need=review.length-optimal;
-      el('analysisSummary').innerHTML=`<div class="sa-cbt-nav" style="position:static;margin-bottom:16px"><h4>Rekap Jawaban</h4><p>Hijau = benar/optimal · Merah = salah · Putih = kosong</p><div class="sa-cbt-grid">${recap}</div></div><div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${review.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints} / ${maxPoints}</div><small>Total nilai yang diperoleh</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${score}%</div><small>${optimal} optimal/benar · ${need} perlu evaluasi</small></div></div>`;
+      el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${review.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints} / ${maxPoints}</div><small>Total nilai yang diperoleh</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${score}%</div><small>${optimal} optimal/benar · ${need} perlu evaluasi</small></div></div>`;
       installReviewFilters(review);
     }catch(e){
       el('analysisSummary').innerHTML='';
@@ -2124,8 +2116,7 @@ showView=async function(name){
     const totalPoints=rows.reduce((sum,x)=>sum+(Number.isFinite(Number(x.selected_score))?Number(x.selected_score):(x.is_correct?5:0)),0);
     const maxPoints=rows.length*5;
     el('analysisTitle').textContent=title||'Pembahasan Latihan';
- const recap=rows.map((x,i)=>`<button type="button" class="sa-qnum ${x.selected_answer==='-'?'':'answered'}" style="background:${x.selected_answer==='-'?'#fff':x.is_correct?'#0f7a4b':'#b42318'};border-color:${x.selected_answer==='-'?'#cbd5df':x.is_correct?'#0f7a4b':'#b42318'};color:${x.selected_answer==='-'?'#17324d':'#fff'}" onclick="document.querySelectorAll('#analysisArea .data-card')[${i}]?.scrollIntoView({behavior:'smooth',block:'center'})">${i+1}</button>`).join('');
-    el('analysisSummary').innerHTML=`<div class="sa-cbt-nav" style="position:static;margin-bottom:16px"><h4>Rekap Jawaban</h4><p>Hijau = benar/optimal · Merah = salah · Putih = kosong</p><div class="sa-cbt-grid">${recap}</div></div><div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints}</div><small>dari ${maxPoints} poin maksimal</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0}%</div><small>${correct} optimal/benar · ${wrong} perlu evaluasi</small></div></div>`;
+    el('analysisSummary').innerHTML=`<div class="analysis-grid"><div class="data-card"><b>Total Soal</b><div style="font-size:28px;font-weight:800">${rows.length}</div></div><div class="data-card"><b>Total Poin</b><div style="font-size:28px;font-weight:800">${totalPoints}</div><small>dari ${maxPoints} poin maksimal</small></div><div class="data-card"><b>Skor</b><div style="font-size:28px;font-weight:800">${maxPoints?Math.round((totalPoints/maxPoints)*10000)/100:0}%</div><small>${correct} optimal/benar · ${wrong} perlu evaluasi</small></div></div>`;
     el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
     installReviewFilters(rows);
   };
@@ -2542,6 +2533,348 @@ td{color:#102b4d!important}
 .sa-review-focus{margin-top:12px}
 @media(max-width:900px){.sa-cbt-layout{grid-template-columns:1fr}.sa-cbt-side{position:static;order:-1}.sa-cbt-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}}
 @media(max-width:600px){.sa-cbt-question-card{padding:17px}.sa-cbt-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-cbt-side{border-radius:16px}}
-</style>
 
+.sa-finish-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(7,18,36,.58);backdrop-filter:blur(7px)}.sa-finish-modal.show{display:flex}.sa-finish-dialog{width:min(480px,100%);border-radius:24px;background:#fff;box-shadow:0 28px 80px rgba(7,18,36,.28);overflow:hidden;animation:saFinishPop .18s ease-out}@keyframes saFinishPop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.sa-finish-top{padding:24px 24px 16px;background:linear-gradient(135deg,#10233f,#155eef);color:#fff}.sa-finish-kicker{font-size:11px;font-weight:900;letter-spacing:.12em;opacity:.78}.sa-finish-title{margin:7px 0 0;font-size:24px;font-weight:900}.sa-finish-body{padding:20px 24px 24px;color:#334155}.sa-finish-body p{margin:0 0 16px;line-height:1.55}.sa-finish-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0 18px}.sa-finish-stat{padding:12px 8px;border:1px solid #dbe5f1;border-radius:14px;background:#f8fafc;text-align:center}.sa-finish-stat b{display:block;font-size:19px;color:#10233f}.sa-finish-stat span{font-size:10px;color:#64748b;font-weight:800}.sa-finish-warning{padding:11px 13px;border-radius:13px;background:#fff7e6;color:#9a6700;font-size:12px;font-weight:700;margin-bottom:18px}.sa-finish-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.sa-finish-confirm{background:#0f766e!important;color:#fff!important;border:0!important}@media(max-width:520px){.sa-finish-dialog{border-radius:20px}.sa-finish-top{padding:20px}.sa-finish-body{padding:18px}.sa-finish-stats{gap:6px}.sa-finish-actions{display:grid;grid-template-columns:1fr}.sa-finish-actions button{width:100%}}
+</style>
+<script id="siap-asn-cbt-navigation-engine">
+/* === SIAP ASN CBT NAVIGATION ENGINE === */
+(function(){
+  const upper=v=>String(v??'').trim().toUpperCase();
+  const originalFinishExam=window.finishExam;
+  const originalOpenAnalysis=window.openAnalysis;
+  const originalOpenPracticeResultReview=window.openPracticeResultReview;
+  let examFinishing=false;
+  let practiceFinishing=false;
+  let practiceCompleted=false;
+  let practiceSnapshot=null;
+
+  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
+  let pendingFinish=null;
+  function hideFinishModal(){const m=document.getElementById('saFinishConfirmModal');if(m)m.classList.remove('show');pendingFinish=null;}
+  function showFinishConfirm(kind){const isExam=kind==='exam';const rows=isExam?(window.examQuestions||[]):(window.practiceState?.rows||[]);const answerMap=isExam?(window.answers||{}):(window.practiceState?.answers||{});if(!rows.length)return;const answered=rows.filter(q=>!!answerMap[q.id]).length,blank=rows.length-answered;const m=ensureFinishModal();document.getElementById('saFinishTitle').textContent=isExam?'Selesaikan Tryout?':'Selesaikan Latihan?';document.getElementById('saFinishText').textContent=isExam?'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil akan diproses dan rekap akan ditampilkan.':'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil dan pembahasan dapat dilihat pada rekap.';document.getElementById('saFinishAnswered').textContent=answered;document.getElementById('saFinishBlank').textContent=blank;document.getElementById('saFinishTotal').textContent=rows.length;const warn=document.getElementById('saFinishWarning');if(blank>0){warn.style.display='block';warn.textContent='⚠ Masih ada '+blank+' soal yang belum dijawab. Kamu tetap bisa menyelesaikan sekarang atau kembali mengerjakan.';}else warn.style.display='none';pendingFinish=kind;document.getElementById('saFinishCancel').onclick=hideFinishModal;document.getElementById('saFinishConfirm').onclick=()=>{const k=pendingFinish;hideFinishModal();if(k==='exam')window.finishExam();else window.completePracticeNow();};m.classList.add('show');}
+  window.requestFinishExam=function(){showFinishConfirm('exam');};
+  window.requestFinishPractice=function(){showFinishConfirm('practice');};
+  document.addEventListener('keydown',e=>{if(e.key==='Escape'&&document.getElementById('saFinishConfirmModal')?.classList.contains('show'))hideFinishModal();});
+
+  function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function getPracticeAnswered(i){const q=window.practiceState?.rows?.[i];return !!(q&&window.practiceState?.answers&&window.practiceState.answers[q.id]);}
+  function buildExamNavigator(resultMode=false,reviewRows=[]){
+    if(resultMode){
+      return '<div class="sa-review-navigator"><div class="sa-review-navigator-head"><b>Rekap Nomor Soal</b><span>Klik nomor untuk melihat detail</span></div><div class="sa-review-numbers">'+(reviewRows||[]).map((q,i)=>{
+        const status=q.is_correct?'correct':(q.selected_answer&&q.selected_answer!=='-'?'wrong':'unanswered');
+        return '<button type="button" class="sa-review-number '+status+'" data-review-index="'+i+'">'+(i+1)+'</button>';
+      }).join('')+'</div><div class="sa-cbt-legend" style="margin-top:10px;margin-bottom:0"><span><i class="sa-cbt-dot" style="background:#eaf8f2;border-color:#9bd8bf"></i>Benar/Optimal</span><span><i class="sa-cbt-dot" style="background:#fff0ee;border-color:#f2afa9"></i>Perlu evaluasi</span><span><i class="sa-cbt-dot"></i>Kosong</span></div></div>';
+    }
+    const rows=window.examQuestions||[];
+    const nums=rows.map((q,i)=>'<button type="button" class="sa-cbt-number '+(answers[q.id]?'done ':'')+(i===window.examIndex?'current':'')+'" onclick="jumpExam('+i+')">'+(i+1)+'</button>').join('');
+    const done=rows.filter(q=>answers[q.id]).length;
+    return '<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+done+'/'+rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><button type="button" class="btn sa-cbt-finish" style="width:100%;margin-top:14px" onclick="requestFinishExam()">Akhiri Ujian</button><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Klik nomor mana pun untuk langsung membuka soal tersebut.</div></aside>';
+  }
+  window.jumpExam=function(i){
+    if(!window.examQuestions?.[i])return;
+    window.examIndex=i;window.renderQuestion();
+  };
+  function getExamLayoutHtml(content,navigator){return '<div class="sa-cbt-layout"><div class="sa-cbt-main">'+content+'</div>'+navigator+'</div>';}
+
+  window.renderQuestion=function(){
+    const q=window.examQuestions?.[window.examIndex]; if(!q)return;
+    const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+    const area=document.getElementById('examArea'); if(!area)return;
+    const selected=answers[q.id]||'';
+    const content='<div class="sa-cbt-question-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><div><span class="sa-kicker">TRYOUT</span><div class="sa-subcategory">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+'</div></div><span class="sa-cbt-status">'+(selected?'Sudah dijawab':'Belum dijawab')+'</span></div><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choose('+JSON.stringify(q.id)+','+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.examIndex>0?'<button type="button" class="btn dark" onclick="prevQ()">← Sebelumnya</button>':'')+(window.examIndex<window.examQuestions.length-1?'<button type="button" class="btn primary" onclick="nextQ()">Berikutnya →</button>':'')+'<button type="button" class="btn sa-cbt-finish" onclick="requestFinishExam()">Akhiri Ujian</button>'+'</div></div></div>';
+    area.innerHTML=getExamLayoutHtml(content,buildExamNavigator(false));
+    const timer=document.getElementById('examTimer');
+    if(timer){timer.textContent=Math.floor(Math.max(0,window.examSecondsLeft||0)/60)+':'+String(Math.max(0,window.examSecondsLeft||0)%60).padStart(2,'0');}
+  };
+
+  window.choose=function(id,k){answers[id]=k;window.renderQuestion();};
+  window.prevQ=function(){if(window.examIndex>0){window.examIndex--;window.renderQuestion();}};
+  window.nextQ=function(){if(window.examIndex<window.examQuestions.length-1){window.examIndex++;window.renderQuestion();}else{window.requestFinishExam();}};
+
+  window.startExam=async function(id){
+    examFinishing=false;
+    const {data,error}=await sb.rpc('get_tryout_questions',{p_tryout_id:id});
+    if(error){alert(error.message);return}
+    window.examQuestions=data||[]; if(!window.examQuestions.length){alert('Soal belum tersedia.');return}
+    window.currentExam=id;window.examIndex=0;window.answers={};window.showView('exam');
+    const {data:tr,error:te}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();
+    if(te){alert(te.message);return}
+    window.examTotalSeconds=Number(tr?.duration_minutes||60)*60;window.examSecondsLeft=window.examTotalSeconds;
+    clearInterval(window.timerInt);
+    window.renderQuestion();
+    window.timerInt=setInterval(()=>{
+      window.examSecondsLeft=Math.max(0,Number(window.examSecondsLeft||0)-1);
+      const t=document.getElementById('examTimer');if(t)t.textContent=Math.floor(window.examSecondsLeft/60)+':'+String(window.examSecondsLeft%60).padStart(2,'0');
+      if(window.examSecondsLeft<=0){clearInterval(window.timerInt);window.finishExam(true)}
+    },1000);
+  };
+
+  window.finishExam=async function(autoFinish=false){
+    if(examFinishing||!window.currentExam)return;
+    examFinishing=true;clearInterval(window.timerInt);
+    const durationSeconds=Math.max((window.examTotalSeconds||0)-Math.max(window.examSecondsLeft||0,0),0);
+    const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:window.currentExam,p_answers:window.answers,p_duration_seconds:durationSeconds});
+    if(error){examFinishing=false;alert('Gagal mengirim jawaban: '+error.message);return}
+    const result=Array.isArray(data)?data[0]:data||{};
+    const attemptId=result.attempt_id||result.id||result.tryout_attempt_id||null;
+    const title=document.getElementById('examTitle')?.textContent||'TRYOUT';
+    window.showWowResult({icon:'🏆',title:autoFinish?'WAKTU HABIS — HASIL TEREKAP':'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Rekap detail tersedia pada tombol evaluasi.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:window.examQuestions.length,totalPoints:result.total_points,maxPoints:result.max_points,reviewMode:'attempt',attemptId,reviewTitle:title});
+    window.currentExam=null;
+    examFinishing=false;
+  };
+
+  function installPracticeNavigator(){
+    const area=window.practiceState?.target==='drilling'?document.getElementById('drillingArea'):document.getElementById('latsolsArea');
+    if(!area)return;
+    const n=window.practiceState.rows.length;
+    const buttons=window.practiceState.rows.map((q,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[q.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
+    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+n+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+buttons+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal dan mengisi soal mana pun terlebih dahulu.</div></aside>';
+    const oldMain=area.querySelector('.sa-cbt-main');
+    if(oldMain){const layout=area.querySelector('.sa-cbt-layout');if(layout){const oldSide=layout.querySelector('.sa-cbt-side');if(oldSide)oldSide.outerHTML=side;return;}}
+  }
+  window.jumpPractice=function(i){
+    if(!window.practiceState?.rows?.[i])return;
+    window.practiceState.index=i;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[i].id]||null;window.renderPracticeQuestion();
+  };
+  window.renderPracticeQuestion=function(){
+    const target=window.practiceState.target==='drilling'?'drillingArea':'latsolsArea';
+    const a=document.getElementById(target),q=window.practiceState.rows?.[window.practiceState.index]; if(!a||!q)return;
+    const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+    const selected=window.practiceState.answers[q.id]||'';
+    const label=window.practiceState.target==='drilling'?'DRILLING':'LATSOL';
+    const content='<div class="sa-exam-head"><div><span class="sa-kicker">'+label+'</span>'+(q.subcategory?'<div class="sa-subcategory">'+escapeHtml(q.subcategory)+'</div>':'')+'<h2 style="margin:5px 0">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+'</h2><p>'+escapeHtml(window.practiceState.title)+'</p></div><button class="sa-outline-btn" onclick="'+(window.practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()')+'">Keluar</button></div><div class="sa-cbt-question-card"><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choosePractice('+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.practiceState.index>0?'<button type="button" class="btn dark" onclick="prevPractice()">← Sebelumnya</button>':'')+(window.practiceState.index<window.practiceState.rows.length-1?'<button type="button" class="btn primary" onclick="nextPractice()">Berikutnya →</button>':'')+'<button type="button" class="btn sa-cbt-finish" onclick="requestFinishPractice()">Akhiri Latihan</button>'+'</div></div></div>';
+    const nums=window.practiceState.rows.map((rq,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[rq.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
+    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+window.practiceState.rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><button type="button" class="btn sa-cbt-finish" style="width:100%;margin-top:14px" onclick="requestFinishPractice()">Akhiri Latihan</button><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Pembahasan dan warna hasil baru muncul setelah selesai.</div></aside>';
+    a.innerHTML='<div class="sa-cbt-layout"><div class="sa-cbt-main">'+content+'</div>'+side+'</div>';
+  };
+  window.choosePractice=function(k){
+    const q=window.practiceState?.rows?.[window.practiceState.index];if(!q)return;
+    window.practiceState.answers[q.id]=k;window.practiceState.selected=k;window.renderPracticeQuestion();
+  };
+  window.prevPractice=function(){if(window.practiceState.index>0){window.practiceState.index--;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();}};
+  window.nextPractice=function(){
+    if(window.practiceState.index<window.practiceState.rows.length-1){window.practiceState.index++;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();}
+  };
+  window.completePracticeNow=async function(){
+    if(practiceFinishing||!window.practiceState?.sessionId)return;practiceFinishing=true;
+    const snapshot={target:window.practiceState.target,title:window.practiceState.title,rows:window.practiceState.rows.slice(),answers:{...window.practiceState.answers},sessionId:window.practiceState.sessionId};
+    const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:window.practiceState.sessionId,p_answers:window.practiceState.answers,p_duration_seconds:0});
+    if(error){practiceFinishing=false;alert(error.message);return}
+    const r=Array.isArray(data)?data[0]:data||{};
+    practiceSnapshot=snapshot;practiceCompleted=true;
+    window.showWowResult({icon:snapshot.target==='drilling'?'🎯':'🎉',title:snapshot.title+' SELESAI!',text:'Latihan selesai. Pembahasan akan tampil pada evaluasi setelah rekap.',score:r.score??0,correct:r.correct_count??0,wrong:r.wrong_count??0,total:snapshot.rows.length,totalPoints:r.total_points,maxPoints:r.max_points,reviewMode:'practice',reviewTitle:snapshot.title,practice:snapshot});
+    window.practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};
+    await Promise.allSettled([window.loadLatsols?.(),window.loadDrilling?.()]);
+    practiceFinishing=false;
+  };
+
+  function makeReviewNavigator(reviewRows){
+    return '<div class="sa-review-navigator"><div class="sa-review-navigator-head"><b>Rekap Nomor Soal</b><span>Klik nomor soal untuk membuka pembahasan</span></div><div class="sa-review-numbers">'+reviewRows.map((q,i)=>{const status=q.is_correct?'correct':(q.selected_answer&&q.selected_answer!=='-'?'wrong':'unanswered');return '<button type="button" class="sa-review-number '+status+'" data-review-jump="'+i+'">'+(i+1)+'</button>';}).join('')+'</div><div class="sa-cbt-legend" style="margin-top:10px;margin-bottom:0"><span><i class="sa-cbt-dot" style="background:#eaf8f2;border-color:#9bd8bf"></i>Benar/Optimal</span><span><i class="sa-cbt-dot" style="background:#fff0ee;border-color:#f2afa9"></i>Perlu evaluasi</span><span><i class="sa-cbt-dot"></i>Kosong</span></div></div>';
+  }
+  function bindReviewJump(reviewRows){
+    const analysis=document.getElementById('analysisArea');if(!analysis)return;
+    const detailRows=[...analysis.querySelectorAll('.sa-review-row')];
+    analysis.closest('.modalbox')?.querySelectorAll('.sa-review-number').forEach((b,i)=>b.addEventListener('click',()=>{
+      const row=detailRows[i];if(!row)return;
+      row.scrollIntoView({behavior:'smooth',block:'start'});
+      row.style.boxShadow='0 0 0 3px rgba(21,94,239,.18),0 10px 28px rgba(16,35,63,.10)';
+      setTimeout(()=>{row.style.boxShadow='';},1200);
+    }));
+  }
+
+  window.openAnalysis=async function(id,title){
+    await originalOpenAnalysis(id,title);
+    const area=document.getElementById('analysisArea');
+    if(!area)return;
+    try{
+      const {data,error}=await sb.rpc('get_my_attempt_review',{p_attempt_id:id});
+      if(error)throw error;
+      const review=data||[];
+      if(review.length)addNavigatorToSummary(review);
+    }catch(e){console.warn('Review navigator',e)}
+  };
+  window.openPracticeResultReview=function(ctx,title){
+    originalOpenPracticeResultReview(ctx,title);
+    setTimeout(()=>{
+      const area=document.getElementById('analysisArea');
+      if(!area)return;
+      const rows=(ctx?.rows||[]).map((q,i)=>{
+        const selected=(ctx.answers||{})[q.id]||'-';
+        const tkp=upper(q.type)==='TKP';
+        let selectedScore=null, optimal=q.correct_answer||'-'; const scoreMap={};
+        ['A','B','C','D','E'].forEach(k=>{const names=['option_'+k.toLowerCase()+'_score','option_'+k.toLowerCase()+'_weight','score_'+k.toLowerCase(),'weight_'+k.toLowerCase(),'nilai_'+k.toLowerCase(),'bobot_'+k.toLowerCase()];for(const n of names){const v=Number(q[n]);if(Number.isFinite(v)&&v>=1&&v<=5){scoreMap[k]=v;break}}});
+        if(tkp){selectedScore=scoreMap[upper(selected)]??null;const k5=Object.keys(scoreMap).find(k=>Number(scoreMap[k])===5);if(k5)optimal=k5;}
+        const correct=tkp?selectedScore===5:upper(selected)===upper(optimal);
+        return {question_order:i+1,category_name:q.category_name||q.category||ctx.title||'Latihan',type:q.type||'',question_text:q.question_text||'',selected_answer:selected,selected_score:selectedScore,correct_answer:optimal,is_correct:correct,explanation:q.explanation||'',option_score_map:scoreMap};
+      });
+      if(!rows.length)return;
+      const summary=document.getElementById('analysisSummary');if(summary){const old=summary.querySelector('.sa-review-navigator');if(old)old.remove();summary.insertAdjacentHTML('beforeend',makeReviewNavigator(rows));}
+      bindReviewJump(rows);
+    },0);
+  };
+})();
+</script>
+
+<script id="siap-asn-latsol-catalog-hardening">
+/* === LATSOL CATALOG HARDENING ===
+   Tujuan: halaman Latsol tidak boleh blank bila RPC katalog gagal atau data relasi kategori tidak lengkap.
+   Fitur/kartu lama tetap dipakai; hanya jalur pemuatan dibuat lebih tahan error. */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const iconHtml=(icon)=>{
+    const name=String(icon||'clipboard-list').trim();
+    return `<span class="sa-pub-cat-icon"><i data-lucide="${esc(name)}"></i></span>`;
+  };
+  const normalizeRows=rows=>(Array.isArray(rows)?rows:[]).map(x=>{
+    const rel=Array.isArray(x.categories)?(x.categories[0]||{}):(x.categories||{});
+    return {...x,
+      category_name:x.category_name||x.category||rel.name||'',
+      category_icon:x.category_icon||rel.icon||'clipboard-list'
+    };
+  });
+
+  window.renderLatsols=function(rows){
+    const area=document.getElementById('latsolsArea'); if(!area)return;
+    const list=normalizeRows(rows);
+    window.latsolRows=list;
+    if(!list.length){
+      area.innerHTML='<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+      try{window.refreshPublishedIcons?.();}catch(_e){}
+      return;
+    }
+    const groupOf=x=>{
+      const raw=String(x.category_name||x.category||'').trim();
+      if(raw)return raw.toUpperCase();
+      const m=String(x.title||'').match(/^(TWK|TIU|TKP)\b/i);
+      return m?m[1].toUpperCase():'LAINNYA';
+    };
+    const preferred=['TWK','TIU','TKP'];
+    const groups=new Map();
+    list.forEach(x=>{const k=groupOf(x);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x);});
+    const keys=[...groups.keys()].sort((a,b)=>{
+      const ia=preferred.indexOf(a),ib=preferred.indexOf(b);
+      if(ia<0&&ib<0)return a.localeCompare(b,'id');
+      if(ia<0)return 1;if(ib<0)return -1;return ia-ib;
+    });
+    area.innerHTML=keys.map(key=>{
+      const items=groups.get(key)||[];
+      const cards=items.map(x=>{
+        const total=Math.max(0,Number(x.question_count)||0);
+        const minutes=Math.max(1,Number(x.duration_minutes)||15);
+        const sub=x.subcategory?`<span class="sa-latsol-stat">${esc(x.subcategory)}</span>`:'';
+        const id=String(x.id||'');
+        return `<div class="sa-course-card sa-latsol-card">
+          <div class="sa-card-top"><div class="sa-course-icon">${iconHtml(x.category_icon)}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div>
+          <div style="margin-top:14px"><h3>${esc(x.title||'Latsol')}</h3><p>${esc(x.description||'Latihan soal terstruktur.')}</p>
+            <div class="sa-latsol-meta"><span class="sa-latsol-stat">${total} Soal</span><span class="sa-latsol-stat">${minutes} Menit</span>${sub}</div>
+          </div>
+          <button type="button" class="sa-card-action" onclick="startLatsol(${JSON.stringify(id)})">Mulai Latsol →</button>
+        </div>`;
+      }).join('');
+      return `<section class="sa-latsol-category" data-latsol-category="${esc(key)}">
+        <div class="sa-latsol-category-head"><div><span class="sa-latsol-category-kicker">LATIHAN TERSTRUKTUR</span><h2>${esc(key)}</h2></div><span class="sa-latsol-category-count">${items.length} Paket</span></div>
+        <div class="sa-course-grid sa-latsol-group-grid">${cards}</div>
+      </section>`;
+    }).join('');
+    try{window.refreshPublishedIcons?.();}catch(e){console.warn('Latsol icon refresh skipped',e);}
+  };
+
+  window.loadLatsols=async function(){
+    const area=document.getElementById('latsolsArea');if(!area)return;
+    area.innerHTML='<div class="sa-course-grid"><div class="sa-course-card">Memuat Latsol...</div></div>';
+    let rpcError=null;
+    try{
+      const r=await sb.rpc('get_latsol_catalog');
+      if(r.error)throw r.error;
+      window.latsolRows=normalizeRows(r.data||[]);
+      window.renderLatsols(window.latsolRows);
+      return;
+    }catch(e){rpcError=e;console.warn('get_latsol_catalog gagal, memakai jalur cadangan:',e);}
+    try{
+      const r=await sb.from('latsol_configs')
+        .select('id,title,category_id,subcategory,question_count,duration_minutes,is_premium,is_published,sort_order,description,categories(name,icon)')
+        .eq('is_published',true)
+        .order('sort_order',{ascending:true})
+        .order('created_at',{ascending:false});
+      if(r.error)throw r.error;
+      window.latsolRows=normalizeRows(r.data||[]);
+      window.renderLatsols(window.latsolRows);
+    }catch(e2){
+      console.error('Latsol fallback gagal:',e2);
+      const msg=e2?.message||rpcError?.message||'Terjadi kesalahan saat memuat Latsol.';
+      area.innerHTML=`<div class="sa-course-card"><b>Latsol belum dapat dimuat.</b><p style="margin-top:8px">${esc(msg)}</p><button type="button" class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Coba Lagi</button></div>`;
+    }
+  };
+
+  window.filterLatsols=function(v){
+    const q=String(v||'').trim().toLowerCase();
+    const src=Array.isArray(window.latsolRows)?window.latsolRows:[];
+    window.renderLatsols(!q?src:src.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)));
+  };
+})();
+</script>
+
+
+<script id="siap-asn-latsol-start-hard-fix">
+/* === LATSOL START HARD FIX: explicit global handler + latest catalog state === */
+(function(){
+  window.startLatsol = async function(id){
+    const area=document.getElementById('latsolsArea');
+    if(!area) return;
+
+    const catalog=Array.isArray(window.latsolRows) ? window.latsolRows :
+      (typeof latsolRows!=='undefined' && Array.isArray(latsolRows) ? latsolRows : []);
+    const meta=catalog.find(x=>String(x?.id)===String(id)) || {};
+    const configuredLimit=Math.max(1, Number(meta.question_count)||10);
+
+    const original=area.innerHTML;
+    area.innerHTML='<div class="sa-course-grid"><div class="sa-course-card">Menyiapkan Latsol...</div></div>';
+
+    try{
+      const {data:sid,error:sessionError}=await sb.rpc('begin_practice_session',{
+        p_activity_type:'latsol',
+        p_mode:'preset',
+        p_latsol_id:id,
+        p_category_id:null,
+        p_subcategory:null,
+        p_limit:configuredLimit
+      });
+      if(sessionError) throw sessionError;
+
+      const sessionId=Array.isArray(sid) ? sid[0] : sid;
+      if(!sessionId) throw new Error('Sesi Latsol tidak berhasil dibuat.');
+
+      const {data:rows,error:questionError}=await sb.rpc('get_practice_questions',{
+        p_session_id:sessionId
+      });
+      if(questionError) throw questionError;
+      if(!Array.isArray(rows)||!rows.length) throw new Error('Paket Latsol belum memiliki soal.');
+
+      window.practiceState={
+        sessionId:sessionId,
+        rows:rows,
+        index:0,
+        selected:null,
+        answers:{},
+        title:meta.title||'Latsol',
+        target:'latsols'
+      };
+
+      if(typeof window.renderPracticeQuestion==='function'){
+        window.renderPracticeQuestion();
+      }else if(typeof renderPracticeQuestion==='function'){
+        renderPracticeQuestion();
+      }else{
+        throw new Error('Tampilan ujian belum siap. Silakan coba lagi.');
+      }
+    }catch(err){
+      console.error('startLatsol gagal:',err);
+      const message=(err&&err.message)||'Gagal memulai Latsol.';
+      area.innerHTML='<div class="sa-course-card"><b>Latsol belum dapat dimulai.</b><p style="margin-top:8px">'+
+        (typeof esc==='function'?esc(message):String(message).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])))+
+        '</p><button type="button" class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>';
+    }
+  };
+})();
+</script>
 </body></html>
