@@ -257,6 +257,10 @@ body.sa-noscroll{overflow:hidden}
 @media(max-width:560px){.sa-result-actions-v2{grid-template-columns:1fr}.sa-result-actions-v2 .sa-later-btn{grid-column:auto}.sa-review-answer-grid{grid-template-columns:1fr}}
 
 .sa-drill-session-clickable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.sa-drill-session-clickable:hover{transform:translateY(-1px);border-color:#8ca7c0;box-shadow:0 10px 22px rgba(38,66,94,.08)}.sa-drill-session-clickable:focus{outline:3px solid rgba(65,110,149,.22);outline-offset:2px}.sa-review-link{display:block!important;margin-top:5px;color:#35698f!important;font-weight:800;font-size:11px!important}
+
+/* Tryout navigation confirmation */
+.tryout-nav-modal{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(15,23,42,.52);z-index:10050;backdrop-filter:blur(5px)}
+.tryout-nav-modal.show{display:flex}.tryout-nav-card{width:min(430px,100%);background:#fff;border-radius:24px;padding:28px;box-shadow:0 24px 70px rgba(15,23,42,.28);text-align:center}.tryout-nav-icon{width:62px;height:62px;margin:0 auto 16px;border-radius:20px;display:grid;place-items:center;background:#eef2ff;font-size:30px}.tryout-nav-card h3{margin:0 0 10px;color:#182033;font-size:22px}.tryout-nav-card p{margin:0;color:#667085;line-height:1.55}.tryout-nav-actions{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:24px}.tryout-nav-actions button{border:0;border-radius:14px;min-height:48px;padding:10px 14px;font-weight:800;cursor:pointer}.tryout-nav-stay{background:#f1f3f7;color:#344054}.tryout-nav-leave{background:#173a70;color:#fff}@media(max-width:520px){.tryout-nav-actions{grid-template-columns:1fr}.tryout-nav-card{padding:24px 20px;border-radius:20px}}
 </style>
 
 
@@ -941,7 +945,17 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
   </div>
 </div>
 <div id="materialModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeMaterial()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAnalysis()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
-<div id="tryoutExitModal" class="modal" onclick="if(event&&event.target===this)closeTryoutExitModal()"><div class="modalbox" style="width:min(460px,calc(100% - 32px));text-align:center;padding:30px 26px"><div style="font-size:46px;line-height:1;margin-bottom:12px">⚠️</div><h2 style="margin:0 0 10px">Tryout Sedang Berlangsung</h2><p style="margin:0;color:#64748b;line-height:1.6">Kamu sedang mengerjakan Tryout. Jika keluar sekarang, Tryout yang sedang berlangsung akan dihentikan dan jawaban yang belum diselesaikan tidak dikirim.</p><div style="display:flex;gap:10px;margin-top:24px;justify-content:center;flex-wrap:wrap"><button type="button" class="btn dark" onclick="closeTryoutExitModal()">← Tetap Mengerjakan</button><button type="button" class="btn primary" onclick="confirmTryoutExit()">Keluar dari Tryout</button></div></div></div>
+<div id="tryoutNavModal" class="tryout-nav-modal" role="dialog" aria-modal="true" aria-labelledby="tryoutNavTitle">
+  <div class="tryout-nav-card" onclick="event.stopPropagation()">
+    <div class="tryout-nav-icon">⚠️</div>
+    <h3 id="tryoutNavTitle">Tryout Sedang Berlangsung</h3>
+    <p>Kamu sedang mengerjakan Tryout. Jika keluar sekarang, Tryout akan dihentikan.</p>
+    <div class="tryout-nav-actions">
+      <button type="button" class="tryout-nav-stay" onclick="closeTryoutNavigationConfirm()">Tetap Mengerjakan</button>
+      <button type="button" class="tryout-nav-leave" onclick="confirmLeaveTryout()">Keluar dari Tryout</button>
+    </div>
+  </div>
+</div>
 <div id="authModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAuth()"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
 <script>
 
@@ -1372,30 +1386,11 @@ async function loadLive(){const area=document.getElementById('liveArea');if(!are
 function startLiveExam(id){startExam(id)}
 async function loadNotifications(){const area=document.getElementById('notificationsArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat notifikasi...</div>';try{const {data,error}=await sb.rpc('get_my_notifications',{p_limit:100});if(error)throw error;notificationRows=data||[];const unread=notificationRows.filter(n=>!n.is_read).length;const badge=document.getElementById('saNotifBadge');if(badge){badge.textContent=unread?String(unread):'';badge.style.display=unread?'inline-flex':'none'}area.innerHTML=notificationRows.length?notificationRows.map(n=>`<div class="notice-item ${n.is_read?'':'unread'}"><div class="notice-item-head"><div><b>${safe(n.title)}</b></div><small class="muted">${new Date(n.created_at).toLocaleString('id-ID')}</small></div><p>${safe(n.message)}</p>${!n.is_read?`<button class="btn dark" onclick="readNotification('${n.id}')">Tandai dibaca</button>`:''}</div>`).join(''):'<div class="sa-course-card">Tidak ada notifikasi.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat notifikasi: ${safe(e.message)}</div>`}}
 
-let pendingTryoutNavigation=null;
-function closeTryoutExitModal(){pendingTryoutNavigation=null;el('tryoutExitModal')?.classList.remove('show')}
-async function confirmTryoutExit(){
-  const destination=pendingTryoutNavigation;
-  pendingTryoutNavigation=null;
-  el('tryoutExitModal')?.classList.remove('show');
-  clearInterval(timerInt);
-  timerInt=null;
-  currentExam=null;
-  examQuestions=[];
-  examIndex=0;
-  answers={};
-  examTotalSeconds=0;
-  examSecondsLeft=0;
-  if(destination) await showView(destination);
-}
-async function showView(name){
-  const guardedViews=new Set(['home','activities','premium']);
-  if(currentExam && guardedViews.has(name)){
-    pendingTryoutNavigation=name;
-    el('tryoutExitModal')?.classList.add('show');
-    return;
-  }
-  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
+let tryoutNavigationTarget=null;
+function openTryoutNavigationConfirm(target){tryoutNavigationTarget=target;const modal=el('tryoutNavModal');if(modal)modal.classList.add('show');}
+function closeTryoutNavigationConfirm(){tryoutNavigationTarget=null;const modal=el('tryoutNavModal');if(modal)modal.classList.remove('show');}
+function confirmLeaveTryout(){const target=tryoutNavigationTarget||'home';closeTryoutNavigationConfirm();clearInterval(timerInt);timerInt=null;currentExam=null;examQuestions=[];examIndex=0;answers={};examTotalSeconds=0;examSecondsLeft=0;showView(target);}
+async function showView(name){const guardedViews=new Set(['home','activities','premium']);if(currentExam&&guardedViews.has(name)){openTryoutNavigationConfirm(name);return;}document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
 async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('app').classList.add('sa-app-shell');el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.allSettled([loadHome(),loadTryouts(),loadLive(),loadDashboard(),loadProfile(),loadRanking('overall'),loadFavoriteIds(),loadNotifications(),loadPremium()]);await loadSaHomePanels();refreshPublishedIcons();loadProfileAndHeader().catch(()=>{});setSaActive('home')}
 
 </script>
