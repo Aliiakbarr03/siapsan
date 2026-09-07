@@ -1443,7 +1443,7 @@ function renderLatsols(rows){
             ${x.subcategory?`<span class="sa-latsol-stat">${safe(subtitle)}</span>`:''}
           </div>
         </div>
-        <button class="sa-card-action" onclick="startLatsol('${x.id}')">Mulai Latsol →</button>
+        <button type="button" class="sa-card-action sa-start-latsol" data-latsol-id="${safe(String(x.id))}">Mulai Latsol →</button>
       </div>`;
     }).join('');
 
@@ -1464,25 +1464,40 @@ function renderLatsols(rows){
 function filterLatsols(v){const q=String(v||'').toLowerCase();renderLatsols(latsolRows.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)))}
 async function startLatsol(id){
   const a=el('latsolsArea');
+  if(!a)return;
   try{
+    const meta=(latsolRows||[]).find(x=>String(x.id)===String(id));
+    if(!id)throw new Error('ID paket Latsol tidak ditemukan.');
     a.innerHTML='<div class="sa-course-card">Menyiapkan Latsol...</div>';
-    const meta=latsolRows.find(x=>String(x.id)===String(id));
     const configuredLimit=Math.max(1,Number(meta?.question_count)||10);
     const {data:sid,error:se}=await sb.rpc('begin_practice_session',{
       p_activity_type:'latsol',p_mode:'preset',p_latsol_id:id,
       p_category_id:null,p_subcategory:null,p_limit:configuredLimit
     });
     if(se)throw se;
-    const sessionId=Array.isArray(sid)?sid[0]:sid;
+    const first=Array.isArray(sid)?sid[0]:sid;
+    const sessionId=(first&&typeof first==='object')?(first.session_id||first.id||first.p_session_id):first;
+    if(!sessionId)throw new Error('Sesi Latsol tidak berhasil dibuat.');
     const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});
     if(error)throw error;
-    practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'};
-    if(!practiceState.rows.length)throw new Error('Paket Latsol belum memiliki soal.');
+    const rows=Array.isArray(data)?data:(data?Object.values(data):[]);
+    if(!rows.length)throw new Error('Paket Latsol belum memiliki soal yang aktif.');
+    practiceState={sessionId,rows,index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'};
     renderPracticeQuestion();
   }catch(e){
-    a.innerHTML=`<div class="sa-course-card">${safe(e.message||'Gagal memulai Latsol.')}<br><button class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>`;
+    console.error('startLatsol error:',e);
+    a.innerHTML=`<div class="sa-course-card"><b>Gagal memulai Latsol.</b><p style="margin-top:8px">${safe(e?.message||'Terjadi kesalahan.')}</p><button type="button" class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Kembali</button></div>`;
   }
 }
+window.startLatsol=startLatsol;
+// Event delegation agar tombol Mulai Latsol tetap berfungsi walau card dirender ulang.
+document.addEventListener('click',function(ev){
+  const btn=ev.target&&ev.target.closest?ev.target.closest('.sa-start-latsol'):null;
+  if(!btn)return;
+  ev.preventDefault();
+  const id=btn.getAttribute('data-latsol-id');
+  if(id)window.startLatsol(id);
+});
 function renderPracticeQuestion(){
   const target=practiceState.target==='drilling'?'drillingArea':'latsolsArea';
   const a=el(target),q=practiceState.rows[practiceState.index];
