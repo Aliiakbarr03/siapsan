@@ -767,6 +767,68 @@ a,.sa-review-link{color:var(--premium-blue)!important}
 }
 </style>
 
+
+<!-- SIAP ASN FINAL VISUAL CONSISTENCY FIX -->
+<style id="siap-asn-final-visual-fix">
+
+/* Unified premium light system — contrast-first */
+:root{--bg:#f4f7fb!important;--panel:#ffffff!important;--card:#ffffff!important;--text:#10233f!important;--muted:#334155!important;--line:#d7e0ec!important;--blue:#155eef!important;--cyan:#0f766e!important;--danger:#b42318!important;}
+html,body{background:#f4f7fb!important;color:#10233f!important;}
+body{font-weight:400;}
+*{text-shadow:none!important;}
+:where(h1,h2,h3,h4,h5,h6,strong,b,label,th){color:#10233f!important;}
+:where(p,span,small,li,td,.muted,.subtitle,.description,.helper,.meta){color:#334155!important;}
+/* Never allow unreadable white text on a light card */
+[style*="color:#fff"],[style*="color: #fff"],[style*="color:white"],[style*="color: white"]{color:#10233f!important;}
+button,.btn,.button,[role="button"]{text-shadow:none!important;}
+input,select,textarea{background:#fff!important;color:#10233f!important;border-color:#cbd5e1!important;}
+input::placeholder,textarea::placeholder{color:#64748b!important;opacity:1!important;}
+input:focus,select:focus,textarea:focus{outline:none!important;border-color:#155eef!important;box-shadow:0 0 0 3px rgba(21,94,239,.12)!important;}
+/* Mobile safety */
+@media(max-width:760px){
+  body{overflow-x:hidden!important;}
+  h1{font-size:clamp(1.55rem,7vw,2.15rem)!important;line-height:1.15!important;}
+  h2{font-size:clamp(1.25rem,5.5vw,1.65rem)!important;}
+  button,input,select,textarea{max-width:100%!important;}
+  .card,.panel,.box{min-width:0!important;}
+}
+
+/* ===== WEB PUBLISH ===== */
+.sa-app-shell,.app-shell,.main,.content{background:#f4f7fb!important;}
+.sa-sidebar,.side-nav,.sidebar{background:#fff!important;border-right:1px solid #d7e0ec!important;box-shadow:8px 0 30px rgba(16,35,63,.04)!important;}
+.sa-topbar,.topbar,.header{background:rgba(255,255,255,.96)!important;border-bottom:1px solid #d7e0ec!important;box-shadow:0 6px 22px rgba(16,35,63,.05)!important;}
+.sa-card,.sa-course-card,.sa-stat-card,.sa-panel,.card,.panel,.box,.profile-card,.material-card,.tryout-card,.rank-card,.notification-card,.history-card{
+ background:#fff!important;color:#10233f!important;border:1px solid #d7e0ec!important;box-shadow:0 10px 28px rgba(16,35,63,.07)!important;
+}
+.sa-card:hover,.sa-course-card:hover,.sa-stat-card:hover,.tryout-card:hover,.material-card:hover{transform:translateY(-2px)!important;border-color:#93b4ff!important;box-shadow:0 16px 34px rgba(21,94,239,.11)!important;}
+.sa-nav-item,.sa-side-link,.nav-item{color:#263b57!important;border-radius:12px!important;}
+.sa-nav-item:hover,.sa-side-link:hover,.nav-item:hover{background:#edf4ff!important;color:#155eef!important;}
+.sa-nav-item.active,.sa-side-link.active,.nav-item.active{background:linear-gradient(135deg,#e7efff,#f3f7ff)!important;color:#0f3f9e!important;border-left:3px solid #155eef!important;font-weight:800!important;}
+.sa-kicker,.section-kicker,.eyebrow{color:#155eef!important;font-weight:900!important;letter-spacing:.12em!important;}
+.sa-chip,.chip,.badge{background:#eef4ff!important;color:#174ea6!important;border:1px solid #c9dbff!important;font-weight:800!important;}
+.sa-chip.premium,.premium{background:#fff7e6!important;color:#8a5a00!important;border-color:#f4cf72!important;}
+.sa-btn,.btn-primary,.primary-btn,.button-primary{background:linear-gradient(135deg,#155eef,#0f3f9e)!important;color:#fff!important;border:0!important;box-shadow:0 8px 18px rgba(21,94,239,.22)!important;}
+.sa-btn *, .btn-primary *, .primary-btn *, .button-primary *{color:#fff!important;}
+.sa-btn-secondary,.btn-secondary,.secondary-btn{background:#fff!important;color:#155eef!important;border:1px solid #9ab9f7!important;}
+.sa-btn-secondary *,.btn-secondary *,.secondary-btn *{color:#155eef!important;}
+.sa-progress,.progress,.progress-track{background:#e6ebf2!important;}
+.sa-progress>span,.progress>span,.progress-fill{background:linear-gradient(90deg,#155eef,#0f766e)!important;}
+.sa-stat-card:nth-child(4n+1),.stat-card:nth-child(4n+1){border-top:3px solid #155eef!important;}
+.sa-stat-card:nth-child(4n+2),.stat-card:nth-child(4n+2){border-top:3px solid #0f766e!important;}
+.sa-stat-card:nth-child(4n+3),.stat-card:nth-child(4n+3){border-top:3px solid #9a6700!important;}
+.sa-stat-card:nth-child(4n+4),.stat-card:nth-child(4n+4){border-top:3px solid #a83a32!important;}
+.sa-banner,.hero,.sa-hero{background:linear-gradient(135deg,#eaf2ff,#ffffff 58%,#e8f7f4)!important;color:#10233f!important;border:1px solid #c9dbf5!important;}
+.sa-banner *, .hero *, .sa-hero *{color:inherit!important;}
+.sa-table-wrap,table{background:#fff!important;color:#10233f!important;}
+th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0!important;color:#263b57!important;}
+.sa-modal,.modal-content{background:#fff!important;color:#10233f!important;border-color:#cbd5e1!important;}
+@media(max-width:760px){
+ .sa-sidebar,.sidebar{box-shadow:none!important;}
+ .sa-course-grid,.sa-card-grid,.stats-grid{grid-template-columns:1fr!important;}
+ .sa-card,.sa-course-card,.sa-stat-card{border-radius:16px!important;}
+}
+
+</style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
