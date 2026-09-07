@@ -940,8 +940,8 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
     </main>
   </div>
 </div>
-<div id="materialModal" class="modal" onclick="if(event.target===this)closeMaterial()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal" onclick="if(event.target===this)closeAnalysis()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
-<div id="authModal" class="modal" onclick="if(event.target===this)closeAuth()"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
+<div id="materialModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeMaterial()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAnalysis()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
+<div id="authModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAuth()"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
 <script>
 
 /* === SHARED CATEGORY ICON RENDERER === */
@@ -2702,4 +2702,104 @@ td{color:#102b4d!important}
   };
 })();
 </script>
+
+<script id="siap-asn-latsol-catalog-hardening">
+/* === LATSOL CATALOG HARDENING ===
+   Tujuan: halaman Latsol tidak boleh blank bila RPC katalog gagal atau data relasi kategori tidak lengkap.
+   Fitur/kartu lama tetap dipakai; hanya jalur pemuatan dibuat lebih tahan error. */
+(function(){
+  const esc=v=>String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+  const iconHtml=(icon)=>{
+    const name=String(icon||'clipboard-list').trim();
+    return `<span class="sa-pub-cat-icon"><i data-lucide="${esc(name)}"></i></span>`;
+  };
+  const normalizeRows=rows=>(Array.isArray(rows)?rows:[]).map(x=>{
+    const rel=Array.isArray(x.categories)?(x.categories[0]||{}):(x.categories||{});
+    return {...x,
+      category_name:x.category_name||x.category||rel.name||'',
+      category_icon:x.category_icon||rel.icon||'clipboard-list'
+    };
+  });
+
+  window.renderLatsols=function(rows){
+    const area=document.getElementById('latsolsArea'); if(!area)return;
+    const list=normalizeRows(rows);
+    window.latsolRows=list;
+    if(!list.length){
+      area.innerHTML='<div class="sa-course-card">Belum ada Latsol yang tersedia.</div>';
+      try{window.refreshPublishedIcons?.();}catch(_e){}
+      return;
+    }
+    const groupOf=x=>{
+      const raw=String(x.category_name||x.category||'').trim();
+      if(raw)return raw.toUpperCase();
+      const m=String(x.title||'').match(/^(TWK|TIU|TKP)\b/i);
+      return m?m[1].toUpperCase():'LAINNYA';
+    };
+    const preferred=['TWK','TIU','TKP'];
+    const groups=new Map();
+    list.forEach(x=>{const k=groupOf(x);if(!groups.has(k))groups.set(k,[]);groups.get(k).push(x);});
+    const keys=[...groups.keys()].sort((a,b)=>{
+      const ia=preferred.indexOf(a),ib=preferred.indexOf(b);
+      if(ia<0&&ib<0)return a.localeCompare(b,'id');
+      if(ia<0)return 1;if(ib<0)return -1;return ia-ib;
+    });
+    area.innerHTML=keys.map(key=>{
+      const items=groups.get(key)||[];
+      const cards=items.map(x=>{
+        const total=Math.max(0,Number(x.question_count)||0);
+        const minutes=Math.max(1,Number(x.duration_minutes)||15);
+        const sub=x.subcategory?`<span class="sa-latsol-stat">${esc(x.subcategory)}</span>`:'';
+        const id=String(x.id||'');
+        return `<div class="sa-course-card sa-latsol-card">
+          <div class="sa-card-top"><div class="sa-course-icon">${iconHtml(x.category_icon)}</div><span class="sa-chip">${x.is_premium?'Premium':'Gratis'}</span></div>
+          <div style="margin-top:14px"><h3>${esc(x.title||'Latsol')}</h3><p>${esc(x.description||'Latihan soal terstruktur.')}</p>
+            <div class="sa-latsol-meta"><span class="sa-latsol-stat">${total} Soal</span><span class="sa-latsol-stat">${minutes} Menit</span>${sub}</div>
+          </div>
+          <button type="button" class="sa-card-action" onclick="startLatsol(${JSON.stringify(id)})">Mulai Latsol →</button>
+        </div>`;
+      }).join('');
+      return `<section class="sa-latsol-category" data-latsol-category="${esc(key)}">
+        <div class="sa-latsol-category-head"><div><span class="sa-latsol-category-kicker">LATIHAN TERSTRUKTUR</span><h2>${esc(key)}</h2></div><span class="sa-latsol-category-count">${items.length} Paket</span></div>
+        <div class="sa-course-grid sa-latsol-group-grid">${cards}</div>
+      </section>`;
+    }).join('');
+    try{window.refreshPublishedIcons?.();}catch(e){console.warn('Latsol icon refresh skipped',e);}
+  };
+
+  window.loadLatsols=async function(){
+    const area=document.getElementById('latsolsArea');if(!area)return;
+    area.innerHTML='<div class="sa-course-grid"><div class="sa-course-card">Memuat Latsol...</div></div>';
+    let rpcError=null;
+    try{
+      const r=await sb.rpc('get_latsol_catalog');
+      if(r.error)throw r.error;
+      window.latsolRows=normalizeRows(r.data||[]);
+      window.renderLatsols(window.latsolRows);
+      return;
+    }catch(e){rpcError=e;console.warn('get_latsol_catalog gagal, memakai jalur cadangan:',e);}
+    try{
+      const r=await sb.from('latsol_configs')
+        .select('id,title,category_id,subcategory,question_count,duration_minutes,is_premium,is_published,sort_order,description,categories(name,icon)')
+        .eq('is_published',true)
+        .order('sort_order',{ascending:true})
+        .order('created_at',{ascending:false});
+      if(r.error)throw r.error;
+      window.latsolRows=normalizeRows(r.data||[]);
+      window.renderLatsols(window.latsolRows);
+    }catch(e2){
+      console.error('Latsol fallback gagal:',e2);
+      const msg=e2?.message||rpcError?.message||'Terjadi kesalahan saat memuat Latsol.';
+      area.innerHTML=`<div class="sa-course-card"><b>Latsol belum dapat dimuat.</b><p style="margin-top:8px">${esc(msg)}</p><button type="button" class="btn primary" style="margin-top:12px" onclick="loadLatsols()">Coba Lagi</button></div>`;
+    }
+  };
+
+  window.filterLatsols=function(v){
+    const q=String(v||'').trim().toLowerCase();
+    const src=Array.isArray(window.latsolRows)?window.latsolRows:[];
+    window.renderLatsols(!q?src:src.filter(x=>`${x.title||''} ${x.category_name||''} ${x.subcategory||''}`.toLowerCase().includes(q)));
+  };
+})();
+</script>
+
 </body></html>
