@@ -2488,4 +2488,218 @@ td{color:#102b4d!important}
 .sa-drill-mode:nth-child(4):hover .ico,.sa-drill-mode:nth-child(4):focus-visible .ico,.sa-drill-mode:nth-child(4):active .ico{color:#93620b!important}
 </style>
 
+<style id="siap-asn-cbt-navigation-ui">
+/* === SIAP ASN CBT NAVIGATOR — UI + NAVIGATION ONLY === */
+.sa-cbt-layout{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:16px;align-items:start}
+.sa-cbt-main{min-width:0}
+.sa-cbt-side{position:sticky;top:88px;background:#fff;border:1px solid #d7e0ec;border-radius:20px;padding:16px;box-shadow:0 10px 28px rgba(16,35,63,.07)}
+.sa-cbt-side-head{display:flex;justify-content:space-between;align-items:center;gap:8px;margin-bottom:12px}
+.sa-cbt-side-head b{font-size:14px;color:#10233f}
+.sa-cbt-side-head span{font-size:11px;color:#64748b}
+.sa-cbt-legend{display:flex;gap:10px;flex-wrap:wrap;font-size:10px;color:#475569;margin-bottom:12px}
+.sa-cbt-legend span{display:inline-flex;align-items:center;gap:5px}
+.sa-cbt-dot{width:10px;height:10px;border-radius:4px;border:1px solid #b9c7d8;background:#fff;display:inline-block}
+.sa-cbt-dot.done{background:#155eef;border-color:#155eef}
+.sa-cbt-dot.current{background:#fff;border:2px solid #155eef}
+.sa-cbt-numbers{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:7px}
+.sa-cbt-number{height:38px;border:1px solid #cbd5e1;background:#fff;color:#18324f;border-radius:9px;font-size:12px;font-weight:800;cursor:pointer;transition:.15s ease;display:grid;place-items:center}
+.sa-cbt-number:hover{transform:translateY(-1px);border-color:#7aa7ed}
+.sa-cbt-number.done{background:#155eef;color:#fff;border-color:#155eef}
+.sa-cbt-number.current{box-shadow:0 0 0 3px rgba(21,94,239,.15);border-color:#155eef}
+.sa-cbt-number.result-correct{background:#eaf8f2!important;color:#13795b!important;border-color:#9bd8bf!important}
+.sa-cbt-number.result-wrong{background:#fff0ee!important;color:#b42318!important;border-color:#f2afa9!important}
+.sa-cbt-number.result-unanswered{background:#fff!important;color:#64748b!important;border-color:#cbd5e1!important}
+.sa-cbt-summary{margin-top:14px;padding:11px 12px;border-radius:12px;background:#f7f9fc;border:1px solid #e2e8f0;font-size:11px;color:#475569;line-height:1.6}
+.sa-cbt-summary b{color:#10233f}
+.sa-cbt-question-card{background:#fff;border:1px solid #d7e0ec;border-radius:20px;padding:22px;box-shadow:0 10px 28px rgba(16,35,63,.07)}
+.sa-cbt-question-card .question{font-size:19px!important;line-height:1.7!important;color:#10233f!important;margin:0 0 18px!important}
+.sa-cbt-option{display:block;width:100%;text-align:left;padding:15px 16px;margin:9px 0;border-radius:13px;background:#fff;color:#18324f;border:1px solid #d7e0ec;cursor:pointer;transition:.15s ease}
+.sa-cbt-option:hover{border-color:#7aa7ed;background:#f8fbff}
+.sa-cbt-option.selected{background:#155eef!important;color:#fff!important;border-color:#155eef!important}
+.sa-cbt-footer{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-top:18px;flex-wrap:wrap}
+.sa-cbt-footer .sa-cbt-status{font-size:11px;color:#475569}
+.sa-cbt-actions{display:flex;gap:8px;flex-wrap:wrap}
+.sa-cbt-finish{background:#0f766e!important;color:#fff!important;border:0!important}
+.sa-review-navigator{margin:16px 0 8px;padding:14px;border:1px solid #d7e0ec;border-radius:16px;background:#f8fafc}
+.sa-review-navigator-head{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:10px}
+.sa-review-navigator-head b{color:#10233f;font-size:13px}
+.sa-review-navigator-head span{color:#64748b;font-size:10px}
+.sa-review-numbers{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px}
+.sa-review-number{height:30px;border-radius:7px;border:1px solid #cbd5e1;background:#fff;color:#18324f;font-size:10px;font-weight:900;cursor:pointer}
+.sa-review-number.correct{background:#eaf8f2;border-color:#9bd8bf;color:#13795b}
+.sa-review-number.wrong{background:#fff0ee;border-color:#f2afa9;color:#b42318}
+.sa-review-number.unanswered{background:#fff;border-color:#cbd5e1;color:#64748b}
+.sa-review-number.active{box-shadow:0 0 0 2px #155eef inset}
+.sa-review-focus{margin-top:12px}
+@media(max-width:900px){.sa-cbt-layout{grid-template-columns:1fr}.sa-cbt-side{position:static;order:-1}.sa-cbt-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}}
+@media(max-width:600px){.sa-cbt-question-card{padding:17px}.sa-cbt-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-cbt-side{border-radius:16px}}
+</style>
+<script id="siap-asn-cbt-navigation-engine">
+/* === SIAP ASN CBT NAVIGATION ENGINE === */
+(function(){
+  const upper=v=>String(v??'').trim().toUpperCase();
+  const originalFinishExam=window.finishExam;
+  const originalOpenAnalysis=window.openAnalysis;
+  const originalOpenPracticeResultReview=window.openPracticeResultReview;
+  let examFinishing=false;
+  let practiceFinishing=false;
+  let practiceCompleted=false;
+  let practiceSnapshot=null;
+
+  function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+  function getPracticeAnswered(i){const q=window.practiceState?.rows?.[i];return !!(q&&window.practiceState?.answers&&window.practiceState.answers[q.id]);}
+  function buildExamNavigator(resultMode=false,reviewRows=[]){
+    if(resultMode){
+      return '<div class="sa-review-navigator"><div class="sa-review-navigator-head"><b>Rekap Nomor Soal</b><span>Klik nomor untuk melihat detail</span></div><div class="sa-review-numbers">'+(reviewRows||[]).map((q,i)=>{
+        const status=q.is_correct?'correct':(q.selected_answer&&q.selected_answer!=='-'?'wrong':'unanswered');
+        return '<button type="button" class="sa-review-number '+status+'" data-review-index="'+i+'">'+(i+1)+'</button>';
+      }).join('')+'</div><div class="sa-cbt-legend" style="margin-top:10px;margin-bottom:0"><span><i class="sa-cbt-dot" style="background:#eaf8f2;border-color:#9bd8bf"></i>Benar/Optimal</span><span><i class="sa-cbt-dot" style="background:#fff0ee;border-color:#f2afa9"></i>Perlu evaluasi</span><span><i class="sa-cbt-dot"></i>Kosong</span></div></div>';
+    }
+    const rows=window.examQuestions||[];
+    const nums=rows.map((q,i)=>'<button type="button" class="sa-cbt-number '+(answers[q.id]?'done ':'')+(i===window.examIndex?'current':'')+'" onclick="jumpExam('+i+')">'+(i+1)+'</button>').join('');
+    const done=rows.filter(q=>answers[q.id]).length;
+    return '<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+done+'/'+rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Klik nomor mana pun untuk langsung membuka soal tersebut.</div></aside>';
+  }
+  window.jumpExam=function(i){
+    if(!window.examQuestions?.[i])return;
+    window.examIndex=i;window.renderQuestion();
+  };
+  function getExamLayoutHtml(content,navigator){return '<div class="sa-cbt-layout"><div class="sa-cbt-main">'+content+'</div>'+navigator+'</div>';}
+
+  window.renderQuestion=function(){
+    const q=window.examQuestions?.[window.examIndex]; if(!q)return;
+    const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+    const area=document.getElementById('examArea'); if(!area)return;
+    const selected=answers[q.id]||'';
+    const content='<div class="sa-cbt-question-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><div><span class="sa-kicker">TRYOUT</span><div class="sa-subcategory">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+'</div></div><span class="sa-cbt-status">'+(selected?'Sudah dijawab':'Belum dijawab')+'</span></div><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choose('+JSON.stringify(q.id)+','+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.examIndex>0?'<button type="button" class="btn dark" onclick="prevQ()">← Sebelumnya</button>':'')+(window.examIndex<window.examQuestions.length-1?'<button type="button" class="btn primary" onclick="nextQ()">Berikutnya →</button>':'<button type="button" class="btn sa-cbt-finish" onclick="finishExam()">Selesai & Lihat Rekap</button>')+'</div></div></div>';
+    area.innerHTML=getExamLayoutHtml(content,buildExamNavigator(false));
+    const timer=document.getElementById('examTimer');
+    if(timer){timer.textContent=Math.floor(Math.max(0,window.examSecondsLeft||0)/60)+':'+String(Math.max(0,window.examSecondsLeft||0)%60).padStart(2,'0');}
+  };
+
+  window.choose=function(id,k){answers[id]=k;window.renderQuestion();};
+  window.prevQ=function(){if(window.examIndex>0){window.examIndex--;window.renderQuestion();}};
+  window.nextQ=function(){if(window.examIndex<window.examQuestions.length-1){window.examIndex++;window.renderQuestion();}else{window.finishExam();}};
+
+  window.startExam=async function(id){
+    examFinishing=false;
+    const {data,error}=await sb.rpc('get_tryout_questions',{p_tryout_id:id});
+    if(error){alert(error.message);return}
+    window.examQuestions=data||[]; if(!window.examQuestions.length){alert('Soal belum tersedia.');return}
+    window.currentExam=id;window.examIndex=0;window.answers={};window.showView('exam');
+    const {data:tr,error:te}=await sb.from('tryouts').select('duration_minutes').eq('id',id).single();
+    if(te){alert(te.message);return}
+    window.examTotalSeconds=Number(tr?.duration_minutes||60)*60;window.examSecondsLeft=window.examTotalSeconds;
+    clearInterval(window.timerInt);
+    window.renderQuestion();
+    window.timerInt=setInterval(()=>{
+      window.examSecondsLeft=Math.max(0,Number(window.examSecondsLeft||0)-1);
+      const t=document.getElementById('examTimer');if(t)t.textContent=Math.floor(window.examSecondsLeft/60)+':'+String(window.examSecondsLeft%60).padStart(2,'0');
+      if(window.examSecondsLeft<=0){clearInterval(window.timerInt);window.finishExam(true)}
+    },1000);
+  };
+
+  window.finishExam=async function(autoFinish=false){
+    if(examFinishing||!window.currentExam)return;
+    examFinishing=true;clearInterval(window.timerInt);
+    const durationSeconds=Math.max((window.examTotalSeconds||0)-Math.max(window.examSecondsLeft||0,0),0);
+    const {data,error}=await sb.rpc('submit_tryout_attempt',{p_tryout_id:window.currentExam,p_answers:window.answers,p_duration_seconds:durationSeconds});
+    if(error){examFinishing=false;alert('Gagal mengirim jawaban: '+error.message);return}
+    const result=Array.isArray(data)?data[0]:data||{};
+    const attemptId=result.attempt_id||result.id||result.tryout_attempt_id||null;
+    const title=document.getElementById('examTitle')?.textContent||'TRYOUT';
+    window.showWowResult({icon:'🏆',title:autoFinish?'WAKTU HABIS — HASIL TEREKAP':'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Rekap detail tersedia pada tombol evaluasi.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:window.examQuestions.length,totalPoints:result.total_points,maxPoints:result.max_points,reviewMode:'attempt',attemptId,reviewTitle:title});
+    window.currentExam=null;
+    examFinishing=false;
+  };
+
+  function installPracticeNavigator(){
+    const area=window.practiceState?.target==='drilling'?document.getElementById('drillingArea'):document.getElementById('latsolsArea');
+    if(!area)return;
+    const n=window.practiceState.rows.length;
+    const buttons=window.practiceState.rows.map((q,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[q.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
+    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+n+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+buttons+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal dan mengisi soal mana pun terlebih dahulu.</div></aside>';
+    const oldMain=area.querySelector('.sa-cbt-main');
+    if(oldMain){const layout=area.querySelector('.sa-cbt-layout');if(layout){const oldSide=layout.querySelector('.sa-cbt-side');if(oldSide)oldSide.outerHTML=side;return;}}
+  }
+  window.jumpPractice=function(i){
+    if(!window.practiceState?.rows?.[i])return;
+    window.practiceState.index=i;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[i].id]||null;window.renderPracticeQuestion();
+  };
+  window.renderPracticeQuestion=function(){
+    const target=window.practiceState.target==='drilling'?'drillingArea':'latsolsArea';
+    const a=document.getElementById(target),q=window.practiceState.rows?.[window.practiceState.index]; if(!a||!q)return;
+    const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
+    const selected=window.practiceState.answers[q.id]||'';
+    const label=window.practiceState.target==='drilling'?'DRILLING':'LATSOL';
+    const content='<div class="sa-exam-head"><div><span class="sa-kicker">'+label+'</span>'+(q.subcategory?'<div class="sa-subcategory">'+escapeHtml(q.subcategory)+'</div>':'')+'<h2 style="margin:5px 0">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+'</h2><p>'+escapeHtml(window.practiceState.title)+'</p></div><button class="sa-outline-btn" onclick="'+(window.practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()')+'">Keluar</button></div><div class="sa-cbt-question-card"><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choosePractice('+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.practiceState.index>0?'<button type="button" class="btn dark" onclick="prevPractice()">← Sebelumnya</button>':'')+(window.practiceState.index<window.practiceState.rows.length-1?'<button type="button" class="btn primary" onclick="nextPractice()">Berikutnya →</button>':'<button type="button" class="btn sa-cbt-finish" onclick="nextPractice()">Selesai & Lihat Rekap</button>')+'</div></div></div>';
+    const nums=window.practiceState.rows.map((rq,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[rq.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
+    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+window.practiceState.rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Pembahasan dan warna hasil baru muncul setelah selesai.</div></aside>';
+    a.innerHTML='<div class="sa-cbt-layout"><div class="sa-cbt-main">'+content+'</div>'+side+'</div>';
+  };
+  window.choosePractice=function(k){
+    const q=window.practiceState?.rows?.[window.practiceState.index];if(!q)return;
+    window.practiceState.answers[q.id]=k;window.practiceState.selected=k;window.renderPracticeQuestion();
+  };
+  window.prevPractice=function(){if(window.practiceState.index>0){window.practiceState.index--;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();}};
+  window.nextPractice=async function(){
+    if(window.practiceState.index<window.practiceState.rows.length-1){window.practiceState.index++;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();return;}
+    if(practiceFinishing)return;practiceFinishing=true;
+    const snapshot={target:window.practiceState.target,title:window.practiceState.title,rows:window.practiceState.rows.slice(),answers:{...window.practiceState.answers},sessionId:window.practiceState.sessionId};
+    const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:window.practiceState.sessionId,p_answers:window.practiceState.answers,p_duration_seconds:0});
+    if(error){practiceFinishing=false;alert(error.message);return}
+    const r=Array.isArray(data)?data[0]:data||{};
+    practiceSnapshot=snapshot;practiceCompleted=true;
+    window.showWowResult({icon:snapshot.target==='drilling'?'🎯':'🎉',title:snapshot.title+' SELESAI!',text:'Latihan selesai. Pembahasan akan tampil pada evaluasi setelah rekap.',score:r.score??0,correct:r.correct_count??0,wrong:r.wrong_count??0,total:snapshot.rows.length,totalPoints:r.total_points,maxPoints:r.max_points,reviewMode:'practice',reviewTitle:snapshot.title,practice:snapshot});
+    window.practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'latsols'};
+    await Promise.allSettled([window.loadLatsols?.(),window.loadDrilling?.()]);
+    practiceFinishing=false;
+  };
+
+  function makeReviewNavigator(reviewRows){
+    return '<div class="sa-review-navigator"><div class="sa-review-navigator-head"><b>Rekap Nomor Soal</b><span>Klik nomor soal untuk membuka pembahasan</span></div><div class="sa-review-numbers">'+reviewRows.map((q,i)=>{const status=q.is_correct?'correct':(q.selected_answer&&q.selected_answer!=='-'?'wrong':'unanswered');return '<button type="button" class="sa-review-number '+status+'" data-review-jump="'+i+'">'+(i+1)+'</button>';}).join('')+'</div><div class="sa-cbt-legend" style="margin-top:10px;margin-bottom:0"><span><i class="sa-cbt-dot" style="background:#eaf8f2;border-color:#9bd8bf"></i>Benar/Optimal</span><span><i class="sa-cbt-dot" style="background:#fff0ee;border-color:#f2afa9"></i>Perlu evaluasi</span><span><i class="sa-cbt-dot"></i>Kosong</span></div></div>';
+  }
+  function bindReviewJump(reviewRows){
+    const analysis=document.getElementById('analysisArea');if(!analysis)return;
+    const detailRows=[...analysis.querySelectorAll('.sa-review-row')];
+    analysis.closest('.modalbox')?.querySelectorAll('.sa-review-number').forEach((b,i)=>b.addEventListener('click',()=>{
+      const row=detailRows[i];if(!row)return;
+      row.scrollIntoView({behavior:'smooth',block:'start'});
+      row.style.boxShadow='0 0 0 3px rgba(21,94,239,.18),0 10px 28px rgba(16,35,63,.10)';
+      setTimeout(()=>{row.style.boxShadow='';},1200);
+    }));
+  }
+
+  window.openAnalysis=async function(id,title){
+    await originalOpenAnalysis(id,title);
+    const area=document.getElementById('analysisArea');
+    if(!area)return;
+    try{
+      const {data,error}=await sb.rpc('get_my_attempt_review',{p_attempt_id:id});
+      if(error)throw error;
+      const review=data||[];
+      if(review.length)addNavigatorToSummary(review);
+    }catch(e){console.warn('Review navigator',e)}
+  };
+  window.openPracticeResultReview=function(ctx,title){
+    originalOpenPracticeResultReview(ctx,title);
+    setTimeout(()=>{
+      const area=document.getElementById('analysisArea');
+      if(!area)return;
+      const rows=(ctx?.rows||[]).map((q,i)=>{
+        const selected=(ctx.answers||{})[q.id]||'-';
+        const tkp=upper(q.type)==='TKP';
+        let selectedScore=null, optimal=q.correct_answer||'-'; const scoreMap={};
+        ['A','B','C','D','E'].forEach(k=>{const names=['option_'+k.toLowerCase()+'_score','option_'+k.toLowerCase()+'_weight','score_'+k.toLowerCase(),'weight_'+k.toLowerCase(),'nilai_'+k.toLowerCase(),'bobot_'+k.toLowerCase()];for(const n of names){const v=Number(q[n]);if(Number.isFinite(v)&&v>=1&&v<=5){scoreMap[k]=v;break}}});
+        if(tkp){selectedScore=scoreMap[upper(selected)]??null;const k5=Object.keys(scoreMap).find(k=>Number(scoreMap[k])===5);if(k5)optimal=k5;}
+        const correct=tkp?selectedScore===5:upper(selected)===upper(optimal);
+        return {question_order:i+1,category_name:q.category_name||q.category||ctx.title||'Latihan',type:q.type||'',question_text:q.question_text||'',selected_answer:selected,selected_score:selectedScore,correct_answer:optimal,is_correct:correct,explanation:q.explanation||'',option_score_map:scoreMap};
+      });
+      if(!rows.length)return;
+      const summary=document.getElementById('analysisSummary');if(summary){const old=summary.querySelector('.sa-review-navigator');if(old)old.remove();summary.insertAdjacentHTML('beforeend',makeReviewNavigator(rows));}
+      bindReviewJump(rows);
+    },0);
+  };
+})();
+</script>
 </body></html>
