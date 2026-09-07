@@ -257,6 +257,18 @@ body.sa-noscroll{overflow:hidden}
 @media(max-width:560px){.sa-result-actions-v2{grid-template-columns:1fr}.sa-result-actions-v2 .sa-later-btn{grid-column:auto}.sa-review-answer-grid{grid-template-columns:1fr}}
 
 .sa-drill-session-clickable{cursor:pointer;transition:transform .16s ease,border-color .16s ease,box-shadow .16s ease}.sa-drill-session-clickable:hover{transform:translateY(-1px);border-color:#8ca7c0;box-shadow:0 10px 22px rgba(38,66,94,.08)}.sa-drill-session-clickable:focus{outline:3px solid rgba(65,110,149,.22);outline-offset:2px}.sa-review-link{display:block!important;margin-top:5px;color:#35698f!important;font-weight:800;font-size:11px!important}
+
+/* Tryout navigation confirmation — integrated with the existing modal system */
+.tryout-leave-modal{position:fixed;inset:0;z-index:10050;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(6,16,35,.58);backdrop-filter:blur(6px)}
+.tryout-leave-modal.show{display:flex}
+.tryout-leave-box{width:min(460px,100%);background:#fff;border-radius:24px;padding:28px;box-shadow:0 28px 80px rgba(8,25,56,.28);color:#10213f;animation:tryoutLeaveIn .18s ease-out}
+.tryout-leave-icon{width:52px;height:52px;border-radius:16px;display:grid;place-items:center;background:#eef3ff;font-size:26px;margin-bottom:14px}
+.tryout-leave-box h3{margin:0 0 8px;font-size:23px;line-height:1.2}.tryout-leave-box p{margin:0;color:#61708a;line-height:1.6}
+.tryout-leave-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:22px;flex-wrap:wrap}
+.tryout-leave-actions button{min-height:44px;border-radius:12px;padding:0 17px;font-weight:800;cursor:pointer}
+.tryout-leave-stay{border:1px solid #dbe3ef;background:#fff;color:#18345f}.tryout-leave-exit{border:0;background:#102f62;color:#fff}
+@keyframes tryoutLeaveIn{from{transform:translateY(8px) scale(.98);opacity:0}to{transform:translateY(0) scale(1);opacity:1}}
+@media(max-width:520px){.tryout-leave-modal{align-items:flex-end;padding:12px}.tryout-leave-box{border-radius:22px 22px 16px 16px;padding:24px 20px}.tryout-leave-actions{display:grid;grid-template-columns:1fr}.tryout-leave-actions button{width:100%}}
 </style>
 
 
@@ -941,6 +953,18 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
   </div>
 </div>
 <div id="materialModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeMaterial()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAnalysis()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
+
+<div id="tryoutLeaveModal" class="tryout-leave-modal" role="dialog" aria-modal="true" aria-labelledby="tryoutLeaveTitle">
+  <div class="tryout-leave-box" onclick="event.stopPropagation()">
+    <div class="tryout-leave-icon">⚠️</div>
+    <h3 id="tryoutLeaveTitle">Tryout Sedang Berlangsung</h3>
+    <p id="tryoutLeaveText">Kamu sedang mengerjakan Tryout. Jika keluar sekarang, Tryout yang sedang berlangsung akan dihentikan.</p>
+    <div class="tryout-leave-actions">
+      <button type="button" class="tryout-leave-stay" onclick="cancelTryoutLeave()">← Tetap Mengerjakan</button>
+      <button type="button" class="tryout-leave-exit" onclick="confirmTryoutLeave()">Ya, Keluar dari Tryout</button>
+    </div>
+  </div>
+</div>
 <div id="authModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAuth()"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
 <script>
 
@@ -1371,7 +1395,42 @@ async function loadLive(){const area=document.getElementById('liveArea');if(!are
 function startLiveExam(id){startExam(id)}
 async function loadNotifications(){const area=document.getElementById('notificationsArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat notifikasi...</div>';try{const {data,error}=await sb.rpc('get_my_notifications',{p_limit:100});if(error)throw error;notificationRows=data||[];const unread=notificationRows.filter(n=>!n.is_read).length;const badge=document.getElementById('saNotifBadge');if(badge){badge.textContent=unread?String(unread):'';badge.style.display=unread?'inline-flex':'none'}area.innerHTML=notificationRows.length?notificationRows.map(n=>`<div class="notice-item ${n.is_read?'':'unread'}"><div class="notice-item-head"><div><b>${safe(n.title)}</b></div><small class="muted">${new Date(n.created_at).toLocaleString('id-ID')}</small></div><p>${safe(n.message)}</p>${!n.is_read?`<button class="btn dark" onclick="readNotification('${n.id}')">Tandai dibaca</button>`:''}</div>`).join(''):'<div class="sa-course-card">Tidak ada notifikasi.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat notifikasi: ${safe(e.message)}</div>`}}
 
-async function showView(name){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
+let pendingTryoutView=null;
+function isTryoutNavigationGuarded(name){
+  return !!currentExam && ['home','activities','premium'].includes(name);
+}
+function openTryoutLeaveModal(name){
+  pendingTryoutView=name;
+  const modal=el('tryoutLeaveModal');
+  if(modal)modal.classList.add('show');
+}
+function cancelTryoutLeave(){
+  pendingTryoutView=null;
+  const modal=el('tryoutLeaveModal');
+  if(modal)modal.classList.remove('show');
+}
+async function confirmTryoutLeave(){
+  const destination=pendingTryoutView;
+  cancelTryoutLeave();
+  if(!destination)return;
+  clearInterval(timerInt);
+  currentExam=null;
+  examQuestions=[];
+  examIndex=0;
+  answers={};
+  examSecondsLeft=0;
+  await showView(destination);
+}
+async function showView(name){
+  if(isTryoutNavigationGuarded(name)){
+    openTryoutLeaveModal(name);
+    return;
+  }
+  document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
+  const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);
+  if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}
+  if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')
+}
 async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('app').classList.add('sa-app-shell');el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.allSettled([loadHome(),loadTryouts(),loadLive(),loadDashboard(),loadProfile(),loadRanking('overall'),loadFavoriteIds(),loadNotifications(),loadPremium()]);await loadSaHomePanels();refreshPublishedIcons();loadProfileAndHeader().catch(()=>{});setSaActive('home')}
 
 </script>
@@ -1625,10 +1684,6 @@ showView=async function(name){
   };
 
   window.showView = async function(name){
-    /* Saat Tryout aktif, navigasi utama dikonfirmasi agar ujian tidak keluar tanpa sengaja. */
-    if(['home','activities','premium'].includes(name) && typeof window.requestTryoutNavigation==='function' && window.requestTryoutNavigation(name)){
-      return;
-    }
     if(name==='home'){
       document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));
       const home=document.getElementById('view-home');
@@ -2537,8 +2592,6 @@ td{color:#102b4d!important}
 .sa-review-focus{margin-top:12px}
 @media(max-width:900px){.sa-cbt-layout{grid-template-columns:1fr}.sa-cbt-side{position:static;order:-1}.sa-cbt-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(8,minmax(0,1fr))}}
 @media(max-width:600px){.sa-cbt-question-card{padding:17px}.sa-cbt-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-review-numbers{grid-template-columns:repeat(5,minmax(0,1fr))}.sa-cbt-side{border-radius:16px}}
-
-.sa-finish-modal{position:fixed;inset:0;z-index:99999;display:none;align-items:center;justify-content:center;padding:18px;background:rgba(7,18,36,.58);backdrop-filter:blur(7px)}.sa-finish-modal.show{display:flex}.sa-finish-dialog{width:min(480px,100%);border-radius:24px;background:#fff;box-shadow:0 28px 80px rgba(7,18,36,.28);overflow:hidden;animation:saFinishPop .18s ease-out}@keyframes saFinishPop{from{opacity:0;transform:translateY(10px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}.sa-finish-top{padding:24px 24px 16px;background:linear-gradient(135deg,#10233f,#155eef);color:#fff}.sa-finish-kicker{font-size:11px;font-weight:900;letter-spacing:.12em;opacity:.78}.sa-finish-title{margin:7px 0 0;font-size:24px;font-weight:900}.sa-finish-body{padding:20px 24px 24px;color:#334155}.sa-finish-body p{margin:0 0 16px;line-height:1.55}.sa-finish-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:9px;margin:14px 0 18px}.sa-finish-stat{padding:12px 8px;border:1px solid #dbe5f1;border-radius:14px;background:#f8fafc;text-align:center}.sa-finish-stat b{display:block;font-size:19px;color:#10233f}.sa-finish-stat span{font-size:10px;color:#64748b;font-weight:800}.sa-finish-warning{padding:11px 13px;border-radius:13px;background:#fff7e6;color:#9a6700;font-size:12px;font-weight:700;margin-bottom:18px}.sa-finish-actions{display:flex;justify-content:flex-end;gap:10px;flex-wrap:wrap}.sa-finish-confirm{background:#0f766e!important;color:#fff!important;border:0!important}@media(max-width:520px){.sa-finish-dialog{border-radius:20px}.sa-finish-top{padding:20px}.sa-finish-body{padding:18px}.sa-finish-stats{gap:6px}.sa-finish-actions{display:grid;grid-template-columns:1fr}.sa-finish-actions button{width:100%}}
 </style>
 <script id="siap-asn-cbt-navigation-engine">
 /* === SIAP ASN CBT NAVIGATION ENGINE === */
@@ -2552,59 +2605,6 @@ td{color:#102b4d!important}
   let practiceCompleted=false;
   let practiceSnapshot=null;
 
-  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
-  let pendingFinish=null;
-  function hideFinishModal(){const m=document.getElementById('saFinishConfirmModal');if(m)m.classList.remove('show');pendingFinish=null;}
-  function showFinishConfirm(kind){const isExam=kind==='exam';const rows=isExam?(window.examQuestions||[]):(window.practiceState?.rows||[]);const answerMap=isExam?(window.answers||{}):(window.practiceState?.answers||{});if(!rows.length)return;const answered=rows.filter(q=>!!answerMap[q.id]).length,blank=rows.length-answered;const m=ensureFinishModal();document.getElementById('saFinishTitle').textContent=isExam?'Selesaikan Tryout?':'Selesaikan Latihan?';document.getElementById('saFinishText').textContent=isExam?'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil akan diproses dan rekap akan ditampilkan.':'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil dan pembahasan dapat dilihat pada rekap.';document.getElementById('saFinishAnswered').textContent=answered;document.getElementById('saFinishBlank').textContent=blank;document.getElementById('saFinishTotal').textContent=rows.length;const warn=document.getElementById('saFinishWarning');if(blank>0){warn.style.display='block';warn.textContent='⚠ Masih ada '+blank+' soal yang belum dijawab. Kamu tetap bisa menyelesaikan sekarang atau kembali mengerjakan.';}else warn.style.display='none';pendingFinish=kind;document.getElementById('saFinishCancel').onclick=hideFinishModal;document.getElementById('saFinishConfirm').onclick=()=>{const k=pendingFinish;hideFinishModal();if(k==='exam')window.finishExam();else window.completePracticeNow();};m.classList.add('show');}
-  window.requestFinishExam=function(){showFinishConfirm('exam');};
-  window.requestFinishPractice=function(){showFinishConfirm('practice');};
-
-  /* Konfirmasi khusus jika peserta mencoba meninggalkan Tryout lewat Beranda/Aktivitas/Pembelian. */
-  let pendingTryoutNavigation=null;
-  function ensureTryoutLeaveModal(){
-    let modal=document.getElementById('saTryoutLeaveModal');
-    if(modal)return modal;
-    modal=document.createElement('div');
-    modal.id='saTryoutLeaveModal';
-    modal.className='sa-finish-modal';
-    modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saTryoutLeaveTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">TRYOUT SEDANG BERLANGSUNG</div><div id="saTryoutLeaveTitle" class="sa-finish-title">Keluar dari Tryout?</div></div><div class="sa-finish-body"><p>Kamu sedang mengerjakan Tryout. Jika keluar sekarang, Tryout yang sedang berlangsung akan dihentikan dan jawaban yang belum diselesaikan tidak dikirim sebagai hasil akhir.</p><div class="sa-finish-warning" style="display:block">⚠ Pastikan kamu benar-benar ingin meninggalkan Tryout.</div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saTryoutLeaveCancel">← Tetap Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saTryoutLeaveConfirm">Ya, Keluar dari Tryout</button></div></div></div>';
-    modal.addEventListener('click',e=>{if(e.target===modal)hideTryoutLeaveModal();});
-    document.body.appendChild(modal);
-    return modal;
-  }
-  function hideTryoutLeaveModal(){
-    const modal=document.getElementById('saTryoutLeaveModal');
-    if(modal)modal.classList.remove('show');
-    pendingTryoutNavigation=null;
-  }
-  window.requestTryoutNavigation=function(target){
-    const isExamActive=!!window.currentExam && !!document.getElementById('view-exam')?.classList.contains('active');
-    if(!isExamActive)return false;
-    const modal=ensureTryoutLeaveModal();
-    pendingTryoutNavigation=target;
-    modal.querySelector('#saTryoutLeaveCancel').onclick=hideTryoutLeaveModal;
-    modal.querySelector('#saTryoutLeaveConfirm').onclick=async()=>{
-      const destination=pendingTryoutNavigation;
-      hideTryoutLeaveModal();
-      clearInterval(window.timerInt);
-      window.currentExam=null;
-      window.examQuestions=[];
-      window.examIndex=0;
-      window.answers={};
-      window.examSecondsLeft=0;
-      if(destination) await window.showView(destination);
-    };
-    modal.classList.add('show');
-    return true;
-  };
-
-  document.addEventListener('keydown',e=>{
-    if(e.key==='Escape'){
-      if(document.getElementById('saFinishConfirmModal')?.classList.contains('show'))hideFinishModal();
-      if(document.getElementById('saTryoutLeaveModal')?.classList.contains('show'))hideTryoutLeaveModal();
-    }
-  });
-
   function escapeHtml(v){return String(v??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
   function getPracticeAnswered(i){const q=window.practiceState?.rows?.[i];return !!(q&&window.practiceState?.answers&&window.practiceState.answers[q.id]);}
   function buildExamNavigator(resultMode=false,reviewRows=[]){
@@ -2617,7 +2617,7 @@ td{color:#102b4d!important}
     const rows=window.examQuestions||[];
     const nums=rows.map((q,i)=>'<button type="button" class="sa-cbt-number '+(answers[q.id]?'done ':'')+(i===window.examIndex?'current':'')+'" onclick="jumpExam('+i+')">'+(i+1)+'</button>').join('');
     const done=rows.filter(q=>answers[q.id]).length;
-    return '<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+done+'/'+rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><button type="button" class="btn sa-cbt-finish" style="width:100%;margin-top:14px" onclick="requestFinishExam()">Akhiri Ujian</button><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Klik nomor mana pun untuk langsung membuka soal tersebut.</div></aside>';
+    return '<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+done+'/'+rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Klik nomor mana pun untuk langsung membuka soal tersebut.</div></aside>';
   }
   window.jumpExam=function(i){
     if(!window.examQuestions?.[i])return;
@@ -2630,7 +2630,7 @@ td{color:#102b4d!important}
     const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
     const area=document.getElementById('examArea'); if(!area)return;
     const selected=answers[q.id]||'';
-    const content='<div class="sa-cbt-question-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><div><span class="sa-kicker">TRYOUT</span><div class="sa-subcategory">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+'</div></div><span class="sa-cbt-status">'+(selected?'Sudah dijawab':'Belum dijawab')+'</span></div><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choose('+JSON.stringify(q.id)+','+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.examIndex>0?'<button type="button" class="btn dark" onclick="prevQ()">← Sebelumnya</button>':'')+(window.examIndex<window.examQuestions.length-1?'<button type="button" class="btn primary" onclick="nextQ()">Berikutnya →</button>':'')+'<button type="button" class="btn sa-cbt-finish" onclick="requestFinishExam()">Akhiri Ujian</button>'+'</div></div></div>';
+    const content='<div class="sa-cbt-question-card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px"><div><span class="sa-kicker">TRYOUT</span><div class="sa-subcategory">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+'</div></div><span class="sa-cbt-status">'+(selected?'Sudah dijawab':'Belum dijawab')+'</span></div><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choose('+JSON.stringify(q.id)+','+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.examIndex+1)+' dari '+window.examQuestions.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.examIndex>0?'<button type="button" class="btn dark" onclick="prevQ()">← Sebelumnya</button>':'')+(window.examIndex<window.examQuestions.length-1?'<button type="button" class="btn primary" onclick="nextQ()">Berikutnya →</button>':'<button type="button" class="btn sa-cbt-finish" onclick="finishExam()">Selesai & Lihat Rekap</button>')+'</div></div></div>';
     area.innerHTML=getExamLayoutHtml(content,buildExamNavigator(false));
     const timer=document.getElementById('examTimer');
     if(timer){timer.textContent=Math.floor(Math.max(0,window.examSecondsLeft||0)/60)+':'+String(Math.max(0,window.examSecondsLeft||0)%60).padStart(2,'0');}
@@ -2638,7 +2638,7 @@ td{color:#102b4d!important}
 
   window.choose=function(id,k){answers[id]=k;window.renderQuestion();};
   window.prevQ=function(){if(window.examIndex>0){window.examIndex--;window.renderQuestion();}};
-  window.nextQ=function(){if(window.examIndex<window.examQuestions.length-1){window.examIndex++;window.renderQuestion();}else{window.requestFinishExam();}};
+  window.nextQ=function(){if(window.examIndex<window.examQuestions.length-1){window.examIndex++;window.renderQuestion();}else{window.finishExam();}};
 
   window.startExam=async function(id){
     examFinishing=false;
@@ -2691,9 +2691,9 @@ td{color:#102b4d!important}
     const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
     const selected=window.practiceState.answers[q.id]||'';
     const label=window.practiceState.target==='drilling'?'DRILLING':'LATSOL';
-    const content='<div class="sa-exam-head"><div><span class="sa-kicker">'+label+'</span>'+(q.subcategory?'<div class="sa-subcategory">'+escapeHtml(q.subcategory)+'</div>':'')+'<h2 style="margin:5px 0">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+'</h2><p>'+escapeHtml(window.practiceState.title)+'</p></div><button class="sa-outline-btn" onclick="'+(window.practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()')+'">Keluar</button></div><div class="sa-cbt-question-card"><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choosePractice('+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.practiceState.index>0?'<button type="button" class="btn dark" onclick="prevPractice()">← Sebelumnya</button>':'')+(window.practiceState.index<window.practiceState.rows.length-1?'<button type="button" class="btn primary" onclick="nextPractice()">Berikutnya →</button>':'')+'<button type="button" class="btn sa-cbt-finish" onclick="requestFinishPractice()">Akhiri Latihan</button>'+'</div></div></div>';
+    const content='<div class="sa-exam-head"><div><span class="sa-kicker">'+label+'</span>'+(q.subcategory?'<div class="sa-subcategory">'+escapeHtml(q.subcategory)+'</div>':'')+'<h2 style="margin:5px 0">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+'</h2><p>'+escapeHtml(window.practiceState.title)+'</p></div><button class="sa-outline-btn" onclick="'+(window.practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()')+'">Keluar</button></div><div class="sa-cbt-question-card"><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick="choosePractice('+JSON.stringify(k)+')">'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.practiceState.index>0?'<button type="button" class="btn dark" onclick="prevPractice()">← Sebelumnya</button>':'')+(window.practiceState.index<window.practiceState.rows.length-1?'<button type="button" class="btn primary" onclick="nextPractice()">Berikutnya →</button>':'<button type="button" class="btn sa-cbt-finish" onclick="nextPractice()">Selesai & Lihat Rekap</button>')+'</div></div></div>';
     const nums=window.practiceState.rows.map((rq,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[rq.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
-    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+window.practiceState.rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><button type="button" class="btn sa-cbt-finish" style="width:100%;margin-top:14px" onclick="requestFinishPractice()">Akhiri Latihan</button><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Pembahasan dan warna hasil baru muncul setelah selesai.</div></aside>';
+    const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+window.practiceState.rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Pembahasan dan warna hasil baru muncul setelah selesai.</div></aside>';
     a.innerHTML='<div class="sa-cbt-layout"><div class="sa-cbt-main">'+content+'</div>'+side+'</div>';
   };
   window.choosePractice=function(k){
@@ -2701,11 +2701,9 @@ td{color:#102b4d!important}
     window.practiceState.answers[q.id]=k;window.practiceState.selected=k;window.renderPracticeQuestion();
   };
   window.prevPractice=function(){if(window.practiceState.index>0){window.practiceState.index--;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();}};
-  window.nextPractice=function(){
-    if(window.practiceState.index<window.practiceState.rows.length-1){window.practiceState.index++;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();}
-  };
-  window.completePracticeNow=async function(){
-    if(practiceFinishing||!window.practiceState?.sessionId)return;practiceFinishing=true;
+  window.nextPractice=async function(){
+    if(window.practiceState.index<window.practiceState.rows.length-1){window.practiceState.index++;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[window.practiceState.index].id]||null;window.renderPracticeQuestion();return;}
+    if(practiceFinishing)return;practiceFinishing=true;
     const snapshot={target:window.practiceState.target,title:window.practiceState.title,rows:window.practiceState.rows.slice(),answers:{...window.practiceState.answers},sessionId:window.practiceState.sessionId};
     const {data,error}=await sb.rpc('complete_practice_session',{p_session_id:window.practiceState.sessionId,p_answers:window.practiceState.answers,p_duration_seconds:0});
     if(error){practiceFinishing=false;alert(error.message);return}
