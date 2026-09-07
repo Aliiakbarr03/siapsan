@@ -2437,4 +2437,43 @@ td{color:#102b4d!important}
 .sa-drill-section h3,.sa-wow-section-title h2,.sa-home-promo h3{color:#103b73!important}
 </style>
 
+
+<style id="siap-asn-drill-icon-color-final">
+/* FINAL: icon tile tint follows each colored drilling card. Visual-only. */
+.sa-drill-mode .ico{
+  position:relative!important;z-index:3!important;
+  width:48px!important;height:48px!important;border-radius:15px!important;
+  display:grid!important;place-items:center!important;
+  margin-bottom:16px!important;font-size:21px!important;font-weight:900!important;
+  box-shadow:0 8px 16px rgba(16,52,88,.10)!important;
+  border:1px solid transparent!important;
+}
+.sa-drill-mode:nth-child(1) .ico{
+  background:linear-gradient(135deg,#d8efff 0%,#b9dcff 100%)!important;
+  color:#145f9f!important;border-color:#9ecbf5!important;
+}
+.sa-drill-mode:nth-child(2) .ico{
+  background:linear-gradient(135deg,#eee6ff 0%,#d8caff 100%)!important;
+  color:#5b43bf!important;border-color:#bfaef7!important;
+}
+.sa-drill-mode:nth-child(3) .ico{
+  background:linear-gradient(135deg,#ffe3e7 0%,#ffc6cd 100%)!important;
+  color:#a53140!important;border-color:#efabb6!important;
+}
+.sa-drill-mode:nth-child(4) .ico{
+  background:linear-gradient(135deg,#fff0c8 0%,#f4d687 100%)!important;
+  color:#93620b!important;border-color:#e4c15f!important;
+}
+/* Never let a later hover rule turn the icon tile white. */
+.sa-drill-mode:hover .ico,
+.sa-drill-mode:focus-visible .ico,
+.sa-drill-mode:active .ico{
+  color:inherit!important;
+}
+.sa-drill-mode:nth-child(1):hover .ico,.sa-drill-mode:nth-child(1):focus-visible .ico,.sa-drill-mode:nth-child(1):active .ico{color:#145f9f!important}
+.sa-drill-mode:nth-child(2):hover .ico,.sa-drill-mode:nth-child(2):focus-visible .ico,.sa-drill-mode:nth-child(2):active .ico{color:#5b43bf!important}
+.sa-drill-mode:nth-child(3):hover .ico,.sa-drill-mode:nth-child(3):focus-visible .ico,.sa-drill-mode:nth-child(3):active .ico{color:#a53140!important}
+.sa-drill-mode:nth-child(4):hover .ico,.sa-drill-mode:nth-child(4):focus-visible .ico,.sa-drill-mode:nth-child(4):active .ico{color:#93620b!important}
+</style>
+
 </body></html>
