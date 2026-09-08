@@ -176,7 +176,7 @@ body{font-family:Inter,DM Sans,system-ui,-apple-system,"Segoe UI",sans-serif!imp
 .sa-top-brand{display:flex;align-items:center;gap:11px;min-width:235px}.sa-top-brand span:last-child{display:grid;line-height:1.05}.sa-top-brand b{font:800 20px/1.1 "Plus Jakarta Sans",Inter,sans-serif;letter-spacing:-.03em}.sa-top-brand small{font-size:10px;color:#8a93a0;margin-top:4px}
 .sa-logo-mark{width:52px;height:52px;display:grid;place-items:center;font-size:12px;font-weight:900}
 .sa-logo-mark img{width:100%;height:100%;object-fit:contain;display:block}
-.sa-top-links{display:flex;align-items:center;gap:26px;flex:1}.sa-top-links button{background:none;border:0;padding:9px 3px;color:#535d6b;font-weight:700;cursor:pointer}.sa-top-links button:hover{color:var(--sa-purple)}
+.sa-top-links{display:flex;align-items:center;gap:26px;flex:1}.sa-top-links button{background:none;border:0;padding:9px 3px;color:#535d6b;font-weight:700;cursor:pointer}.sa-top-links button:hover{color:#102b4d!important;background:transparent!important}
 .sa-account-wrap{margin-left:auto}.sa-profile-trigger{border:1px solid #e6e8ed!important;background:#fff!important;border-radius:18px!important;min-width:175px;box-shadow:none!important}.sa-profile-trigger:hover{transform:none!important;box-shadow:0 5px 15px rgba(30,35,50,.08)!important}
 .sa-mobile-menu{display:none;border:0;background:#f2f3f6;border-radius:10px;width:40px;height:40px;cursor:pointer;font-size:19px}
 .sa-layout{max-width:1440px;margin:auto;display:grid;grid-template-columns:252px minmax(0,1fr);min-height:calc(100vh - 72px)}
@@ -944,9 +944,9 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
     </main>
   </div>
 </div>
-<div id="materialModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeMaterial()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAnalysis()"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
+<div id="materialModal" class="modal"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeMaterial()" aria-label="Tutup">×</button><div id="materialDetailArea"><div class="profile-loading">Memuat materi...</div></div><button class="btn dark" style="margin-top:12px" onclick="closeMaterial()">Tutup</button></div></div><div id="analysisModal" class="modal"><div class="modalbox" style="width:min(900px,100%)"><button class="modal-close-x" type="button" onclick="closeAnalysis()" aria-label="Tutup">×</button><h2 id="analysisTitle">Hasil Tryout</h2><div id="analysisSummary"></div><div id="analysisArea"></div><button class="btn dark" style="margin-top:12px" onclick="closeAnalysis()">Tutup</button></div></div>
 <div id="tryoutNavModal" class="tryout-nav-modal" role="dialog" aria-modal="true" aria-labelledby="tryoutNavTitle">
-  <div class="tryout-nav-card" onclick="event.stopPropagation()">
+  <div class="tryout-nav-card">
     <div class="tryout-nav-icon">⚠️</div>
     <h3 id="tryoutNavTitle">Tryout Sedang Berlangsung</h3>
     <p>Kamu sedang mengerjakan Tryout. Jika keluar sekarang, Tryout akan dihentikan.</p>
@@ -956,7 +956,7 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
     </div>
   </div>
 </div>
-<div id="authModal" class="modal" onclick="if(typeof event!=='undefined'&&event&&event.target===this)closeAuth()"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
+<div id="authModal" class="modal"><div class="modalbox"><button class="modal-close-x" type="button" onclick="closeAuth()" aria-label="Tutup">×</button><h2 id="authTitle">Masuk SIAP ASN</h2><input id="authEmail" type="email" placeholder="Email"><input id="authPassword" type="password" placeholder="Password minimal 6 karakter"><button id="authButton" class="btn primary" style="width:100%" onclick="submitAuth()">Masuk</button><p style="color:#aebed4">Belum punya akun? <a href="#" style="color:#21d4fd" onclick="toggleAuth();return false">Daftar sekarang</a></p><div id="authMsg" class="msg"></div></div></div>
 <script>
 
 /* === SHARED CATEGORY ICON RENDERER === */
@@ -1089,7 +1089,7 @@ function updateTopProfile(data,email){
   if(data?.avatar_url){img.src=data.avatar_url;img.style.display='block';fallback.style.display='none';}else{img.style.display='none';fallback.style.display='grid';fallback.textContent=name.charAt(0).toUpperCase()||'P';}
 }
 function toggleProfileMenu(force){const m=el('profileMenu');const open=typeof force==='boolean'?force:m.getAttribute('aria-hidden')==='true';m.setAttribute('aria-hidden',String(!open));m.classList.toggle('show',open)}
-document.addEventListener('click',e=>{const wrap=document.querySelector('.profile-menu-wrap');if(wrap&&!wrap.contains(e.target))toggleProfileMenu(false)});
+document.addEventListener('click',e=>{const wrap=document.querySelector('.profile-menu-wrap');if(wrap&&e?.target&&!wrap.contains(e.target))toggleProfileMenu(false)});
 function previewProfilePhoto(input){
   const file=input.files&&input.files[0];if(!file)return;
   const allowed=['image/jpeg','image/png','image/webp'];
@@ -1178,8 +1178,8 @@ function openPracticeResultReview(ctx,title){
  el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
  installReviewFilters(rows);
 }function closeAnalysis(){el('analysisModal').classList.remove('show')}
-el('analysisModal').addEventListener('click',e=>{if(e.target.id==='analysisModal')closeAnalysis()});
-el('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
+el('analysisModal').addEventListener('click',e=>{if(e?.target?.id==='analysisModal')closeAnalysis()});
+el('authModal').addEventListener('click',e=>{if(e?.target?.id==='authModal')closeAuth()});
 async function loadRanking(period){try{const [{data,error},{data:ud}]=await Promise.all([sb.rpc('get_ranking',{p_period:period,p_limit:50}),sb.auth.getUser()]);if(error)throw error;const me=ud?.user?.id;const rows=data||[];el('rankingArea').innerHTML=rows.length?'<div class="data-card">'+rows.map(r=>'<div class="rank-row"><div><b>#'+r.rank+'</b></div><div><b>'+safe(r.full_name||'Peserta')+'</b><div class="muted">'+r.attempt_count+' tryout</div></div><div><b>'+r.best_score+'</b></div><div>'+((r.user_id&&me===r.user_id)?'<span class="chip">Kamu</span>':'')+'</div></div>').join('')+'</div>':'<div class="data-card">Belum ada ranking.</div>'}catch(e){el('rankingArea').innerHTML='<div class="data-card">Gagal memuat ranking: '+safe(e.message)+'</div>'}}
 async function logout(){await sb.auth.signOut();location.reload()}
 sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()}).catch(console.error);
@@ -1298,8 +1298,8 @@ async function finishExam(){
  showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Total poin dihitung dengan bobot yang sama untuk TKP dan Tryout.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:examQuestions.length,totalPoints:result.total_points,maxPoints:result.max_points,reviewMode:'attempt',attemptId,reviewTitle:title});
  currentExam=null;
 }
-document.getElementById('materialModal').addEventListener('click',e=>{if(e.target.id==='materialModal')closeMaterial()});
-document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
+document.getElementById('materialModal').addEventListener('click',e=>{if(e?.target?.id==='materialModal')closeMaterial()});
+document.getElementById('authModal').addEventListener('click',e=>{if(e?.target?.id==='authModal')closeAuth()});
 
 /* === SIAP ASN MODERN LEARNING UX === */
 function toggleSaSidebar(forceState){
@@ -1495,7 +1495,7 @@ async function startLatsol(id){
     const sessionId=Array.isArray(sid)?sid[0]:sid;
     const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});
     if(error)throw error;
-    practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'};
+    practiceState={sessionId,rows:data||[],index:0,selected:null,answers:{},title:meta?.title||'Latsol',target:'latsols'}; window.practiceState=practiceState;
     if(!practiceState.rows.length)throw new Error('Paket Latsol belum memiliki soal.');
     renderPracticeQuestion();
   }catch(e){
@@ -1503,6 +1503,7 @@ async function startLatsol(id){
   }
 }
 function renderPracticeQuestion(){
+  if(!practiceState || !Array.isArray(practiceState.rows) || !practiceState.rows.length) return;
   const target=practiceState.target==='drilling'?'drillingArea':'latsolsArea';
   const a=el(target),q=practiceState.rows[practiceState.index];
   if(!a||!q)return;
@@ -1591,7 +1592,7 @@ async function startDrilling(mode){
   const sessionId=Array.isArray(sid)?sid[0]:sid;
   const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
   if(!(data||[]).length)throw new Error('Tidak ada soal yang berhasil dipilih.');
-  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};renderPracticeQuestion();
+  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'}; window.practiceState=practiceState; renderPracticeQuestion();
  }catch(e){a.innerHTML=`<div class="sa-drill-empty">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:14px" onclick="loadDrilling()">Kembali</button></div>`;}
 }
 
@@ -2454,16 +2455,23 @@ td{color:#102b4d!important}
 /* Final contrast guard for dynamic content */
 .sa-drill-hero-v2 .sa-drill-snapshot>div span,
 .sa-drill-hero-v2 .sa-drill-snapshot>div b{color:#fff!important}
-.sa-drill-indicators .sa-drill-indicator span,
-.sa-drill-indicators .sa-drill-indicator b,
-.sa-drill-indicators .sa-drill-indicator small{color:#fff!important}
+.sa-drill-indicators .sa-drill-indicator span{color:#344054!important}
+.sa-drill-indicators .sa-drill-indicator b{color:#102A43!important}
+.sa-drill-indicators .sa-drill-indicator small{color:#5f6b7a!important}
 .sa-drill-modes .sa-drill-mode h4,
 .sa-drill-modes .sa-drill-mode p,
 .sa-drill-modes .sa-drill-mode small{color:#fff!important}
 .sa-drill-modes .sa-drill-mode .ico{color:#fff!important}
 .sa-drill-secondary,.sa-drill-secondary:hover{color:#fff!important}
 .sa-drill-primary{color:#103b73!important}
-.sa-drill-mode:hover h4,.sa-drill-mode:hover p,.sa-drill-mode:hover small{color:#fff!important}
+.sa-drill-modes .sa-drill-mode:hover{background:#fff!important;color:#102A43!important;border:1px solid #cbd5e1!important;box-shadow:0 14px 30px rgba(16,42,67,.12)!important}
+.sa-drill-modes .sa-drill-mode:hover h4{color:#102A43!important}
+.sa-drill-modes .sa-drill-mode:hover p{color:#344054!important}
+.sa-drill-modes .sa-drill-mode:hover small{color:#52657a!important}
+.sa-drill-mode:nth-child(1):hover{background:#fff!important;color:#102A43!important;border-color:#cbd5e1!important}
+.sa-drill-mode:nth-child(2):hover{background:#fff!important;color:#102A43!important;border-color:#cbd5e1!important}
+.sa-drill-mode:nth-child(3):hover{background:#fff!important;color:#102A43!important;border-color:#cbd5e1!important}
+.sa-drill-mode:nth-child(4):hover{background:#fff!important;color:#102A43!important;border-color:#cbd5e1!important}
 .sa-course-card p,.sa-formation-card .agency,.sa-wow-card small,.sa-mini-tryout small{color:#294765!important}
 .sa-drill-section h3,.sa-wow-section-title h2,.sa-home-promo h3{color:#103b73!important}
 </style>
@@ -2567,7 +2575,7 @@ td{color:#102b4d!important}
   let practiceCompleted=false;
   let practiceSnapshot=null;
 
-  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
+  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e?.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
   let pendingFinish=null;
   function hideFinishModal(){const m=document.getElementById('saFinishConfirmModal');if(m)m.classList.remove('show');pendingFinish=null;}
   function showFinishConfirm(kind){const isExam=kind==='exam';const rows=isExam?(window.examQuestions||[]):(window.practiceState?.rows||[]);const answerMap=isExam?(window.answers||{}):(window.practiceState?.answers||{});if(!rows.length)return;const answered=rows.filter(q=>!!answerMap[q.id]).length,blank=rows.length-answered;const m=ensureFinishModal();document.getElementById('saFinishTitle').textContent=isExam?'Selesaikan Tryout?':'Selesaikan Latihan?';document.getElementById('saFinishText').textContent=isExam?'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil akan diproses dan rekap akan ditampilkan.':'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil dan pembahasan dapat dilihat pada rekap.';document.getElementById('saFinishAnswered').textContent=answered;document.getElementById('saFinishBlank').textContent=blank;document.getElementById('saFinishTotal').textContent=rows.length;const warn=document.getElementById('saFinishWarning');if(blank>0){warn.style.display='block';warn.textContent='⚠ Masih ada '+blank+' soal yang belum dijawab. Kamu tetap bisa menyelesaikan sekarang atau kembali mengerjakan.';}else warn.style.display='none';pendingFinish=kind;document.getElementById('saFinishCancel').onclick=hideFinishModal;document.getElementById('saFinishConfirm').onclick=()=>{const k=pendingFinish;hideFinishModal();if(k==='exam')window.finishExam();else window.completePracticeNow();};m.classList.add('show');}
@@ -2656,11 +2664,13 @@ td{color:#102b4d!important}
     window.practiceState.index=i;window.practiceState.selected=window.practiceState.answers[window.practiceState.rows[i].id]||null;window.renderPracticeQuestion();
   };
   window.renderPracticeQuestion=function(){
-    const target=window.practiceState.target==='drilling'?'drillingArea':'latsolsArea';
-    const a=document.getElementById(target),q=window.practiceState.rows?.[window.practiceState.index]; if(!a||!q)return;
+    const state=window.practiceState;
+    if(!state || !Array.isArray(state.rows) || !state.rows.length) return;
+    const target=state.target==='drilling'?'drillingArea':'latsolsArea';
+    const a=document.getElementById(target),q=state.rows?.[state.index]; if(!a||!q)return;
     const opts=['A','B','C','D','E'].filter(k=>q['option_'+k.toLowerCase()]);
-    const selected=window.practiceState.answers[q.id]||'';
-    const label=window.practiceState.target==='drilling'?'DRILLING':'LATSOL';
+    const selected=state.answers[q.id]||'';
+    const label=state.target==='drilling'?'DRILLING':'LATSOL';
     const content='<div class="sa-exam-head"><div><span class="sa-kicker">'+label+'</span>'+(q.subcategory?'<div class="sa-subcategory">'+escapeHtml(q.subcategory)+'</div>':'')+'<h2 style="margin:5px 0">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+'</h2><p>'+escapeHtml(window.practiceState.title)+'</p></div><button class="sa-outline-btn" onclick="'+(window.practiceState.target==='drilling'?'loadDrilling()':'loadLatsols()')+'">Keluar</button></div><div class="sa-cbt-question-card"><div class="question">'+escapeHtml(q.question_text)+'</div>'+opts.map(k=>'<button type="button" class="sa-cbt-option '+(selected===k?'selected':'')+'" onclick=\'choosePractice('+JSON.stringify(k)+')\'>'+k+'. '+escapeHtml(q['option_'+k.toLowerCase()])+'</button>').join('')+'<div class="sa-cbt-footer"><span class="sa-cbt-status">Soal '+(window.practiceState.index+1)+' dari '+window.practiceState.rows.length+' • '+(selected?'Sudah dijawab':'Belum dijawab')+'</span><div class="sa-cbt-actions">'+(window.practiceState.index>0?'<button type="button" class="btn dark" onclick="prevPractice()">← Sebelumnya</button>':'')+(window.practiceState.index<window.practiceState.rows.length-1?'<button type="button" class="btn primary" onclick="nextPractice()">Berikutnya →</button>':'')+'<button type="button" class="btn sa-cbt-finish" onclick="requestFinishPractice()">Akhiri Latihan</button>'+'</div></div></div>';
     const nums=window.practiceState.rows.map((rq,i)=>'<button type="button" class="sa-cbt-number '+(window.practiceState.answers[rq.id]?'done ':'')+(i===window.practiceState.index?'current':'')+'" onclick="jumpPractice('+i+')">'+(i+1)+'</button>').join('');
     const side='<aside class="sa-cbt-side"><div class="sa-cbt-side-head"><b>Nomor Soal</b><span>'+Object.keys(window.practiceState.answers||{}).length+'/'+window.practiceState.rows.length+' terjawab</span></div><div class="sa-cbt-legend"><span><i class="sa-cbt-dot done"></i>Sudah dijawab</span><span><i class="sa-cbt-dot"></i>Belum</span></div><div class="sa-cbt-numbers">'+nums+'</div><button type="button" class="btn sa-cbt-finish" style="width:100%;margin-top:14px" onclick="requestFinishPractice()">Akhiri Latihan</button><div class="sa-cbt-summary"><b>Tips:</b> Kamu bebas berpindah soal. Pembahasan dan warna hasil baru muncul setelah selesai.</div></aside>';
