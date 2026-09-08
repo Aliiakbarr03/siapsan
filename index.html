@@ -1599,7 +1599,7 @@ async function startDrilling(mode){
   const sessionId=Array.isArray(sid)?sid[0]:sid;
   const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
   if(!(data||[]).length)throw new Error('Tidak ada soal yang berhasil dipilih.');
-  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};window.practiceState=practiceState;renderPracticeQuestion();
+  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};renderPracticeQuestion();
  }catch(e){a.innerHTML=`<div class="sa-drill-empty">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:14px" onclick="loadDrilling()">Kembali</button></div>`;}
 }
 
