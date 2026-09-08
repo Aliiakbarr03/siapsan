@@ -1147,61 +1147,81 @@ function updateTopProfile(data,email){
 }
 function toggleProfileMenu(force){const m=el('profileMenu');const open=typeof force==='boolean'?force:m.getAttribute('aria-hidden')==='true';m.setAttribute('aria-hidden',String(!open));m.classList.toggle('show',open)}
 document.addEventListener('click',e=>{const wrap=document.querySelector('.profile-menu-wrap');const clickTarget=e?.target;if(wrap&&clickTarget&&!wrap.contains(clickTarget))toggleProfileMenu(false)});
+function profileMsg(text,type='ok'){
+  const box=el('profileMsg');
+  if(box){box.textContent=text||'';box.className='notice '+(type==='err'?'err':'ok');}
+}
+function profilePopup(title,text,type='ok'){
+  let m=document.getElementById('profileSavePopup');
+  if(!m){
+    m=document.createElement('div');m.id='profileSavePopup';
+    m.style.cssText='position:fixed;inset:0;background:rgba(7,20,45,.48);display:none;align-items:center;justify-content:center;padding:20px;z-index:99999';
+    m.innerHTML='<div style="width:min(420px,100%);background:#fff;border-radius:22px;padding:26px;box-shadow:0 24px 70px rgba(0,0,0,.25);text-align:center"><div id="profilePopupIcon" style="font-size:42px;margin-bottom:8px"></div><h3 id="profilePopupTitle" style="margin:0 0 8px;color:#0f172a"></h3><p id="profilePopupText" style="margin:0 0 20px;color:#64748b;line-height:1.55"></p><button type="button" class="btn primary" id="profilePopupClose">OK</button></div>';
+    document.body.appendChild(m);
+    m.addEventListener('click',e=>{if(e.target===m)m.style.display='none'});
+    document.getElementById('profilePopupClose').onclick=()=>m.style.display='none';
+  }
+  document.getElementById('profilePopupIcon').textContent=type==='err'?'⚠️':'✅';
+  document.getElementById('profilePopupTitle').textContent=title;
+  document.getElementById('profilePopupText').textContent=text;
+  m.style.display='flex';
+}
+function withProfileTimeout(promise,ms=15000){
+  let timer;
+  const timeout=new Promise((_,reject)=>{timer=setTimeout(()=>reject(new Error('Proses terlalu lama. Periksa koneksi internet lalu coba lagi.')),ms)});
+  return Promise.race([promise,timeout]).finally(()=>clearTimeout(timer));
+}
 function previewProfilePhoto(input){
-  const file=input.files&&input.files[0];if(!file)return;
+  const file=input?.files?.[0];if(!file)return;
   const allowed=['image/jpeg','image/png','image/webp'];
-  if(!allowed.includes(file.type)){msg('profileMsg','Foto harus JPG, PNG, atau WEBP.','err');input.value='';return;}
-  if(file.size>2*1024*1024){msg('profileMsg','Ukuran foto maksimal 2 MB.','err');input.value='';return;}
-  const url=URL.createObjectURL(file);const img=el('profileAvatarPreview');img.src=url;img.style.display='block';el('profileAvatarFallback').style.display='none';
+  if(!allowed.includes(file.type)){profileMsg('Foto harus JPG, PNG, atau WEBP.','err');input.value='';return;}
+  if(file.size>2*1024*1024){profileMsg('Ukuran foto maksimal 2 MB.','err');input.value='';return;}
+  const url=URL.createObjectURL(file),img=el('profileAvatarPreview');
+  if(img){img.src=url;img.style.display='block';}const fb=el('profileAvatarFallback');if(fb)fb.style.display='none';
 }
 async function saveProfile(){
   const btn=el('saveProfileBtn');
   const originalText=btn?.textContent||'Simpan Profil';
   try{
-    const {data:{user},error:userError}=await sb.auth.getUser();
-    if(userError) throw userError;
-    if(!user) throw new Error('Sesi login tidak ditemukan.');
-    const fullName=el('pfFullName')?.value.trim()||'';
+    profileMsg('');
+    const auth=await withProfileTimeout(sb.auth.getUser());
+    const user=auth?.data?.user;
+    if(auth?.error) throw auth.error;
+    if(!user) throw new Error('Sesi login tidak ditemukan. Silakan login kembali.');
+    const fullName=el('pfFullName')?.value?.trim()||'';
     if(!fullName) throw new Error('Nama lengkap wajib diisi.');
+    if(btn){btn.disabled=true;btn.textContent='Menyimpan...';}
+    let avatarUrl=null;
+    const preview=el('profileAvatarPreview');
+    const currentSrc=preview?.getAttribute('src')||'';
+    if(currentSrc && !currentSrc.startsWith('blob:')) avatarUrl=currentSrc;
     const file=el('pfAvatarFile')?.files?.[0];
     if(file){
       const allowed=['image/jpeg','image/png','image/webp'];
       if(!allowed.includes(file.type)) throw new Error('Foto harus JPG, PNG, atau WEBP.');
       if(file.size>2*1024*1024) throw new Error('Ukuran foto maksimal 2 MB.');
-    }
-    if(btn){btn.disabled=true;btn.textContent='Menyimpan...';}
-    let avatarUrl=el('profileAvatarPreview')?.getAttribute('src')||null;
-    if(file){
       const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
       const path=user.id+'/profile.'+ext;
-      const {error:upErr}=await sb.storage.from('avatars').upload(path,file,{cacheControl:'3600',upsert:true,contentType:file.type});
-      if(upErr) throw upErr;
+      const up=await withProfileTimeout(sb.storage.from('avatars').upload(path,file,{cacheControl:'3600',upsert:true,contentType:file.type}),20000);
+      if(up?.error) throw up.error;
       avatarUrl=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl+'?v='+Date.now();
     }
-    const payload={
-      full_name:fullName,
-      phone:el('pfPhone')?.value.trim()||null,
-      birth_date:el('pfBirthDate')?.value||null,
-      gender:el('pfGender')?.value||null,
-      domicile:el('pfDomicile')?.value.trim()||null,
-      education:el('pfEducation')?.value||null,
-      target_formasi:el('pfTargetFormasi')?.value.trim()||null,
-      avatar_url:avatarUrl
-    };
-    // Pakai UPDATE langsung ke tabel profiles: RPC update_my_profile tidak tersedia di project ini.
-    const {data:updated,error}=await sb.from('profiles').update(payload).eq('id',user.id).select('id,full_name,avatar_url,phone,birth_date,gender,domicile,education,target_formasi,membership,membership_expires_at,created_at').maybeSingle();
-    if(error) throw error;
-    if(!updated) throw new Error('Profil tidak ditemukan untuk diperbarui. Silakan login ulang.');
+    const payload={id:user.id,full_name:fullName,phone:el('pfPhone')?.value?.trim()||null,birth_date:el('pfBirthDate')?.value||null,gender:el('pfGender')?.value||null,domicile:el('pfDomicile')?.value?.trim()||null,education:el('pfEducation')?.value||null,target_formasi:el('pfTargetFormasi')?.value?.trim()||null};
+    if(avatarUrl) payload.avatar_url=avatarUrl;
+    const saved=await withProfileTimeout(sb.from('profiles').upsert(payload,{onConflict:'id'}).select('id,full_name,avatar_url,phone,birth_date,gender,domicile,education,target_formasi,membership,membership_expires_at,created_at').single(),20000);
+    if(saved?.error) throw saved.error;
+    const updated=saved.data;
     updateTopProfile(updated,user.email);
-    const userNameEl=el('userName'); if(userNameEl) userNameEl.textContent=updated.full_name||user.email.split('@')[0];
-    msg('profileMsg','Profil berhasil disimpan.','ok');
+    const userNameEl=el('userName');if(userNameEl)userNameEl.textContent=updated.full_name||user.email.split('@')[0];
     profileEditMode=false;
-    if(btn) btn.textContent='Tersimpan ✓';
-    setTimeout(()=>loadProfile(),500);
+    profileMsg('Profil berhasil disimpan.','ok');
+    profilePopup('Profil berhasil disimpan','Data profil kamu sudah tersimpan dengan aman.','ok');
+    await loadProfile();
   }catch(e){
-    msg('profileMsg',e?.message||'Gagal menyimpan profil.','err');
-    if(btn) btn.textContent=originalText;
-  }finally{if(btn) btn.disabled=false;}
+    const message=e?.message||'Gagal menyimpan profil.';
+    profileMsg(message,'err');
+    profilePopup('Gagal menyimpan profil',message,'err');
+  }finally{if(btn){btn.disabled=false;btn.textContent=originalText;}}
 }
 async function loadHistory(){try{const {data,error}=await sb.rpc('get_my_tryout_history',{p_limit:50});if(error)throw error;const rows=data||[];if(!rows.length){el('historyArea').innerHTML='<div class="data-card">Belum ada riwayat tryout.</div>';return}el('historyArea').innerHTML=rows.map(r=>'<div class="data-card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>'+safe(r.title)+'</h3><div class="chip">'+new Date(r.submitted_at).toLocaleString('id-ID')+'</div></div><div class="score-big" style="font-size:32px">'+(r.score??0)+'</div></div><p>'+(r.total_points!=null?('Total Poin <b>'+r.total_points+'</b>'+(r.max_points!=null?' / <b>'+r.max_points+'</b>':'')+' • '):'')+'Benar/Optimal <b>'+r.correct_count+'</b> • Perlu Evaluasi <b>'+r.wrong_count+'</b> • Kosong <b>'+r.unanswered_count+'</b> • '+Math.round((r.duration_seconds||0)/60)+' menit</p><button class="btn primary" onclick="openAnalysis(\''+r.attempt_id+'\',\''+safe(r.title).replace(/'/g,'&#39;')+'\')">Lihat Analisis</button></div>').join('')}catch(e){el('historyArea').innerHTML='<div class="data-card">Gagal memuat riwayat: '+safe(e.message)+'</div>'}}
 function renderReviewRows(review,filter='all'){
