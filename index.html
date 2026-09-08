@@ -1156,41 +1156,53 @@ function previewProfilePhoto(input){
 }
 async function saveProfile(){
   const btn=el('saveProfileBtn');
+  const originalText=btn?.textContent||'Simpan Profil';
   try{
-    const {data:{user}}=await sb.auth.getUser(); if(!user)throw new Error('Sesi login tidak ditemukan.');
+    const {data:{user},error:userError}=await sb.auth.getUser();
+    if(userError) throw userError;
+    if(!user) throw new Error('Sesi login tidak ditemukan.');
+    const fullName=el('pfFullName')?.value.trim()||'';
+    if(!fullName) throw new Error('Nama lengkap wajib diisi.');
     const file=el('pfAvatarFile')?.files?.[0];
     if(file){
       const allowed=['image/jpeg','image/png','image/webp'];
-      if(!allowed.includes(file.type))throw new Error('Foto harus JPG, PNG, atau WEBP.');
-      if(file.size>2*1024*1024)throw new Error('Ukuran foto maksimal 2 MB.');
+      if(!allowed.includes(file.type)) throw new Error('Foto harus JPG, PNG, atau WEBP.');
+      if(file.size>2*1024*1024) throw new Error('Ukuran foto maksimal 2 MB.');
     }
-    btn.disabled=true;btn.textContent='Menyimpan...';
+    if(btn){btn.disabled=true;btn.textContent='Menyimpan...';}
     let avatarUrl=el('profileAvatarPreview')?.getAttribute('src')||null;
     if(file){
       const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg';
       const path=user.id+'/profile.'+ext;
       const {error:upErr}=await sb.storage.from('avatars').upload(path,file,{cacheControl:'3600',upsert:true,contentType:file.type});
-      if(upErr)throw upErr;
+      if(upErr) throw upErr;
       avatarUrl=sb.storage.from('avatars').getPublicUrl(path).data.publicUrl+'?v='+Date.now();
     }
-    const params={
-      p_full_name:el('pfFullName').value.trim(),p_phone:el('pfPhone').value.trim()||null,p_birth_date:el('pfBirthDate').value||null,
-      p_gender:el('pfGender').value||null,p_domicile:el('pfDomicile').value.trim()||null,p_education:el('pfEducation').value||null,
-      p_target_formasi:el('pfTargetFormasi').value.trim()||null,p_avatar_url:avatarUrl
+    const payload={
+      full_name:fullName,
+      phone:el('pfPhone')?.value.trim()||null,
+      birth_date:el('pfBirthDate')?.value||null,
+      gender:el('pfGender')?.value||null,
+      domicile:el('pfDomicile')?.value.trim()||null,
+      education:el('pfEducation')?.value||null,
+      target_formasi:el('pfTargetFormasi')?.value.trim()||null,
+      avatar_url:avatarUrl
     };
-    const rpcPromise=sb.rpc('update_my_profile',params);
-    const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Penyimpanan profil terlalu lama. Silakan coba lagi.')),15000));
-    const {data,error}=await Promise.race([rpcPromise,timeoutPromise]);if(error)throw error;
-    if(data){
-      const updated=Array.isArray(data)?data[0]:data;
-      updateTopProfile(updated,user.email);
-    }
-    el('userName').textContent=params.p_full_name||user.email.split('@')[0];
+    // Pakai UPDATE langsung ke tabel profiles: RPC update_my_profile tidak tersedia di project ini.
+    const {data:updated,error}=await sb.from('profiles').update(payload).eq('id',user.id).select('id,full_name,avatar_url,phone,birth_date,gender,domicile,education,target_formasi,membership,membership_expires_at,created_at').maybeSingle();
+    if(error) throw error;
+    if(!updated) throw new Error('Profil tidak ditemukan untuk diperbarui. Silakan login ulang.');
+    updateTopProfile(updated,user.email);
+    const userNameEl=el('userName'); if(userNameEl) userNameEl.textContent=updated.full_name||user.email.split('@')[0];
     msg('profileMsg','Profil berhasil disimpan.','ok');
-    btn.textContent='Tersimpan';profileEditMode=false;setTimeout(()=>loadProfile(),700);
-  }catch(e){msg('profileMsg',e.message||'Gagal menyimpan profil.','err');btn.textContent='Simpan Perubahan'}finally{btn.disabled=false}
+    profileEditMode=false;
+    if(btn) btn.textContent='Tersimpan ✓';
+    setTimeout(()=>loadProfile(),500);
+  }catch(e){
+    msg('profileMsg',e?.message||'Gagal menyimpan profil.','err');
+    if(btn) btn.textContent=originalText;
+  }finally{if(btn) btn.disabled=false;}
 }
-
 async function loadHistory(){try{const {data,error}=await sb.rpc('get_my_tryout_history',{p_limit:50});if(error)throw error;const rows=data||[];if(!rows.length){el('historyArea').innerHTML='<div class="data-card">Belum ada riwayat tryout.</div>';return}el('historyArea').innerHTML=rows.map(r=>'<div class="data-card" style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;gap:12px;align-items:center"><div><h3>'+safe(r.title)+'</h3><div class="chip">'+new Date(r.submitted_at).toLocaleString('id-ID')+'</div></div><div class="score-big" style="font-size:32px">'+(r.score??0)+'</div></div><p>'+(r.total_points!=null?('Total Poin <b>'+r.total_points+'</b>'+(r.max_points!=null?' / <b>'+r.max_points+'</b>':'')+' • '):'')+'Benar/Optimal <b>'+r.correct_count+'</b> • Perlu Evaluasi <b>'+r.wrong_count+'</b> • Kosong <b>'+r.unanswered_count+'</b> • '+Math.round((r.duration_seconds||0)/60)+' menit</p><button class="btn primary" onclick="openAnalysis(\''+r.attempt_id+'\',\''+safe(r.title).replace(/'/g,'&#39;')+'\')">Lihat Analisis</button></div>').join('')}catch(e){el('historyArea').innerHTML='<div class="data-card">Gagal memuat riwayat: '+safe(e.message)+'</div>'}}
 function renderReviewRows(review,filter='all'){
  const rows=(review||[]).filter(q=>filter==='all'||(filter==='correct'?!!q.is_correct:!q.is_correct));
@@ -1693,6 +1705,8 @@ function openFreeDrilling(){
 window.startDrilling=async function(mode){
  mode=(typeof mode==='string'&&['free','adaptive','wrong','weakness'].includes(mode))?mode:'weakness';
  const a=el('drillingArea');if(!a)return;
+ // Pastikan engine CBT selalu punya state yang valid sebelum proses Drilling dimulai.
+ if(!window.practiceState || typeof window.practiceState!=='object') window.practiceState={sessionId:null,rows:[],index:0,selected:null,answers:{},title:'',target:'drilling'};
  const categoryId=mode==='free'?(el('drillCategory')?.value||null):null;
  const subcategory=mode==='free'?(el('drillSubcategory')?.value.trim()||null):null;
  const limit=mode==='free'?Number(el('drillLimit')?.value||10):10;
@@ -1703,7 +1717,7 @@ window.startDrilling=async function(mode){
   const sessionId=Array.isArray(sid)?sid[0]:sid;
   const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
   if(!(data||[]).length)throw new Error('Tidak ada soal yang berhasil dipilih.');
-  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};window.practiceState=practiceState;renderPracticeQuestion();
+  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};window.practiceState=practiceState;if(typeof window.renderPracticeQuestion==='function')window.renderPracticeQuestion();else renderPracticeQuestion();
  }catch(e){a.innerHTML=`<div class="sa-drill-empty">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:14px" onclick="loadDrilling()">Kembali</button></div>`;}
 }
 
