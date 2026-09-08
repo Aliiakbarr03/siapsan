@@ -833,6 +833,33 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
 }
 
 </style>
+
+<style id="siap-asn-material-5col-layout">
+/* MATERI ONLY — compact category cards, matching the Latsol layout. */
+#materialsArea{display:block!important;width:100%!important;min-width:0!important;}
+.sa-material-category{width:100%;display:block;margin:0 0 34px;}
+.sa-material-category-head{display:flex;align-items:end;justify-content:space-between;gap:16px;padding:0 2px 8px;border-bottom:1px solid #dfe6ee;margin-bottom:8px;}
+.sa-material-category-head h2{margin:2px 0 0;font-size:22px;line-height:1.1;}
+.sa-material-group-grid{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:12px;align-items:stretch;}
+.sa-material-group-grid>*{min-width:0;}
+.sa-material-card{min-height:0!important;padding:10px!important;display:flex!important;flex-direction:column!important;}
+.sa-material-card .sa-card-top{margin-bottom:7px!important;}
+.sa-material-card .sa-course-icon{width:30px!important;height:30px!important;border-radius:9px!important;font-size:15px!important;}
+.sa-material-card .sa-chip{font-size:9px!important;padding:5px 7px!important;}
+.sa-material-card-body{margin:0!important;min-height:0;}
+.sa-material-card h3{font-size:13px!important;line-height:1.25!important;margin:0 0 5px!important;min-height:32px;}
+.sa-material-card p{font-size:10px!important;line-height:1.45!important;margin:0 0 8px!important;min-height:30px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.sa-material-tags{display:flex;gap:5px;flex-wrap:wrap;min-height:25px;align-items:flex-start;}
+.sa-material-card .sa-latsol-stat{font-size:8px!important;padding:5px 7px!important;}
+.sa-material-progress{margin-top:auto!important;}
+.sa-material-meta{font-size:9px!important;margin-top:6px!important;margin-bottom:7px!important;}
+.sa-material-card .sa-card-action{font-size:11px!important;padding:8px 7px!important;margin-top:0!important;min-height:36px;}
+.sa-material-cover-compact{max-height:82px!important;object-fit:cover;border-radius:10px;margin-bottom:7px;}
+@media(max-width:1100px){.sa-material-group-grid{grid-template-columns:repeat(4,minmax(0,1fr));}}
+@media(max-width:900px){.sa-material-group-grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+@media(max-width:700px){.sa-material-group-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;}.sa-material-category{margin-bottom:26px;}}
+@media(max-width:460px){.sa-material-group-grid{grid-template-columns:1fr;}}
+</style>
 <style id="siap-asn-latsol-5col-layout">
 /* LATSOL LAYOUT ONLY — keep each card's existing design/content unchanged. */
 /* The outer container was also .sa-course-grid (2-col), so category sections were being placed side-by-side. */
@@ -1391,9 +1418,92 @@ async function loadHome(){
 
 function renderMaterials(rows){
   const area=document.getElementById('materialsArea');if(!area)return;
-  area.innerHTML=((rows||[]).map(x=>`<div class="sa-course-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">${x.cover_url?`<img class="material-cover" src="${safe(x.cover_url)}" alt="">`:''}<div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.icon||x.category_icon||'book-open')}</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:12px"><div class="sa-chip">${safe(x.category_name||'Materi')}</div>${x.subcategory?`<div class="sa-subcategory">${safe(x.subcategory)}</div>`:''}<h3>${safe(x.title)}</h3><p>${safe(x.summary||'')}</p></div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.progress_percent||0)))}%"></div></div><div class="sa-card-meta"><span>${Number(x.progress_percent||0)}% selesai</span><span>${safe(x.subcategory||x.category_name||'Materi')}</span></div><button class="sa-card-action" onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>=100?'Baca Lagi':'Mulai Belajar'} →</button></div>`).join('')||'<div class="sa-course-card">Belum ada materi yang tersedia.</div>');
+  const list=Array.isArray(rows)?rows:[];
+  if(!list.length){
+    area.innerHTML='<div class="sa-course-card">Belum ada materi yang tersedia.</div>';
+    refreshPublishedIcons();
+    return;
+  }
+
+  const preferred=['TWK','TIU','TKP'];
+  const getGroup=x=>{
+    const raw=String(x.category_name||'').trim();
+    if(raw)return raw.toUpperCase();
+    return 'LAINNYA';
+  };
+  const groups=new Map();
+  list.forEach(x=>{
+    const key=getGroup(x);
+    if(!groups.has(key))groups.set(key,[]);
+    groups.get(key).push(x);
+  });
+  const keys=[...groups.keys()].sort((a,b)=>{
+    const ia=preferred.indexOf(a),ib=preferred.indexOf(b);
+    if(ia===-1&&ib===-1)return a.localeCompare(b,'id');
+    if(ia===-1)return 1;if(ib===-1)return -1;return ia-ib;
+  });
+  const compactTitle=x=>{
+    const sub=String(x.subcategory||'').trim();
+    if(sub)return sub;
+    return String(x.title||'Materi')
+      .replace(/\s*[—–-]\s*Materi Lengkap SKD CPNS\s*/ig,'')
+      .replace(/\s+Materi Lengkap SKD CPNS\s*/ig,'')
+      .trim()||'Materi';
+  };
+  const shortText=v=>{
+    const s=String(v||'').trim();
+    if(!s)return 'Materi pembelajaran terstruktur.';
+    return s.length>82?s.slice(0,79).replace(/\s+$/,'')+'...':s;
+  };
+
+  area.innerHTML=keys.map(key=>{
+    const items=groups.get(key)||[];
+    const cards=items.map(x=>{
+      const progress=Math.max(0,Math.min(100,Number(x.progress_percent||0)));
+      const title=compactTitle(x);
+      return `<article class="sa-course-card sa-material-card material-item" data-search="${safe((x.title+' '+title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">
+        ${x.cover_url?`<img class="material-cover sa-material-cover-compact" src="${safe(x.cover_url)}" alt="">`:''}
+        <div class="sa-card-top">
+          <div class="sa-course-icon">${renderCategoryIcon(x.icon||x.category_icon||'book-open')}</div>
+          <span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Gratis'}</span>
+        </div>
+        <div class="sa-material-card-body">
+          <h3>${safe(title)}</h3>
+          <p>${safe(shortText(x.summary))}</p>
+          <div class="sa-material-tags">
+            <span class="sa-latsol-stat">${safe(key)}</span>
+            ${x.subcategory?`<span class="sa-latsol-stat">${safe(x.subcategory)}</span>`:''}
+          </div>
+        </div>
+        <div class="sa-progress-line sa-material-progress"><div style="width:${progress}%"></div></div>
+        <div class="sa-card-meta sa-material-meta"><span>${progress}% selesai</span><span>${progress>=100?'Selesai':'Belajar'}</span></div>
+        <button class="sa-card-action" onclick="openMaterial('${x.id}')">${progress>=100?'Baca Lagi':'Mulai Belajar'} →</button>
+      </article>`;
+    }).join('');
+    return `<section class="sa-material-category" data-material-category="${safe(key)}">
+      <div class="sa-material-category-head">
+        <div>
+          <span class="sa-latsol-category-kicker">BELAJAR TERSTRUKTUR</span>
+          <h2>${safe(key)}</h2>
+        </div>
+        <span class="sa-latsol-category-count">${items.length} Materi</span>
+      </div>
+      <div class="sa-material-group-grid">${cards}</div>
+    </section>`;
+  }).join('');
+  refreshPublishedIcons();
 }
-function filterMaterials(q){const s=String(q||'').trim().toLowerCase();document.querySelectorAll('.material-item').forEach(x=>{x.style.display=!s||x.dataset.search.includes(s)?'':'none'})}
+function filterMaterials(q){
+  const s=String(q||'').trim().toLowerCase();
+  document.querySelectorAll('.sa-material-category').forEach(group=>{
+    let visible=0;
+    group.querySelectorAll('.material-item').forEach(card=>{
+      const show=!s||(card.dataset.search||'').includes(s);
+      card.style.display=show?'':'none';if(show)visible++;
+    });
+    group.style.display=visible?'':'none';
+  });
+}
 async function loadMaterials(){const area=document.getElementById('materialsArea');if(area)area.innerHTML='<div class="sa-course-card">Memuat materi...</div>';try{const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});if(error)throw error;renderMaterials(data||[])}catch(e){if(area)area.innerHTML=`<div class="sa-course-card">Gagal memuat materi: ${safe(e.message)}</div>`}}
 async function loadTryouts(){const area=document.getElementById('tryoutsArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat tryout...</div>';try{const {data,error}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium,type,icon').in('status',['published','scheduled']).neq('type','live').order('created_at',{ascending:false});if(error)throw error;area.innerHTML=(data||[]).map(x=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">${renderCategoryIcon(x.icon||'trophy')}</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:13px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Simulasi untuk mengukur kemampuanmu.')}</p></div><div class="sa-card-meta" style="margin-top:12px"><span>${Number(x.duration_minutes||100)} menit</span><span>${x.type==='practice'?'Latihan':'Tryout'}</span></div><button class="sa-card-action" onclick="startExam('${x.id}')">Kerjakan Tryout →</button></div>`).join('')||'<div class="sa-course-card">Belum ada tryout.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat tryout: ${safe(e.message)}</div>`}}
 async function loadFavorites(){const area=document.getElementById('favoritesArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat favorit...</div>';try{const {data,error}=await sb.rpc('get_my_favorites');if(error)throw error;const rows=data||[];area.innerHTML=rows.length?rows.map(q=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">★</div><button class="favorite-btn active" onclick="toggleFavorite('${q.question_id}',this)">★</button></div><div style="margin-top:13px"><h3>${safe(q.category_name||'Soal')} · ${safe(String(q.type||'').toUpperCase())}</h3><p style="font-weight:700;color:#414a57;line-height:1.6">${safe(q.question_text)}</p></div><p class="muted"><b>A.</b> ${safe(q.option_a)}<br><b>B.</b> ${safe(q.option_b)}<br><b>C.</b> ${safe(q.option_c)}<br><b>D.</b> ${safe(q.option_d)}${q.option_e?'<br><b>E.</b> '+safe(q.option_e):''}</p><div class="payment-box" style="margin-top:12px"><b>Kunci: ${safe(q.correct_answer||'-')}</b><div class="muted" style="margin-top:5px">${safe(q.explanation||'Belum ada pembahasan.')}</div></div></div>`).join(''):'<div class="sa-course-card">Belum ada soal favorit.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat favorit: ${safe(e.message)}</div>`}}
