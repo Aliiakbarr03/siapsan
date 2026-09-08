@@ -850,6 +850,10 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
 @media(max-width:700px){.sa-latsol-group-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important;}}
 @media(max-width:460px){.sa-latsol-group-grid{grid-template-columns:1fr!important;}}
 </style>
+
+<style id="siap-asn-material-bookmark-style">
+.sa-material-bookmark-btn{border:1px solid #dfe6ee;background:#fff;color:#64748b;width:32px;height:32px;border-radius:10px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;transition:.2s;flex:0 0 auto}.sa-material-bookmark-btn:hover{transform:translateY(-1px);border-color:#f5b301;color:#b77900;background:#fff8dc}.sa-material-bookmark-btn.active{background:#fff3cd;border-color:#f0b429;color:#b77900}.sa-material-bookmark-btn i{width:16px;height:16px}.sa-material-bookmark-top{display:flex;align-items:center;justify-content:space-between;gap:8px}.sa-bookmark-empty{padding:28px;text-align:center;color:#64748b}.sa-bookmark-back{margin-left:auto}
+</style>
 </head><body>
 <div id="landing"><div class="container"><nav><div class="brand"><b>SIAP</b> ASN</div><div><button class="btn dark" onclick="openAuth(false)">Masuk</button> <button class="btn primary" onclick="openAuth(true)">Daftar Gratis</button></div></nav>
 <main class="hero"><div><span class="badge">🚀 PLATFORM PERSIAPAN SELEKSI ASN</span><h1>Belajar Lebih Siap.<br><span>Lulus Lebih Dekat.</span></h1><p class="lead">Tryout, Latsol, materi, analisis hasil, dan persiapan seleksi ASN dalam satu platform.</p><button class="btn primary" onclick="openAuth(true)">Mulai Sekarang →</button></div><div class="hero-card"><h2>🎯 Siapkan Dirimu Mulai Hari Ini</h2><p class="lead">2 tryout awal gratis. Premium membuka lebih banyak tryout dan konten.</p><div class="stats"><div class="stat"><b>2</b>Gratis</div><div class="stat"><b>15</b>Premium</div><div class="stat"><b>3 Hari</b>Update</div></div></div></main></div>
@@ -921,8 +925,13 @@ th{background:#edf3fb!important;color:#10233f!important;}td{border-color:#e1e8f0
 
       <div id="view-materials" class="view">
         <div class="sa-page-title"><div><span class="sa-kicker">BELAJAR</span><h1>Materi CPNS</h1><p>Belajar materi secara bertahap dan lihat progresmu di setiap kategori.</p></div></div>
-        <div class="sa-filterbar"><button class="sa-filter active" type="button">Semua materi</button><button class="sa-filter" type="button" onclick="showView('favorites')">★ Bookmark</button><input id="materialSearch" class="sa-search" oninput="filterMaterials(this.value)" placeholder="Cari materi..."></div>
+        <div class="sa-filterbar"><button class="sa-filter active" type="button">Semua materi</button><button class="sa-filter" type="button" onclick="showMaterialBookmarks()">★ Bookmark</button><input id="materialSearch" class="sa-search" oninput="filterMaterials(this.value)" placeholder="Cari materi..."></div>
         <div id="materialsArea" class="sa-course-grid"></div>
+      </div>
+
+      <div id="view-material-bookmarks" class="view">
+        <div class="sa-page-title"><div><span class="sa-kicker">MATERI TERSIMPAN</span><h1>Bookmark Materi</h1><p>Semua materi yang kamu tandai dengan bintang.</p></div><button class="sa-outline-btn sa-bookmark-back" onclick="showView('materials')">← Kembali ke Materi</button></div>
+        <div id="materialBookmarksArea" class="sa-course-grid"></div>
       </div>
 
       <div id="view-latsols" class="view">
@@ -1190,6 +1199,47 @@ async function logout(){await sb.auth.signOut();location.reload()}
 sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()}).catch(console.error);
 /* === SIAP ASN PARTICIPANT FEATURES === */
 let favoriteQuestionIds=new Set(),liveCountdownTimer=null,notificationRows=[];
+let materialBookmarkIds=new Set();
+let materialRowsCache=[];
+async function loadMaterialBookmarkIds(){
+  try{
+    const {data,error}=await sb.rpc('get_my_material_bookmark_ids');
+    if(error)throw error;
+    materialBookmarkIds=new Set((data||[]).map(x=>x.material_id));
+  }catch(e){
+    console.error('loadMaterialBookmarkIds',e);
+    materialBookmarkIds=new Set();
+  }
+}
+async function toggleMaterialBookmark(materialId,button){
+  try{
+    if(!materialId)return;
+    if(button)button.disabled=true;
+    const {data,error}=await sb.rpc('toggle_material_bookmark',{p_material_id:materialId});
+    if(error)throw error;
+    const active=Boolean(data);
+    if(active)materialBookmarkIds.add(materialId);else materialBookmarkIds.delete(materialId);
+    if(button){
+      button.classList.toggle('active',active);
+      button.dataset.bookmarked=active?'1':'0';
+      button.setAttribute('aria-label',active?'Hapus Bookmark':'Tambah Bookmark');
+      button.title=active?'Hapus Bookmark':'Tambah Bookmark';
+    }
+    refreshPublishedIcons();
+    if(document.getElementById('view-material-bookmarks')?.classList.contains('active'))renderMaterialBookmarks();
+  }catch(e){
+    alert(e.message||'Gagal menyimpan bookmark materi.');
+  }finally{
+    if(button)button.disabled=false;
+  }
+}
+function showMaterialBookmarks(){showView('material-bookmarks');}
+function renderMaterialBookmarks(){
+  const area=document.getElementById('materialBookmarksArea');
+  if(!area)return;
+  const rows=(materialRowsCache||[]).filter(x=>materialBookmarkIds.has(x.id));
+  renderMaterialsInto(area,rows,true);
+}
 async function loadFavoriteIds(){try{const {data:{user}}=await sb.auth.getUser();if(!user)return;const {data,error}=await sb.from('question_favorites').select('question_id').eq('user_id',user.id);if(error)throw error;favoriteQuestionIds=new Set((data||[]).map(x=>x.question_id))}catch(e){console.error(e)}}
 async function toggleFavorite(questionId,button){try{const {data,error}=await sb.rpc('toggle_question_favorite',{p_question_id:questionId});if(error)throw error;const active=Boolean(data);active?favoriteQuestionIds.add(questionId):favoriteQuestionIds.delete(questionId);if(button){button.classList.toggle('active',active);button.textContent=active?'★ Tersimpan':'☆ Favorit'}}catch(e){alert(e.message||'Gagal menyimpan favorit.')}}
 
@@ -1379,12 +1429,45 @@ async function loadHome(){
   }catch(e){console.warn('loadHome view',e)}
 }
 
-function renderMaterials(rows){
-  const area=document.getElementById('materialsArea');if(!area)return;
-  area.innerHTML=((rows||[]).map(x=>`<div class="sa-course-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">${x.cover_url?`<img class="material-cover" src="${safe(x.cover_url)}" alt="">`:''}<div class="sa-card-top"><div class="sa-course-icon">▦</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:12px"><div class="sa-chip">${safe(x.category_name||'Materi')}</div>${x.subcategory?`<div class="sa-subcategory">${safe(x.subcategory)}</div>`:''}<h3>${safe(x.title)}</h3><p>${safe(x.summary||'')}</p></div><div class="sa-progress-line"><div style="width:${Math.max(0,Math.min(100,Number(x.progress_percent||0)))}%"></div></div><div class="sa-card-meta"><span>${Number(x.progress_percent||0)}% selesai</span><span>${safe(x.subcategory||x.category_name||'Materi')}</span></div><button class="sa-card-action" onclick="openMaterial('${x.id}')">${Number(x.progress_percent||0)>=100?'Baca Lagi':'Mulai Belajar'} →</button></div>`).join('')||'<div class="sa-course-card">Belum ada materi yang tersedia.</div>');
+function materialCardMarkup(x){
+  const progress=Math.max(0,Math.min(100,Number(x.progress_percent||0)));
+  const active=materialBookmarkIds.has(x.id);
+  return `<div class="sa-course-card material-item" data-search="${safe((x.title+' '+(x.summary||'')+' '+(x.category_name||'')+' '+(x.subcategory||'')).toLowerCase())}">${x.cover_url?`<img class="material-cover" src="${safe(x.cover_url)}" alt="">`:''}<div class="sa-card-top sa-material-bookmark-top"><div class="sa-course-icon">${renderCategoryIcon(x.icon||x.category_icon||'book-open')}</div><div style="display:flex;gap:7px;align-items:center"><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span><button class="sa-material-bookmark-btn ${active?'active':''}" data-bookmarked="${active?'1':'0'}" type="button" title="${active?'Hapus Bookmark':'Tambah Bookmark'}" aria-label="${active?'Hapus Bookmark':'Tambah Bookmark'}" onclick="toggleMaterialBookmark('${x.id}',this)"><i data-lucide="star"></i></button></div></div><div style="margin-top:12px"><div class="sa-chip">${safe(x.category_name||'Materi')}</div>${x.subcategory?`<div class="sa-subcategory">${safe(x.subcategory)}</div>`:''}<h3>${safe(x.title)}</h3><p>${safe(x.summary||'')}</p></div><div class="sa-progress-line"><div style="width:${progress}%"></div></div><div class="sa-card-meta"><span>${progress}% selesai</span><span>${safe(x.subcategory||x.category_name||'Materi')}</span></div><button class="sa-card-action" onclick="openMaterial('${x.id}')">${progress>=100?'Baca Lagi':'Mulai Belajar'} →</button></div>`;
 }
-function filterMaterials(q){const s=String(q||'').trim().toLowerCase();document.querySelectorAll('.material-item').forEach(x=>{x.style.display=!s||x.dataset.search.includes(s)?'':'none'})}
-async function loadMaterials(){const area=document.getElementById('materialsArea');if(area)area.innerHTML='<div class="sa-course-card">Memuat materi...</div>';try{const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});if(error)throw error;renderMaterials(data||[])}catch(e){if(area)area.innerHTML=`<div class="sa-course-card">Gagal memuat materi: ${safe(e.message)}</div>`}}
+function renderMaterialsInto(area,rows,bookmarkMode=false){
+  const list=Array.isArray(rows)?rows:[];
+  if(!list.length){
+    area.innerHTML=bookmarkMode?'<div class="sa-course-card sa-bookmark-empty">Belum ada materi yang kamu bookmark. Klik ikon bintang pada card materi untuk menyimpannya di sini.</div>':'<div class="sa-course-card">Belum ada materi yang tersedia.</div>';
+    refreshPublishedIcons();
+    return;
+  }
+  area.innerHTML=list.map(materialCardMarkup).join('');
+  refreshPublishedIcons();
+}
+function renderMaterials(rows){
+  materialRowsCache=Array.isArray(rows)?rows:[];
+  const area=document.getElementById('materialsArea');
+  if(!area)return;
+  renderMaterialsInto(area,materialRowsCache,false);
+}
+function filterMaterials(q){
+  const s=String(q||'').trim().toLowerCase();
+  document.querySelectorAll('#materialsArea .material-item').forEach(x=>{
+    x.style.display=!s||(x.dataset.search||'').includes(s)?'':'none';
+  });
+}
+async function loadMaterials(){
+  const area=document.getElementById('materialsArea');
+  if(area)area.innerHTML='<div class="sa-course-card">Memuat materi...</div>';
+  try{
+    await loadMaterialBookmarkIds();
+    const {data,error}=await sb.rpc('get_my_materials',{p_search:null,p_category_id:null});
+    if(error)throw error;
+    renderMaterials(data||[]);
+  }catch(e){
+    if(area)area.innerHTML=`<div class="sa-course-card">Gagal memuat materi: ${safe(e.message)}</div>`;
+  }
+}
 async function loadTryouts(){const area=document.getElementById('tryoutsArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat tryout...</div>';try{const {data,error}=await sb.from('tryouts').select('id,title,description,duration_minutes,is_premium,type').in('status',['published','scheduled']).neq('type','live').order('created_at',{ascending:false});if(error)throw error;area.innerHTML=(data||[]).map(x=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">▤</div><span class="sa-chip ${x.is_premium?'premium':''}">${x.is_premium?'Premium':'Free'}</span></div><div style="margin-top:13px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Simulasi untuk mengukur kemampuanmu.')}</p></div><div class="sa-card-meta" style="margin-top:12px"><span>${Number(x.duration_minutes||100)} menit</span><span>${x.type==='practice'?'Latihan':'Tryout'}</span></div><button class="sa-card-action" onclick="startExam('${x.id}')">Kerjakan Tryout →</button></div>`).join('')||'<div class="sa-course-card">Belum ada tryout.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat tryout: ${safe(e.message)}</div>`}}
 async function loadFavorites(){const area=document.getElementById('favoritesArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat favorit...</div>';try{const {data,error}=await sb.rpc('get_my_favorites');if(error)throw error;const rows=data||[];area.innerHTML=rows.length?rows.map(q=>`<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon">★</div><button class="favorite-btn active" onclick="toggleFavorite('${q.question_id}',this)">★</button></div><div style="margin-top:13px"><h3>${safe(q.category_name||'Soal')} · ${safe(String(q.type||'').toUpperCase())}</h3><p style="font-weight:700;color:#414a57;line-height:1.6">${safe(q.question_text)}</p></div><p class="muted"><b>A.</b> ${safe(q.option_a)}<br><b>B.</b> ${safe(q.option_b)}<br><b>C.</b> ${safe(q.option_c)}<br><b>D.</b> ${safe(q.option_d)}${q.option_e?'<br><b>E.</b> '+safe(q.option_e):''}</p><div class="payment-box" style="margin-top:12px"><b>Kunci: ${safe(q.correct_answer||'-')}</b><div class="muted" style="margin-top:5px">${safe(q.explanation||'Belum ada pembahasan.')}</div></div></div>`).join(''):'<div class="sa-course-card">Belum ada soal favorit.</div>'}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat favorit: ${safe(e.message)}</div>`}}
 async function loadLive(){const area=document.getElementById('liveArea');if(!area)return;area.innerHTML='<div class="sa-course-card">Memuat jadwal...</div>';clearInterval(liveCountdownTimer);try{const {data,error}=await sb.rpc('get_my_live_tryouts');if(error)throw error;const rows=data||[];area.innerHTML=rows.length?rows.map(x=>{const now=Date.now(),s=new Date(x.starts_at).getTime(),en=new Date(x.ends_at).getTime(),st=now<s?'waiting':now<en?'live':'done';return `<div class="sa-course-card"><div class="sa-card-top"><div class="sa-course-icon" style="background:${st==='live'?'#eaf8f2':'#fff0f0'};color:${st==='live'?'#168260':'#d04a59'}">●</div><span class="live-status ${st}">${st==='waiting'?'Akan dimulai':st==='live'?'Sedang berlangsung':'Selesai'}</span></div><div style="margin-top:13px"><h3>${safe(x.title)}</h3><p>${safe(x.description||'Live Tryout SIAP ASN.')}</p></div><div class="sa-card-meta" style="margin-top:12px"><span>${new Date(x.starts_at).toLocaleString('id-ID')}</span><span>${Number(x.participant_count||0)} peserta</span></div><div class="live-countdown" id="livecd-${x.tryout_id}" style="margin-top:12px">${st==='waiting'?formatCountdown(s-now):st==='live'?formatCountdown(en-now):'Berakhir'}</div><button class="sa-card-action" ${st!=='live'?'disabled':''} onclick="startLiveExam('${x.tryout_id}')">${st==='waiting'?'Belum dimulai':st==='live'?'Masuk Live':'Selesai'}</button></div>`}).join(''):'<div class="sa-course-card">Belum ada jadwal Live Tryout.</div>';if(rows.length)liveCountdownTimer=setInterval(()=>rows.forEach(x=>{const e=document.getElementById('livecd-'+x.tryout_id);if(!e)return;const n=Date.now(),s=new Date(x.starts_at).getTime(),en=new Date(x.ends_at).getTime();e.textContent=n<s?formatCountdown(s-n):n<en?formatCountdown(en-n):'Berakhir'}),1000)}catch(e){area.innerHTML=`<div class="sa-course-card">Gagal memuat Live: ${safe(e.message)}</div>`}}
@@ -1395,8 +1478,8 @@ let tryoutNavigationTarget=null;
 function openTryoutNavigationConfirm(target){tryoutNavigationTarget=target;const modal=el('tryoutNavModal');if(modal)modal.classList.add('show');}
 function closeTryoutNavigationConfirm(){tryoutNavigationTarget=null;const modal=el('tryoutNavModal');if(modal)modal.classList.remove('show');}
 function confirmLeaveTryout(){const target=tryoutNavigationTarget||'home';closeTryoutNavigationConfirm();clearInterval(timerInt);timerInt=null;currentExam=null;examQuestions=[];examIndex=0;answers={};examTotalSeconds=0;examSecondsLeft=0;showView(target);}
-async function showView(name){const guardedViews=new Set(['home','activities','premium']);if(currentExam&&guardedViews.has(name)){openTryoutNavigationConfirm(name);return;}document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
-async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('app').classList.add('sa-app-shell');el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.allSettled([loadHome(),loadTryouts(),loadLive(),loadDashboard(),loadProfile(),loadRanking('overall'),loadFavoriteIds(),loadNotifications(),loadPremium()]);await loadSaHomePanels();refreshPublishedIcons();loadProfileAndHeader().catch(()=>{});setSaActive('home')}
+async function showView(name){const guardedViews=new Set(['home','activities','premium']);if(currentExam&&guardedViews.has(name)){openTryoutNavigationConfirm(name);return;}document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));const target=el('view-'+name);if(!target)return;target.classList.add('active');setSaActive(name);if(name==='home'){loadHome();loadDashboard().catch(()=>{});loadSaHomePanels().catch(()=>{})}if(name==='history')await loadHistory();if(name==='ranking')await loadRanking('overall');if(name==='profile')await loadProfile();if(name==='favorites')await loadFavorites();if(name==='materials')await loadMaterials();if(name==='material-bookmarks')await renderMaterialBookmarks();if(name==='drilling')await loadDrilling();if(name==='progress')await loadProgress();if(name==='formations')await loadFormations();if(name==='premium')await loadPremium();if(name==='notifications')await loadNotifications();if(name==='live')await loadLive();if(name==='exam')setSaActive('exam')}
+async function startApp(){const {data:{user}}=await sb.auth.getUser();if(!user)return;closeAuth();el('landing').style.display='none';el('app').style.display='block';el('app').classList.add('sa-app-shell');el('app').style.display='block';el('userName').textContent=user.email.split('@')[0];await Promise.allSettled([loadHome(),loadTryouts(),loadLive(),loadDashboard(),loadProfile(),loadRanking('overall'),loadFavoriteIds(),loadMaterialBookmarkIds(),loadNotifications(),loadPremium()]);await loadSaHomePanels();refreshPublishedIcons();loadProfileAndHeader().catch(()=>{});setSaActive('home')}
 
 </script>
 
@@ -1599,7 +1682,7 @@ async function startDrilling(mode){
   const sessionId=Array.isArray(sid)?sid[0]:sid;
   const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
   if(!(data||[]).length)throw new Error('Tidak ada soal yang berhasil dipilih.');
-  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};renderPracticeQuestion();
+  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};window.practiceState=practiceState;renderPracticeQuestion();
  }catch(e){a.innerHTML=`<div class="sa-drill-empty">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:14px" onclick="loadDrilling()">Kembali</button></div>`;}
 }
 
