@@ -1140,7 +1140,7 @@ function updateTopProfile(data,email){
   if(data?.avatar_url){img.src=data.avatar_url;img.style.display='block';fallback.style.display='none';}else{img.style.display='none';fallback.style.display='grid';fallback.textContent=name.charAt(0).toUpperCase()||'P';}
 }
 function toggleProfileMenu(force){const m=el('profileMenu');const open=typeof force==='boolean'?force:m.getAttribute('aria-hidden')==='true';m.setAttribute('aria-hidden',String(!open));m.classList.toggle('show',open)}
-document.addEventListener('click',e=>{const wrap=document.querySelector('.profile-menu-wrap');if(wrap&&!wrap.contains(e.target))toggleProfileMenu(false)});
+document.addEventListener('click',e=>{const wrap=document.querySelector('.profile-menu-wrap');const clickTarget=e?.target;if(wrap&&clickTarget&&!wrap.contains(clickTarget))toggleProfileMenu(false)});
 function previewProfilePhoto(input){
   const file=input.files&&input.files[0];if(!file)return;
   const allowed=['image/jpeg','image/png','image/webp'];
@@ -1229,8 +1229,8 @@ function openPracticeResultReview(ctx,title){
  el('analysisArea').innerHTML='';el('analysisModal').classList.add('show');
  installReviewFilters(rows);
 }function closeAnalysis(){el('analysisModal').classList.remove('show')}
-el('analysisModal').addEventListener('click',e=>{if(e.target.id==='analysisModal')closeAnalysis()});
-el('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
+el('analysisModal').addEventListener('click',e=>{if(e?.target?.id==='analysisModal')closeAnalysis()});
+el('authModal').addEventListener('click',e=>{if(e?.target?.id==='authModal')closeAuth()});
 async function loadRanking(period){try{const [{data,error},{data:ud}]=await Promise.all([sb.rpc('get_ranking',{p_period:period,p_limit:50}),sb.auth.getUser()]);if(error)throw error;const me=ud?.user?.id;const rows=data||[];el('rankingArea').innerHTML=rows.length?'<div class="data-card">'+rows.map(r=>'<div class="rank-row"><div><b>#'+r.rank+'</b></div><div><b>'+safe(r.full_name||'Peserta')+'</b><div class="muted">'+r.attempt_count+' tryout</div></div><div><b>'+r.best_score+'</b></div><div>'+((r.user_id&&me===r.user_id)?'<span class="chip">Kamu</span>':'')+'</div></div>').join('')+'</div>':'<div class="data-card">Belum ada ranking.</div>'}catch(e){el('rankingArea').innerHTML='<div class="data-card">Gagal memuat ranking: '+safe(e.message)+'</div>'}}
 async function logout(){await sb.auth.signOut();location.reload()}
 sb.auth.getSession().then(({data:{session}})=>{if(session)startApp()}).catch(console.error);
@@ -1372,8 +1372,8 @@ async function finishExam(){
  showWowResult({icon:'🏆',title:'UJIAN TELAH SELESAI!',text:'Hasil kamu sudah tersimpan. Total poin dihitung dengan bobot yang sama untuk TKP dan Tryout.',score:result.score??0,correct:result.correct_count??0,wrong:result.wrong_count??0,total:examQuestions.length,totalPoints:result.total_points,maxPoints:result.max_points,reviewMode:'attempt',attemptId,reviewTitle:title});
  currentExam=null;
 }
-document.getElementById('materialModal').addEventListener('click',e=>{if(e.target.id==='materialModal')closeMaterial()});
-document.getElementById('authModal').addEventListener('click',e=>{if(e.target.id==='authModal')closeAuth()});
+document.getElementById('materialModal').addEventListener('click',e=>{if(e?.target?.id==='materialModal')closeMaterial()});
+document.getElementById('authModal').addEventListener('click',e=>{if(e?.target?.id==='authModal')closeAuth()});
 
 /* === SIAP ASN MODERN LEARNING UX === */
 function toggleSaSidebar(forceState){
@@ -1682,7 +1682,8 @@ function openFreeDrilling(){
  const a=el('drillingArea'),cats=window._drillCategories||[];
  a.innerHTML=`<div class="sa-drill-config"><div class="sa-drill-section"><div class="sa-drill-kicker">Latihan Bebas</div><h3>Atur sesi drilling kamu</h3><p>Pilih kategori, subkategori opsional, lalu jumlah soal.</p></div><div class="sa-drill-config-grid" style="margin-top:18px"><div><label>Kategori</label><select id="drillCategory"><option value="">Semua kategori</option>${cats.map(c=>`<option value="${c.id}">${safe(c.name)}</option>`).join('')}</select></div><div><label>Subkategori (opsional)</label><input id="drillSubcategory" placeholder="Contoh: Nasionalisme"></div><div><label>Jumlah soal</label><input id="drillLimit" type="number" min="5" max="50" value="10"></div></div><div style="display:flex;gap:10px;margin-top:18px"><button class="btn dark" onclick="loadDrilling()">← Kembali</button><button class="btn primary" onclick="startDrilling('free')">Mulai Drilling →</button></div></div>`;
 }
-async function startDrilling(mode){
+window.startDrilling=async function(mode){
+ mode=(typeof mode==='string'&&['free','adaptive','wrong','weakness'].includes(mode))?mode:'weakness';
  const a=el('drillingArea');if(!a)return;
  const categoryId=mode==='free'?(el('drillCategory')?.value||null):null;
  const subcategory=mode==='free'?(el('drillSubcategory')?.value.trim()||null):null;
@@ -2670,7 +2671,7 @@ td{color:#102b4d!important}
   let practiceCompleted=false;
   let practiceSnapshot=null;
 
-  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
+  function ensureFinishModal(){let modal=document.getElementById('saFinishConfirmModal');if(modal)return modal;modal=document.createElement('div');modal.id='saFinishConfirmModal';modal.className='sa-finish-modal';modal.innerHTML='<div class="sa-finish-dialog" role="dialog" aria-modal="true" aria-labelledby="saFinishTitle"><div class="sa-finish-top"><div class="sa-finish-kicker">KONFIRMASI UJIAN</div><div id="saFinishTitle" class="sa-finish-title">Yakin ingin menyelesaikan?</div></div><div class="sa-finish-body"><p id="saFinishText"></p><div class="sa-finish-stats"><div class="sa-finish-stat"><b id="saFinishAnswered">0</b><span>TERJAWAB</span></div><div class="sa-finish-stat"><b id="saFinishBlank">0</b><span>BELUM</span></div><div class="sa-finish-stat"><b id="saFinishTotal">0</b><span>TOTAL SOAL</span></div></div><div id="saFinishWarning" class="sa-finish-warning" style="display:none"></div><div class="sa-finish-actions"><button type="button" class="btn dark" id="saFinishCancel">← Lanjut Mengerjakan</button><button type="button" class="btn sa-finish-confirm" id="saFinishConfirm">✓ Ya, Selesaikan</button></div></div></div>';modal.addEventListener('click',e=>{if(e?.target===modal)hideFinishModal();});document.body.appendChild(modal);return modal;}
   let pendingFinish=null;
   function hideFinishModal(){const m=document.getElementById('saFinishConfirmModal');if(m)m.classList.remove('show');pendingFinish=null;}
   function showFinishConfirm(kind){const isExam=kind==='exam';const rows=isExam?(window.examQuestions||[]):(window.practiceState?.rows||[]);const answerMap=isExam?(window.answers||{}):(window.practiceState?.answers||{});if(!rows.length)return;const answered=rows.filter(q=>!!answerMap[q.id]).length,blank=rows.length-answered;const m=ensureFinishModal();document.getElementById('saFinishTitle').textContent=isExam?'Selesaikan Tryout?':'Selesaikan Latihan?';document.getElementById('saFinishText').textContent=isExam?'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil akan diproses dan rekap akan ditampilkan.':'Pastikan jawabanmu sudah sesuai. Setelah diselesaikan, hasil dan pembahasan dapat dilihat pada rekap.';document.getElementById('saFinishAnswered').textContent=answered;document.getElementById('saFinishBlank').textContent=blank;document.getElementById('saFinishTotal').textContent=rows.length;const warn=document.getElementById('saFinishWarning');if(blank>0){warn.style.display='block';warn.textContent='⚠ Masih ada '+blank+' soal yang belum dijawab. Kamu tetap bisa menyelesaikan sekarang atau kembali mengerjakan.';}else warn.style.display='none';pendingFinish=kind;document.getElementById('saFinishCancel').onclick=hideFinishModal;document.getElementById('saFinishConfirm').onclick=()=>{const k=pendingFinish;hideFinishModal();if(k==='exam')window.finishExam();else window.completePracticeNow();};m.classList.add('show');}
