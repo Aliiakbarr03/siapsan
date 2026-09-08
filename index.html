@@ -1687,6 +1687,13 @@ async function nextPractice(){
 }
 
 /* Drilling is measurement-only: no question list, no drilling session, no question selection. */
+function formatDrillingRecommendationTitle(value){
+  const text=String(value||'').trim();
+  const match=text.match(/^\s*([^·\-–—]+?)\s*([·\-–—])\s*(.+?)\s*$/);
+  if(!match) return safe(text);
+  return `<span class="sa-drill-recommendation-category">${safe(match[1])}</span><span class="sa-drill-recommendation-separator"> ${safe(match[2])} </span><span class="sa-drill-recommendation-name">${safe(match[3])}</span>`;
+}
+
 async function loadDrilling(){
   const a=el('drillingArea');if(!a)return;
   a.innerHTML='<div class="sa-drill-empty">Memuat dashboard drilling...</div>';
@@ -1704,7 +1711,7 @@ async function loadDrilling(){
     const latsolSummaryCards=latsolCards.map(x=>{const total=Number(x.total_latsol||0),done=Number(x.completed_latsol||0),avg=Math.max(0,Math.min(100,Number(x.average_score||0))),progress=Math.max(0,Math.min(100,Number(x.mastery_percent||0)));return `<div class="sa-latsol-card"><div class="sa-latsol-card-head"><div><h4>${safe(x.category_name||'Kategori')}</h4><small>Rekap Latsol kategori</small></div><div class="sa-latsol-score">${avg}%<small>rata-rata</small></div></div><div class="sa-latsol-stats"><div class="sa-latsol-stat"><span>Total Latsol</span><b>${total}</b></div><div class="sa-latsol-stat"><span>Sudah dikerjakan</span><b>${done}/${total}</b></div><div class="sa-latsol-stat"><span>Soal tersedia</span><b>${Number(x.total_questions||0)}</b></div><div class="sa-latsol-stat"><span>Soal dikerjakan</span><b>${Number(x.questions_done||0)}</b></div></div><div class="sa-latsol-progress"><div class="sa-latsol-progress-top"><span>Progress penyelesaian</span><b>${progress}%</b></div><div class="sa-latsol-progress-line"><div style="width:${progress}%"></div></div></div></div>`;}).join('');
     const recentRows=recent.length?recent.map(x=>{const kind=String(x.activity_type||'drilling').toLowerCase();const chip=kind==='latsol'?'LATSOL':kind==='drilling'?'DRILLING':safe(kind.toUpperCase());const title=x.session_title||`${x.category_name||'Latihan'}${x.subcategory?` · ${x.subcategory}`:''}`;const pts=Number(x.total_points);const maxPts=Number(x.max_points);const meta=(Number.isFinite(pts)&&Number.isFinite(maxPts)&&maxPts>0)?`${pts}/${maxPts} poin · `:'';const reviewTitle=safe(title).replace(/'/g,'&#39;');return `<div class="sa-drill-session sa-drill-session-clickable" role="button" tabindex="0" onclick="openRecentPracticeReview('${x.id}','${reviewTitle}')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();openRecentPracticeReview('${x.id}','${reviewTitle}')}" title="Klik untuk melihat evaluasi dan pembahasan"><span class="sa-chip">${safe(chip)}</span><div><b>${safe(title)}</b><small class="sa-recent-meta">${meta}<span>${Number(x.correct_count||0)} optimal/benar</span><i>•</i><span>${Number(x.wrong_count||0)} perlu evaluasi</span><i>•</i><span>${Number(x.total_questions||0)} soal</span></small><small class="sa-review-link">Klik untuk lihat evaluasi & pembahasan →</small></div><div class="sa-drill-score">${Number(x.score||0)}%</div></div>`;}).join(''):'<div class="sa-drill-empty">Belum ada riwayat latihan. Selesaikan Latsol atau Drilling untuk melihat hasil terbaru.</div>';
     a.innerHTML=`<div class="sa-drill-wrap">
-      <div class="sa-drill-hero-v2"><div><span class="sa-drill-badge">● Rekomendasi untuk hari ini</span><h2>${recommendation}</h2><p>${weak?`Akurasi terakhir ${Number(weak.accuracy||0)}%. Perkuat area ini agar mastery meningkat.`:'Pilih mode latihan dan mulai membangun data performamu.'}</p><div class="sa-drill-actions"><button class="sa-drill-primary" onclick="startDrilling('weakness')">▶ Mulai sekarang</button><button class="sa-drill-secondary" onclick="document.getElementById('drillModes').scrollIntoView({behavior:'smooth'})">Pilih mode lain</button></div></div><div class="sa-drill-snapshot"><div><span>Akurasi</span><b>${Number(s?.average_accuracy||0)}%</b></div><div><span>Soal latihan</span><b>${Number(s?.questions_done||0)}</b></div><div><span>Soal salah</span><b>${wrongPool}</b></div><div><span>Mastery</span><b>${mastered}/${total}</b></div></div></div>
+      <div class="sa-drill-hero-v2"><div><span class="sa-drill-badge">● Rekomendasi untuk hari ini</span><h2 class="sa-drill-recommendation-title">${formatDrillingRecommendationTitle(recommendation)}</h2><p>${weak?`Akurasi terakhir ${Number(weak.accuracy||0)}%. Perkuat area ini agar mastery meningkat.`:'Pilih mode latihan dan mulai membangun data performamu.'}</p><div class="sa-drill-actions"><button class="sa-drill-primary" onclick="startDrilling('weakness')">▶ Mulai sekarang</button><button class="sa-drill-secondary" onclick="document.getElementById('drillModes').scrollIntoView({behavior:'smooth'})">Pilih mode lain</button></div></div><div class="sa-drill-snapshot"><div><span>Akurasi</span><b>${Number(s?.average_accuracy||0)}%</b></div><div><span>Soal latihan</span><b>${Number(s?.questions_done||0)}</b></div><div><span>Soal salah</span><b>${wrongPool}</b></div><div><span>Mastery</span><b>${mastered}/${total}</b></div></div></div>
       <div class="sa-drill-section"><div class="sa-drill-kicker">Indikator Performa</div><h3>Snapshot 30 hari terakhir</h3><p>Semua indikator dihitung dari jawaban latihan yang benar-benar tersimpan.</p></div>
       <div class="sa-drill-indicators"><div class="sa-drill-indicator"><span>Total sesi drilling</span><b>${Number(s?.total_sessions||0)}</b><small>30 hari terakhir</small></div><div class="sa-drill-indicator"><span>Akurasi rata-rata</span><b>${Number(s?.average_accuracy||0)}%</b><small>semua latihan</small></div><div class="sa-drill-indicator"><span>Soal dikerjakan</span><b>${Number(s?.questions_done||0)}</b><small>jawaban tersimpan</small></div><div class="sa-drill-indicator"><span>Bab mastered</span><b>${mastered}/${total}</b><small>target akurasi 80%</small></div></div>
       <div class="sa-drill-section" id="drillModes"><div class="sa-drill-kicker">Pilih Mode Drilling</div><h3>4 mode latihan untuk kebutuhan berbeda</h3><p>Sistem mengambil soal langsung dari Bank Soal Supabase.</p></div>
@@ -3042,4 +3049,12 @@ td{color:#102b4d!important}
   };
 })();
 </script>
+
+<style id="sa-drilling-recommendation-title-colors-restored">
+/* Visual-only: restore the drilling recommendation title colors without changing drilling behavior. */
+.sa-drill-hero-v2 h2.sa-drill-recommendation-title{color:#F8FAFC!important;}
+.sa-drill-hero-v2 h2.sa-drill-recommendation-title .sa-drill-recommendation-category{color:#93C5FD!important;}
+.sa-drill-hero-v2 h2.sa-drill-recommendation-title .sa-drill-recommendation-separator{color:#DCEBFF!important;}
+.sa-drill-hero-v2 h2.sa-drill-recommendation-title .sa-drill-recommendation-name{color:#F8FAFC!important;}
+</style>
 </body></html>
