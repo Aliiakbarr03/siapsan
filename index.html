@@ -1061,6 +1061,9 @@ function choose(id,k){answers[id]=k;renderQuestion()}function prevQ(){if(examInd
 
 
 async function loadDashboard(){try{const {data,error}=await sb.rpc('get_my_dashboard');if(error)throw error;const d=Array.isArray(data)?data[0]:data;if(!d){el('dashboardArea').innerHTML='<div class="data-card">Profil peserta belum tersedia.</div>';return}el('dashboardArea').innerHTML='<div class="dashboard-grid"><div class="data-card"><div class="chip">Ringkasan Belajar</div><div class="score-big">'+(d.best_score??0)+'</div><div>Nilai terbaik</div><p>Rata-rata: <b>'+(d.average_score??0)+'</b> • Total tryout: <b>'+(d.tryout_count??0)+'</b></p><p>Tryout terakhir: <b>'+safe(d.last_tryout_title||'-')+'</b> — '+(d.last_tryout_score??0)+'</p></div><div class="data-card"><div class="chip">Membership</div><h3>'+safe(d.membership||'free').toUpperCase()+'</h3><p>'+(d.membership_expires_at?'Berlaku sampai '+new Date(d.membership_expires_at).toLocaleDateString('id-ID'):'Akses dasar')+'</p></div></div>';}catch(e){el('dashboardArea').innerHTML='<div class="data-card">Gagal memuat dashboard: '+safe(e.message)+'</div>'}}
+let profileEditMode=false;
+function enterProfileEdit(){profileEditMode=true;loadProfile();}
+function cancelProfileEdit(){profileEditMode=false;loadProfile();}
 async function loadProfile(){
   const area=el('profileArea');
   try{
@@ -1073,6 +1076,9 @@ async function loadProfile(){
     const {data:d,dashError}=await sb.rpc('get_my_dashboard');
     const x=dashError?null:(Array.isArray(d)?d[0]:d);
     const avatar=data.avatar_url||'';
+    const profileSaved=Boolean(String(data.full_name||'').trim());
+    const isEditable=!profileSaved||profileEditMode;
+    const fieldDisabled=isEditable?'':' disabled';
     const initial=safe((data.full_name||'P').trim().charAt(0).toUpperCase());
     area.innerHTML=`
       <div class="profile-hero-card">
@@ -1080,7 +1086,7 @@ async function loadProfile(){
         <div class="profile-main-head">
           <div class="avatar-editor">
             <div class="avatar-large-wrap"><img id="profileAvatarPreview" class="avatar-large" alt="Foto profil"><div id="profileAvatarFallback" class="avatar-large-fallback">${initial}</div></div>
-            <label class="photo-btn" for="pfAvatarFile">Ganti foto</label>
+            <label class="photo-btn" for="pfAvatarFile" style="${isEditable?'':'display:none'}">Ganti foto</label>
             <input id="pfAvatarFile" type="file" accept="image/jpeg,image/png,image/webp" onchange="previewProfilePhoto(this)" hidden>
             <small class="muted">JPG, PNG, WEBP · maks. 2 MB</small>
           </div>
@@ -1103,27 +1109,27 @@ async function loadProfile(){
           <section class="profile-info-section">
             <div class="profile-info-section-head"><div class="profile-info-icon">♙</div><div><h4>Identitas Pribadi</h4><p>Lengkapi data dasar untuk profil peserta.</p></div></div>
             <div class="profile-fields">
-              <div class="profile-field"><label><span></span>Nama Lengkap</label><input id="pfFullName" value="${safe(data.full_name||'')}" maxlength="120" placeholder="Nama lengkap"></div>
-              <div class="profile-field"><label><span></span>Tanggal Lahir</label><input id="pfBirthDate" type="date" value="${safe(data.birth_date||'')}"></div>
-              <div class="profile-field" style="grid-column:1/-1"><label><span></span>Jenis Kelamin</label><select id="pfGender"><option value="">Pilih jenis kelamin</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
+              <div class="profile-field"><label><span></span>Nama Lengkap</label><input id="pfFullName" value="${safe(data.full_name||'')}" maxlength="120" placeholder="Nama lengkap"${fieldDisabled}></div>
+              <div class="profile-field"><label><span></span>Tanggal Lahir</label><input id="pfBirthDate" type="date" value="${safe(data.birth_date||'')}"${fieldDisabled}></div>
+              <div class="profile-field" style="grid-column:1/-1"><label><span></span>Jenis Kelamin</label><select id="pfGender"${fieldDisabled}><option value="">Pilih jenis kelamin</option><option value="L">Laki-laki</option><option value="P">Perempuan</option></select></div>
             </div>
           </section>
           <section class="profile-info-section">
             <div class="profile-info-section-head"><div class="profile-info-icon">⌁</div><div><h4>Kontak & Domisili</h4><p>Informasi kontak untuk melengkapi akunmu.</p></div></div>
             <div class="profile-fields single">
-              <div class="profile-field"><label><span></span>Nomor HP</label><input id="pfPhone" value="${safe(data.phone||'')}" maxlength="30" placeholder="08xxxxxxxxxx" inputmode="tel"></div>
-              <div class="profile-field"><label><span></span>Domisili</label><input id="pfDomicile" value="${safe(data.domicile||'')}" maxlength="120" placeholder="Kabupaten / Kota"></div>
+              <div class="profile-field"><label><span></span>Nomor HP</label><input id="pfPhone" value="${safe(data.phone||'')}" maxlength="30" placeholder="08xxxxxxxxxx" inputmode="tel"${fieldDisabled}></div>
+              <div class="profile-field"><label><span></span>Domisili</label><input id="pfDomicile" value="${safe(data.domicile||'')}" maxlength="120" placeholder="Kabupaten / Kota"${fieldDisabled}></div>
             </div>
           </section>
           <section class="profile-info-section full">
             <div class="profile-info-section-head"><div class="profile-info-icon">◆</div><div><h4>Pendidikan & Target ASN</h4><p>Sesuaikan profil belajar dengan pendidikan dan formasi yang kamu tuju.</p></div></div>
             <div class="profile-fields">
-              <div class="profile-field"><label><span></span>Pendidikan Terakhir</label><select id="pfEducation"><option value="">Pilih pendidikan terakhir</option><option>SMA/SMK</option><option>D3</option><option>D4</option><option>S1</option><option>S2</option><option>S3</option></select></div>
-              <div class="profile-field"><label><span></span>Target Formasi</label><input id="pfTargetFormasi" value="${safe(data.target_formasi||'')}" maxlength="160" placeholder="Contoh: CPNS Pemkab / Kementerian / Jabatan"></div>
+              <div class="profile-field"><label><span></span>Pendidikan Terakhir</label><select id="pfEducation"${fieldDisabled}><option value="">Pilih pendidikan terakhir</option><option>SMA/SMK</option><option>D3</option><option>D4</option><option>S1</option><option>S2</option><option>S3</option></select></div>
+              <div class="profile-field"><label><span></span>Target Formasi</label><input id="pfTargetFormasi" value="${safe(data.target_formasi||'')}" maxlength="160" placeholder="Contoh: CPNS Pemkab / Kementerian / Jabatan"${fieldDisabled}></div>
             </div>
           </section>
         </div>
-        <div class="profile-actions-modern"><div id="profileMsg" class="notice"></div><button id="saveProfileBtn" class="btn primary" onclick="saveProfile()">Simpan Perubahan</button></div>
+        <div class="profile-actions-modern"><div id="profileMsg" class="notice"></div>${isEditable?`<button class="btn dark" type="button" onclick="cancelProfileEdit()">Batal</button><button id="saveProfileBtn" class="btn primary" onclick="saveProfile()">${profileSaved?'Simpan Perubahan':'Simpan Profil'}</button>`:`<button id="editProfileBtn" class="btn primary" type="button" onclick="enterProfileEdit()">✎ Edit Profil</button>`}</div>
       </div>`;
     el('pfGender').value=['L','P'].includes(String(data.gender||''))?data.gender:'';
     el('pfEducation').value=['SMA/SMK','D3','D4','S1','S2','S3'].includes(String(data.education||''))?data.education:'';
@@ -1172,14 +1178,16 @@ async function saveProfile(){
       p_gender:el('pfGender').value||null,p_domicile:el('pfDomicile').value.trim()||null,p_education:el('pfEducation').value||null,
       p_target_formasi:el('pfTargetFormasi').value.trim()||null,p_avatar_url:avatarUrl
     };
-    const {data,error}=await sb.rpc('update_my_profile',params);if(error)throw error;
+    const rpcPromise=sb.rpc('update_my_profile',params);
+    const timeoutPromise=new Promise((_,reject)=>setTimeout(()=>reject(new Error('Penyimpanan profil terlalu lama. Silakan coba lagi.')),15000));
+    const {data,error}=await Promise.race([rpcPromise,timeoutPromise]);if(error)throw error;
     if(data){
       const updated=Array.isArray(data)?data[0]:data;
       updateTopProfile(updated,user.email);
     }
     el('userName').textContent=params.p_full_name||user.email.split('@')[0];
     msg('profileMsg','Profil berhasil disimpan.','ok');
-    btn.textContent='Tersimpan';setTimeout(()=>btn.textContent='Simpan Perubahan',1200);
+    btn.textContent='Tersimpan';profileEditMode=false;setTimeout(()=>loadProfile(),700);
   }catch(e){msg('profileMsg',e.message||'Gagal menyimpan profil.','err');btn.textContent='Simpan Perubahan'}finally{btn.disabled=false}
 }
 
@@ -1695,7 +1703,7 @@ window.startDrilling=async function(mode){
   const sessionId=Array.isArray(sid)?sid[0]:sid;
   const {data,error}=await sb.rpc('get_practice_questions',{p_session_id:sessionId});if(error)throw error;
   if(!(data||[]).length)throw new Error('Tidak ada soal yang berhasil dipilih.');
-  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};renderPracticeQuestion();
+  practiceState={sessionId,rows:data,index:0,selected:null,answers:{},title:labels[mode]||'Drilling',target:'drilling'};window.practiceState=practiceState;renderPracticeQuestion();
  }catch(e){a.innerHTML=`<div class="sa-drill-empty">${safe(e.message||'Gagal memulai drilling.')}<br><button class="btn primary" style="margin-top:14px" onclick="loadDrilling()">Kembali</button></div>`;}
 }
 
